@@ -1,0 +1,88 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.header {
+  background: linear-gradient(to right, rgba(10, 25, 60, 1) 40%, rgba(40, 80, 120, 0.8));
+  text-align: center;
+  padding: 40px;
+}
+
+.header h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.section-about {
+  background-color: #000;
+  padding: 40px;
+  text-align: center;
+}
+
+.section-about h2 {
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.section-about p {
+  font-size: 18px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.section-services {
+  background-color: #000;
+  padding: 40px;
+  text-align: center;
+}
+
+.section-services h2 {
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.section-services ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.section-services li {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.section-contact {
+  background: linear-gradient(to right, rgba(10, 25, 60, 1), rgba(40, 80, 120, 1));
+  padding: 40px;
+  text-align: center;
+}
+
+.section-contact h2 {
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.section-contact p {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.footer {
+  background: linear-gradient(to right, rgba(10, 25, 60, 1), rgba(40, 80, 120, 1));
+  padding: 20px;
+  text-align: center;
+}
+
+.footer p {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
