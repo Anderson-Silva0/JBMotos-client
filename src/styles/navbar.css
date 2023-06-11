@@ -1,0 +1,50 @@
+.navbar {
+    background: linear-gradient(to right, rgba(10, 25, 60, 1) 40%, rgba(40, 80, 120, 0.8));
+    color: rgb(235, 235, 5);
+    font-size: 15pt;
+    font-weight: bolder;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 15px;
+}
+
+.link {
+    color: rgb(235, 235, 5);
+    margin-right: 25px;
+}
+
+.me-auto {
+    justify-content: center;
+}
+
+.me-auto :hover {
+    color: rgb(200, 20, 30);
+    transition: .8s;
+}
+
+#basic-nav-dropdown {
+    color: rgb(235, 235, 5);
+}
+
+#basic-nav-dropdown:hover {
+    color: rgb(200, 20, 30);
+}
+
+.dropdown-menu {
+    background-color: rgba(200, 20, 30, 0.8);
+}
+
+.dropdown-menu:hover {
+    transition: .8s;
+}
+
+.dropdown-item {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bolder;
+    color: rgb(235, 235, 5);
+}
+
+.dropdown-item:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+    color: rgb(235, 235, 5);
+}
