@@ -2,7 +2,7 @@ import '../styles/home.css'
 
 export default function LandingPage() {
   return (
-    <div>
+    <div className='div-form-container'>
       <header className="header">
         <h1>JB Motos</h1>
         <p>A melhor oficina especializada em motos</p>
