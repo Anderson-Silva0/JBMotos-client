@@ -1,4 +1,12 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {}
+const webpack = require('webpack')
 
-module.exports = nextConfig
+module.exports = {
+  webpack: (config) => {
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        '__REACT_DEVTOOLS_GLOBAL_HOOK__': '({ isDisabled: true })'
+      })
+    )
+    return config
+  }
+}
