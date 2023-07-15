@@ -1,7 +1,7 @@
 import { ApiService } from "./apiService"
 
 export const ClienteService = () => {
-    
+
     const url = "/cliente"
 
     const salvarCliente = (dados: object) => {
@@ -16,6 +16,10 @@ export const ClienteService = () => {
         return ApiService.get(`${url}/buscar/${cpf}`)
     }
 
+    const filtrarCliente = (nomeCampo: string, valor: string) => {
+        return ApiService.get(`${url}/filtrar/?${nomeCampo}=${valor}`)
+    }
+
     const atualizarCliente = (cpf: string, dados: object) => {
         return ApiService.put(`${url}/atualizar/${cpf}`, dados)
     }
@@ -28,6 +32,7 @@ export const ClienteService = () => {
         salvarCliente,
         buscarTodosClientes,
         buscarClientePorCpf,
+        filtrarCliente,
         atualizarCliente,
         deletarCliente
     }
