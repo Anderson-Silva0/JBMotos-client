@@ -13,7 +13,7 @@ export const FornecedorService = () => {
     }
 
     const buscarFornecedorPorCnpj = (cnpj: string) => {
-        return ApiService.get(`${url}/buscar/${cnpj}`)
+        return ApiService.get(`${url}/buscar/?cnpj=${cnpj}`)
     }
 
     const atualizarFornecedor = (cnpj: string, dados: object) => {
