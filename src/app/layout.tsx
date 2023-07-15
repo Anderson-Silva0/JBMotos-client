@@ -2,7 +2,7 @@ import { NavBar } from '@/components/Navbar'
 import './globals.css'
 import { Inter } from 'next/font/google'
 import 'toastr/build/toastr.css'
-import { SSRProvider } from 'react-bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,12 +19,10 @@ export default function RootLayout({
   return (
     <html lang="pt-br">
       <body className={inter.className}>
-        <SSRProvider>
           <NavBar />
           <div className='div-principal'>
             {children}
           </div>
-        </SSRProvider>
       </body>
     </html>
   )
