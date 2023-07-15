@@ -94,84 +94,81 @@ export default function CadastroFuncionario() {
   }, [funcionario, deletarEndereco, endereco, salvarFuncionario, erros])
 
   return (
-    <div>
-      <div>
-        <Card titulo="Dados do Funcionário">
-          <form >
-            <FormGroup label="CPF: *" htmlFor="cpf">
-              <InputCpf
-                value={funcionario.cpf}
-                onChange={e => setPropsFuncionario("cpf", e)}
-              />
-              {<ExibeErro erros={erros} nomeInput='cpf' />}
-            </FormGroup>
-            <FormGroup label="Nome: *" htmlFor="nome">
-              <input
-                value={funcionario.nome}
-                onChange={e => setPropsFuncionario("nome", e)}
-                id="nome"
-                type="text"
-              />
-              {<ExibeErro erros={erros} nomeInput='nome' />}
-            </FormGroup>
-            <FormGroup label="Telefone: *" htmlFor="telefone">
-              <InputTelefone
-                value={funcionario.telefone}
-                onChange={e => setPropsFuncionario("telefone", e)}
-              />
-              {<ExibeErro erros={erros} nomeInput='telefone' />}
-            </FormGroup>
-          </form>
-        </Card>
-      </div>
-      <div>
-        <Card titulo="Endereço do Funcionario">
-          <FormGroup label="Rua: *" htmlFor="rua">
+    <div className='div-form-container'>
+      <Card titulo="Dados do Funcionário">
+        <form >
+          <FormGroup label="CPF: *" htmlFor="cpf">
+            <InputCpf
+              value={funcionario.cpf}
+              onChange={e => setPropsFuncionario("cpf", e)}
+            />
+            {<ExibeErro erros={erros} nomeInput='cpf' />}
+          </FormGroup>
+          <FormGroup label="Nome: *" htmlFor="nome">
             <input
-              value={endereco.rua}
-              onChange={e => setPropsEndereco("rua", e)}
-              id="rua"
+              value={funcionario.nome}
+              onChange={e => setPropsFuncionario("nome", e)}
+              id="nome"
               type="text"
             />
-            {<ExibeErro erros={erros} nomeInput='rua' />}
+            {<ExibeErro erros={erros} nomeInput='nome' />}
           </FormGroup>
-          <FormGroup label="CEP: *" htmlFor="cep">
-            <InputCep
-              value={endereco.cep}
-              onChange={e => setPropsEndereco("cep", e)}
+          <FormGroup label="Telefone: *" htmlFor="telefone">
+            <InputTelefone
+              value={funcionario.telefone}
+              onChange={e => setPropsFuncionario("telefone", e)}
             />
-            {<ExibeErro erros={erros} nomeInput='cep' />}
+            {<ExibeErro erros={erros} nomeInput='telefone' />}
           </FormGroup>
-          <FormGroup label="Número: *" htmlFor="numero">
-            <input
-              value={endereco.numero}
-              onChange={e => setPropsEndereco("numero", e)}
-              id="numero"
-              type="number"
-              onWheel={(e) => e.currentTarget.blur()}
-            />
-            {<ExibeErro erros={erros} nomeInput='numero' />}
-          </FormGroup>
-          <FormGroup label="Bairro: *" htmlFor="bairro">
-            <input
-              value={endereco.bairro}
-              onChange={e => setPropsEndereco("bairro", e)}
-              id="bairro"
-              type="text"
-            />
-            {<ExibeErro erros={erros} nomeInput='bairro' />}
-          </FormGroup>
-          <FormGroup label="Cidade: *" htmlFor="cidade">
-            <input
-              value={endereco.cidade}
-              onChange={e => setPropsEndereco("cidade", e)}
-              id="cidade"
-              type="text"
-            />
-            {<ExibeErro erros={erros} nomeInput='cidade' />}
-          </FormGroup>
-        </Card>
-      </div>
+        </form>
+      </Card>
+      <Card titulo="Endereço do Funcionario">
+        <FormGroup label="Endereço: *" htmlFor="rua">
+          <input
+            value={endereco.rua}
+            onChange={e => setPropsEndereco("rua", e)}
+            id="rua"
+            type="text"
+          />
+          {<ExibeErro erros={erros} nomeInput='rua' />}
+        </FormGroup>
+        <FormGroup label="CEP: *" htmlFor="cep">
+          <InputCep
+            value={endereco.cep}
+            onChange={e => setPropsEndereco("cep", e)}
+          />
+          {<ExibeErro erros={erros} nomeInput='cep' />}
+        </FormGroup>
+        <FormGroup label="Número: *" htmlFor="numero">
+          <input
+            className='input-number-form'
+            value={endereco.numero}
+            onChange={e => setPropsEndereco("numero", e)}
+            id="numero"
+            type="number"
+            onWheel={(e) => e.currentTarget.blur()}
+          />
+          {<ExibeErro erros={erros} nomeInput='numero' />}
+        </FormGroup>
+        <FormGroup label="Bairro: *" htmlFor="bairro">
+          <input
+            value={endereco.bairro}
+            onChange={e => setPropsEndereco("bairro", e)}
+            id="bairro"
+            type="text"
+          />
+          {<ExibeErro erros={erros} nomeInput='bairro' />}
+        </FormGroup>
+        <FormGroup label="Cidade: *" htmlFor="cidade">
+          <input
+            value={endereco.cidade}
+            onChange={e => setPropsEndereco("cidade", e)}
+            id="cidade"
+            type="text"
+          />
+          {<ExibeErro erros={erros} nomeInput='cidade' />}
+        </FormGroup>
+      </Card>
       <div className="divBotaoCadastrar">
         <button
           onClick={submit}
