@@ -1,12 +1,12 @@
 import { Funcionario } from '@/models/funcionario'
 import { Endereco, estadoInicialEndereco } from '../models/endereco'
 import { EnderecoService } from '../services/enderecoService'
-import '../styles/cardListagem.css'
 import { useEffect, useState } from 'react'
 import { mensagemErro } from '@/models/toast'
+import { Edit, Trash2 } from 'lucide-react'
+import '../styles/cardListagem.css'
 
 export default function FuncionarioCard(funcionario: Funcionario) {
-
   const [enderecosState, setEnderecoState] = useState<Endereco>(estadoInicialEndereco)
 
   const { buscarEnderecoPorId } = EnderecoService()
@@ -25,28 +25,36 @@ export default function FuncionarioCard(funcionario: Funcionario) {
 
   return (
     <div className="cardListagem-container">
-
-      <span id="usuario">Funcionário</span>
-      <div className="info-usuario">
-
-        <strong className="item">CPF: {funcionario.cpf}</strong>
-        <strong className="item">Nome: {funcionario.nome}</strong>
-        <strong className="item">Telefone: {funcionario.telefone}</strong>
-        <strong className="item">
-          Data e Hora de Cadastro: {funcionario.dataHoraCadastro}
-        </strong>
+      <div className="info-principal">
+        <div className='items'>
+          <span id="info-title">Funcionário</span>
+          <div className='div-dados'>Nome</div>
+          <div className='div-resultado'>{funcionario.nome}</div>
+          <div className='div-dados'>CPF</div>
+          <div className='div-resultado'>{funcionario.cpf}</div>
+          <div className='div-dados'>Telefone</div>
+          <div className='div-resultado'>{funcionario.telefone}</div>
+          <div className='div-dados'>Data e Hora de Cadastro</div>
+          <div className='div-resultado'>{funcionario.dataHoraCadastro}</div>
+        </div>
+        <div className='items'>
+          <span id="info-title">Endereço</span>
+          <div className='div-dados'>Endereço</div>
+          <div className='div-resultado'>{enderecosState.rua}</div>
+          <div className='div-dados'>CEP</div>
+          <div className='div-resultado'>{enderecosState.cep}</div>
+          <div className='div-dados'>Número</div>
+          <div className='div-resultado'>{enderecosState.numero}</div>
+          <div className='div-dados'>Bairro</div>
+          <div className='div-resultado'>{enderecosState.bairro}</div>
+          <div className='div-dados'>Cidade</div>
+          <div className='div-resultado'>{enderecosState.cidade}</div>
+        </div>
       </div>
-
-      <span id="endereco">Endereço</span>
-      <div className="info-endereco">
-
-        <strong className="item">Rua: {enderecosState.rua}</strong>
-        <strong className="item">CEP: {enderecosState.cep}</strong>
-        <strong className="item">Número: {enderecosState.numero}</strong>
-        <strong className="item">Bairro: {enderecosState.bairro}</strong>
-        <strong className="item">Cidade: {enderecosState.cidade}</strong>
+      <div className='icones-container'>
+        <Edit className='icones-atualizacao-e-delecao' />
+        <Trash2 className='icones-atualizacao-e-delecao' />
       </div>
-
     </div>
   )
 }
