@@ -227,93 +227,90 @@ export default function CadastroVenda() {
   }
 
   return (
-    <div>
-      <div id="venda-container">
-        <Card titulo="Informações do Pedido">
-          <form >
+    <div className="div-form-container">
+      <Card titulo="Detalhes da Venda">
+        <form >
+          <FormGroup label="Selecione o Cliente: *" htmlFor="cpfCliente">
+            <Select
+              styles={selectStyles}
+              placeholder="Selecione..."
+              value={opcaoSelecionadaCliente}
+              onChange={(option: any) => setOpcaoSelecionadaCliente(option)}
+              options={clientes.map(c => ({ label: c.cpf, value: c.cpf }) as OpcoesSelecoes)}
+              instanceId="select-cpfCliente"
+            />
+            {<ExibeErro erros={erros} nomeInput="cpfCliente" />}
+          </FormGroup>
 
-            <FormGroup label="Selecione o Cliente: *" htmlFor="cpfCliente">
-              <Select
-                styles={selectStyles}
-                placeholder="Selecione..."
-                value={opcaoSelecionadaCliente}
-                onChange={(option: any) => setOpcaoSelecionadaCliente(option)}
-                options={clientes.map(c => ({ label: c.cpf, value: c.cpf }) as OpcoesSelecoes)}
-                instanceId="select-cpfCliente"
-              />
-              {<ExibeErro erros={erros} nomeInput="cpfCliente" />}
-            </FormGroup>
+          <FormGroup label="Selecione o Funcionário (Vendedor): *" htmlFor="cpfFuncionario">
+            <Select
+              styles={selectStyles}
+              placeholder="Selecione..."
+              value={opcaoSelecionadaFuncionario}
+              onChange={(option: any) => setOpcaoSelecionadaFuncionario(option)}
+              options={funcionarios.map(f => ({ label: f.nome, value: f.cpf }) as OpcoesSelecoes)}
+              instanceId="select-cpfFuncionario"
+            />
+            {<ExibeErro erros={erros} nomeInput="cpfFuncionario" />}
+          </FormGroup>
 
-            <FormGroup label="Selecione o Funcionário (Vendedor): *" htmlFor="cpfFuncionario">
-              <Select
-                styles={selectStyles}
-                placeholder="Selecione..."
-                value={opcaoSelecionadaFuncionario}
-                onChange={(option: any) => setOpcaoSelecionadaFuncionario(option)}
-                options={funcionarios.map(f => ({ label: f.nome, value: f.cpf }) as OpcoesSelecoes)}
-                instanceId="select-cpfFuncionario"
-              />
-              {<ExibeErro erros={erros} nomeInput="cpfFuncionario" />}
-            </FormGroup>
+          <FormGroup label="Selecione a forma de pagamento*" htmlFor="formaDePagamento">
+            <Select
+              styles={selectStyles}
+              placeholder="Selecione..."
+              value={opcaoSelecionadaFormaDePagamento}
+              onChange={(option: any) => setOpcaoSelecionadaFormaDePagamento(option)}
+              options={formasDePagamento}
+              instanceId="select-formaDePagamento"
+            />
+            {<ExibeErro erros={erros} nomeInput="formaDePagamento" />}
+          </FormGroup>
 
-            <FormGroup label="Selecione a forma de pagamento*" htmlFor="formaDePagamento">
-              <Select
-                styles={selectStyles}
-                placeholder="Selecione..."
-                value={opcaoSelecionadaFormaDePagamento}
-                onChange={(option: any) => setOpcaoSelecionadaFormaDePagamento(option)}
-                options={formasDePagamento}
-                instanceId="select-formaDePagamento"
-              />
-              {<ExibeErro erros={erros} nomeInput="formaDePagamento" />}
-            </FormGroup>
+          <FormGroup label="Observação:" htmlFor="observacao">
+            <input
+              value={pedido.observacao}
+              onChange={(e) => setPedido({ ...pedido, observacao: e.target.value })}
+              id="observacao"
+              type="text"
+            />
+            {<ExibeErro erros={erros} nomeInput='observacao' />}
+          </FormGroup>
 
-            <FormGroup label="Observação:" htmlFor="observacao">
-              <input
-                value={pedido.observacao}
-                onChange={(e) => setPedido({ ...pedido, observacao: e.target.value })}
-                id="observacao"
-                type="text"
-              />
-              {<ExibeErro erros={erros} nomeInput='observacao' />}
-            </FormGroup>
-
-          </form>
-        </Card>
-        <TabelaVenda>
-          {qtdLinha.map(idLinha => {
-            return (
-              <LinhaTabela key={idLinha}
-                idLinha={idLinha}
-                produtos={produtos}
-                idPedido={idPedido}
-                qtdLinha={qtdLinha}
-                setOcorrenciasErros={setOcorrenciasErros}
-                atualizarIdProdutoIdLinhaSelecionado={atualizarIdProdutoIdLinhaSelecionado}
-                handleRepeticao={handleRepeticao}
-                valoresTotais={valoresTotais}
-                setValoresTotais={setValoresTotais}
-              />
-            )
-          })
-          }
-        </TabelaVenda>
-        <div className="div-botoes-line">
-          <button onClick={adicionarLinha} className="botao-add-line">
-            <Image src={imgAdicionarLinha} width={40} height={40} alt={""} />
-          </button>
-          <button onClick={removerLinha} className="botao-remove-line">
-            <Image src={imgRemoverLinha} width={40} height={40} alt={""} />
-          </button>
-        </div>
-      </div>
+        </form>
+      </Card>
+      <TabelaVenda>
+        {qtdLinha.map(idLinha => {
+          return (
+            <LinhaTabela key={idLinha}
+              idLinha={idLinha}
+              produtos={produtos}
+              idPedido={idPedido}
+              qtdLinha={qtdLinha}
+              setOcorrenciasErros={setOcorrenciasErros}
+              atualizarIdProdutoIdLinhaSelecionado={atualizarIdProdutoIdLinhaSelecionado}
+              handleRepeticao={handleRepeticao}
+              valoresTotais={valoresTotais}
+              setValoresTotais={setValoresTotais}
+            />
+          )
+        })
+        }
+      </TabelaVenda>
       <div id="valor-total-pedido">
-        <span>Total do Pedido:{" "}</span>
+        <span>Total do Pedido</span>
         <span>
           {formatarParaReal(
             valoresTotais.reduce((acumulador, valor) => acumulador + valor.valorTotal, 0)
           )}
         </span>
+      </div>
+      <div className="div-botoes-line">
+        <button onClick={adicionarLinha} className="botao-add-line">
+          <Image src={imgAdicionarLinha} width={40} height={40} alt={""} />
+        </button>
+        <button onClick={removerLinha} className="botao-remove-line">
+          <Image src={imgRemoverLinha} width={40} height={40} alt={""} />
+        </button>
       </div>
       <div className="divBotaoCadastrar">
         <button
