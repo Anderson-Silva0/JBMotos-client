@@ -55,6 +55,7 @@ export default function CadastroFornecedor() {
       setFornecedor({ ...fornecedor, endereco: responseEndereco.data.id })
     } catch (erro: any) {
       exibirErros(erro)
+      mensagemErro('Erro no preenchimento dos campos.')
     }
   }
 
@@ -85,92 +86,90 @@ export default function CadastroFornecedor() {
         await deletarEndereco(endereco.id)
         setEndereco({ ...endereco, id: 0 })
         setFornecedor({ ...fornecedor, endereco: 0 })
+        mensagemErro('Erro no preenchimento dos campos.')
       }
     }
     if (endereco.id !== 0) {
       salvarFornecedorAtualizado()
     }
-  }, [fornecedor, deletarEndereco, endereco, salvarFornecedor, erros])
+  }, [fornecedor])
 
   return (
-    <div>
-      <div>
-        <Card titulo="Dados do Fornecedor">
-          <form >
-            <FormGroup label="CNPJ: *" htmlFor="cnpj">
-              <InputCnpj
-                value={fornecedor.cnpj}
-                onChange={e => setPropsFornecedor("cnpj", e)}
-              />
-              {<ExibeErro erros={erros} nomeInput='cnpj' />}
-            </FormGroup>
-            <FormGroup label="Nome: *" htmlFor="nome">
-              <input
-                value={fornecedor.nome}
-                onChange={e => setPropsFornecedor("nome", e)}
-                id="nome"
-                type="text"
-              />
-              {<ExibeErro erros={erros} nomeInput='nome' />}
-            </FormGroup>
-            <FormGroup label="Telefone: *" htmlFor="telefone">
-              <InputTelefone
-                value={fornecedor.telefone}
-                onChange={e => setPropsFornecedor("telefone", e)}
-              />
-              {<ExibeErro erros={erros} nomeInput='telefone' />}
-            </FormGroup>
-          </form>
-        </Card>
-      </div>
-      <div>
-        <Card titulo="Endereço do Fornecedor">
-          <FormGroup label="Rua: *" htmlFor="rua">
+    <div className='div-form-container'>
+      <Card titulo="Dados do Fornecedor">
+        <form >
+          <FormGroup label="CNPJ: *" htmlFor="cnpj">
+            <InputCnpj
+              value={fornecedor.cnpj}
+              onChange={e => setPropsFornecedor("cnpj", e)}
+            />
+            {<ExibeErro erros={erros} nomeInput='cnpj' />}
+          </FormGroup>
+          <FormGroup label="Nome: *" htmlFor="nome">
             <input
-              value={endereco.rua}
-              onChange={e => setPropsEndereco("rua", e)}
-              id="rua"
+              value={fornecedor.nome}
+              onChange={e => setPropsFornecedor("nome", e)}
+              id="nome"
               type="text"
             />
-            {<ExibeErro erros={erros} nomeInput='rua' />}
+            {<ExibeErro erros={erros} nomeInput='nome' />}
           </FormGroup>
-          <FormGroup label="CEP: *" htmlFor="cep">
-            <InputCep
-              value={endereco.cep}
-              onChange={e => setPropsEndereco("cep", e)}
+          <FormGroup label="Telefone: *" htmlFor="telefone">
+            <InputTelefone
+              value={fornecedor.telefone}
+              onChange={e => setPropsFornecedor("telefone", e)}
             />
-            {<ExibeErro erros={erros} nomeInput='cep' />}
+            {<ExibeErro erros={erros} nomeInput='telefone' />}
           </FormGroup>
-          <FormGroup label="Número: *" htmlFor="numero">
-            <input
-              value={endereco.numero}
-              onChange={e => setPropsEndereco("numero", e)}
-              id="numero"
-              type="number"
-              onWheel={(e) => e.currentTarget.blur()}
-            />
-            {<ExibeErro erros={erros} nomeInput='numero' />}
-          </FormGroup>
-          <FormGroup label="Bairro: *" htmlFor="bairro">
-            <input
-              value={endereco.bairro}
-              onChange={e => setPropsEndereco("bairro", e)}
-              id="bairro"
-              type="text"
-            />
-            {<ExibeErro erros={erros} nomeInput='bairro' />}
-          </FormGroup>
-          <FormGroup label="Cidade: *" htmlFor="cidade">
-            <input
-              value={endereco.cidade}
-              onChange={e => setPropsEndereco("cidade", e)}
-              id="cidade"
-              type="text"
-            />
-            {<ExibeErro erros={erros} nomeInput='cidade' />}
-          </FormGroup>
-        </Card>
-      </div>
+        </form>
+      </Card>
+      <Card titulo="Endereço do Fornecedor">
+        <FormGroup label="Endereço: *" htmlFor="rua">
+          <input
+            value={endereco.rua}
+            onChange={e => setPropsEndereco("rua", e)}
+            id="rua"
+            type="text"
+          />
+          {<ExibeErro erros={erros} nomeInput='rua' />}
+        </FormGroup>
+        <FormGroup label="CEP: *" htmlFor="cep">
+          <InputCep
+            value={endereco.cep}
+            onChange={e => setPropsEndereco("cep", e)}
+          />
+          {<ExibeErro erros={erros} nomeInput='cep' />}
+        </FormGroup>
+        <FormGroup label="Número: *" htmlFor="numero">
+          <input
+            className='input-number-form'
+            value={endereco.numero}
+            onChange={e => setPropsEndereco("numero", e)}
+            id="numero"
+            type="number"
+            onWheel={(e) => e.currentTarget.blur()}
+          />
+          {<ExibeErro erros={erros} nomeInput='numero' />}
+        </FormGroup>
+        <FormGroup label="Bairro: *" htmlFor="bairro">
+          <input
+            value={endereco.bairro}
+            onChange={e => setPropsEndereco("bairro", e)}
+            id="bairro"
+            type="text"
+          />
+          {<ExibeErro erros={erros} nomeInput='bairro' />}
+        </FormGroup>
+        <FormGroup label="Cidade: *" htmlFor="cidade">
+          <input
+            value={endereco.cidade}
+            onChange={e => setPropsEndereco("cidade", e)}
+            id="cidade"
+            type="text"
+          />
+          {<ExibeErro erros={erros} nomeInput='cidade' />}
+        </FormGroup>
+      </Card>
       <div className="divBotaoCadastrar">
         <button
           onClick={submit}
