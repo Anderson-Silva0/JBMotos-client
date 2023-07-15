@@ -4,10 +4,14 @@ import FornecedorCard from "@/components/FornecedorCard"
 import { Fornecedor } from "@/models/fornecedor"
 import { mensagemErro } from "@/models/toast"
 import { FornecedorService } from "@/services/fornecedorService"
+import Image from "next/image"
 import { useState, useEffect } from "react"
+import imgFornecedor from "@/images/supplier.png"
 
 export default function ListarFornecedores() {
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([])
+
+  const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
 
   const { buscarTodosFornecedores } = FornecedorService()
 
@@ -18,37 +22,47 @@ export default function ListarFornecedores() {
         setFornecedores(response.data)
       } catch (error: any) {
         mensagemErro(error.response.data)
+      } finally {
+        setFoiCarregado(true)
       }
     }
     buscarTodos()
   }, [])
 
-  return (
-    <div>
-      {
-        fornecedores.length > 1 ? (
-          <h1 className="centered-text">O sistema possui {fornecedores.length} Fornecedores cadastrados</h1>
-        ) : fornecedores.length === 1 ? (
-          <h1 className="centered-text">O sistema possui {fornecedores.length} Fornecedor cadastrado</h1>
-        ) : fornecedores.length === 0 && (
-          <h1 className="centered-text">O sistema não possui Fornecedores cadastrados</h1>
-        )
-      }
+  if (!foiCarregado) {
+    return <h1 className="carregando">Carregando...</h1>
+  }
 
-      <div>
-        {fornecedores.map((fornecedor) => {
-          return (
-            <FornecedorCard
-              key={fornecedor.cnpj}
-              cnpj={fornecedor.cnpj}
-              nome={fornecedor.nome}
-              telefone={fornecedor.telefone}
-              endereco={fornecedor.endereco}
-              dataHoraCadastro={fornecedor.dataHoraCadastro}
-            />
-          );
-        })}
-      </div>
+  return (
+    <div className="div-form-container">
+      <h1 className="centered-text">
+        {
+          fornecedores.length > 1 ? (
+            <>
+              <Image src={imgFornecedor} width={60} height={60} alt="" /> {fornecedores.length} Fornecedores cadastrados
+            </>
+          ) : fornecedores.length === 1 ? (
+            <>
+              <Image src={imgFornecedor} width={60} height={60} alt="" /> {fornecedores.length} Fornecedor cadastrado
+            </>
+          ) : (
+            'Nenhum Fornecedor cadastrado no sistema'
+          )
+        }
+      </h1>
+
+      {fornecedores.map((fornecedor) => {
+        return (
+          <FornecedorCard
+            key={fornecedor.cnpj}
+            cnpj={fornecedor.cnpj}
+            nome={fornecedor.nome}
+            telefone={fornecedor.telefone}
+            endereco={fornecedor.endereco}
+            dataHoraCadastro={fornecedor.dataHoraCadastro}
+          />
+        );
+      })}
     </div>
-  );
+  )
 }
