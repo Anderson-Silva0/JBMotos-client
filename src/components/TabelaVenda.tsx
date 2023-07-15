@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react'
 
 export default function TabelaTeste({ children }: { children: ReactNode }) {
   return (
-    <div>
+    <div className="tabela-container">
       <table>
         <thead>
           <tr>
