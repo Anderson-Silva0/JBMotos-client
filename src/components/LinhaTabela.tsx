@@ -9,7 +9,7 @@ import { ValoresTotaisProps } from "@/app/venda/cadastro/page"
 import { ProdutoPedidoService } from '@/services/ProdutoPedidoService'
 
 import { ProdutoPedido, estadoInicialProdutoPedido } from "@/models/ProdutoPedido"
-import { selectStyles } from '@/models/selectStyles'
+import { selectStylesVenda } from '@/models/selectStyles'
 import { Produto } from '@/models/produto'
 import { formatarParaReal } from "@/models/formatadorReal"
 import { mensagemErro } from "@/models/toast"
@@ -101,7 +101,11 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
   useEffect(() => {
     const salvar = async () => {
       try {
-        const produtoPedidoAtualizado = { ...produtoPedido, idPedido: props.idPedido, idProduto: opcaoSelecionada.idProduto }
+        const produtoPedidoAtualizado = {
+          ...produtoPedido,
+          idPedido: props.idPedido,
+          idProduto: opcaoSelecionada.idProduto
+        }
         await salvarProdutoPedido(produtoPedidoAtualizado)
         props.setOcorrenciasErros(prevState => [...prevState, 'sucesso'])
       } catch (error: any) {
@@ -150,7 +154,7 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
       <td id="col-NomeProduto">
         {
           <FormGroup label="" htmlFor="idProduto">
-            <Select styles={selectStyles}
+            <Select styles={selectStylesVenda}
               placeholder="Selecione..."
               value={opcaoSelecionada}
               onChange={(option: any) => setOpcaoSelecionada(option)}
@@ -161,6 +165,7 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
                 idEstoqueProduto: p.idEstoque
               }) as OpcaoSelecionadaProps)}
               instanceId="select-idProduto"
+              id="select-idProduto"
             />
           </FormGroup>
         }
