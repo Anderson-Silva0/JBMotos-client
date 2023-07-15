@@ -1,24 +1,15 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-}
 
-.container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
 
 .header {
   background: linear-gradient(to right, rgba(10, 25, 60, 1) 40%, rgba(40, 80, 120, 0.8));
   text-align: center;
   padding: 40px;
+  width: 80%;
 }
 
 .header h1 {
   font-size: 36px;
-  margin-bottom: 20px;
+  margin-bottom: 20pxf;
 }
 
 .section-about {
