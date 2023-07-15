@@ -17,7 +17,18 @@
 }
 
 body {
-  background-color: black;
+  background-color: #DEE2E6;
+  width: 80vw;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+.div-form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
 .div-principal {
@@ -26,7 +37,7 @@ body {
   justify-content: center;
   font-size: 17pt;
   position: relative;
-  color: rgb(235, 235, 5);
+  color: #495057;
   margin-bottom: 4%;
 }
 
@@ -35,27 +46,24 @@ label {
   display: block;
 }
 
-input[type=number]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-}
-
 .divBotaoCadastrar button {
   border: none;
   border-radius: 30px;
   padding: 15px 30px;
   width: 250px;
-  background: linear-gradient(to right, rgba(10, 25, 60, 1) 40%, rgba(40, 80, 120, 0.8));
-  color: rgb(235, 235, 5);
+  background-image: linear-gradient(to top, #002855 40%, #0353A4);
+  color: #979DAC;
   font-size: 24px;
-  font-weight: bold;
+  font-weight: 900;
   letter-spacing: 1px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: background-color 0.2s, transform 0.2s;
+  margin: 4vh;
 }
 
 .divBotaoCadastrar button:hover {
-  background: linear-gradient(to right, rgb(40, 80, 120), rgb(10, 25, 60));
+  background-image: linear-gradient(to top, #002855 10%, #0353A4);
   box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
 }
 
@@ -72,13 +80,45 @@ input[type=number]::-webkit-inner-spin-button {
 
 .centered-text {
   text-align: center;
+  font-weight: 800;
 }
 
+.carregando {
+  font-weight: 800;
+}
 
+.css-qbdosj-Input {
+  color: red;
+}
 
+/* .container-geral {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+} */
 
+#valor-total-pedido {
+  user-select: none;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.3rem;
+  border-radius: 4vh;
+  padding: 10px;
+  background-color: #0466C8;
+}
 
+#valor-total-pedido span {
+  color: #979DAC;
+  font-size: 20pt;
+  font-weight: 800;
+  padding: 5px;
+  box-shadow: 5px 5px 20px 12px #0466C8;
+}
 
-
-
-
+#select-idProduto {
+  width: max-content;
+  margin: auto;
+}
