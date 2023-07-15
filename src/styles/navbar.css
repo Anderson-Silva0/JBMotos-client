@@ -1,16 +1,16 @@
 .navbar {
-    background: linear-gradient(to right, rgba(10, 25, 60, 1) 40%, rgba(40, 80, 120, 0.8));
+    background-image: linear-gradient(to right, #002855 70%, #0353A4);
     color: rgb(235, 235, 5);
-    font-size: 15pt;
-    font-weight: bolder;
-    margin: 10px;
+    font-weight: 900;
     padding: 10px;
     border-radius: 15px;
+    user-select: none;
+    width: 100%;
+    margin-bottom: 2vh;
 }
 
 .link {
-    color: rgb(235, 235, 5);
-    margin-right: 25px;
+    color: #979DAC;
 }
 
 .me-auto {
@@ -18,16 +18,16 @@
 }
 
 .me-auto :hover {
-    color: rgb(200, 20, 30);
+    color: #FFFF;
     transition: .8s;
 }
 
 #basic-nav-dropdown {
-    color: rgb(235, 235, 5);
+    color: #979DAC;
 }
 
 #basic-nav-dropdown:hover {
-    color: rgb(200, 20, 30);
+    color: #FFFF;
 }
 
 .dropdown-menu {
