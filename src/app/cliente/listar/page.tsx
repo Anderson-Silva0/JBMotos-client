@@ -4,52 +4,172 @@ import ClienteCard from "@/components/ClienteCard"
 import { Cliente } from "@/models/cliente"
 import { mensagemErro } from "@/models/toast"
 import { ClienteService } from "@/services/clienteService"
+import Image from "next/image"
 import { useState, useEffect } from "react"
+import imgCliente from "@/images/client.png"
+import { InputCpf, InputTelefone } from "@/components/Input"
+import { Search } from "lucide-react"
 
 export default function ListarClientes() {
   const [clientes, setClientes] = useState<Cliente[]>([])
 
-  const { buscarTodosClientes } = ClienteService()
+  const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
+
+  const [valorInputBuscar, setValorInputBuscar] = useState<string>('')
+
+  const [campoSelecionado, setCampoSelecionado] = useState<string>('')
+
+  const { filtrarCliente } = ClienteService()
 
   useEffect(() => {
-    const buscarTodos = async () => {
+    const buscarPorCpf = async () => {
       try {
-        const response = await buscarTodosClientes()
-        setClientes(response.data)
+        const clienteResponse = await filtrarCliente(campoSelecionado, valorInputBuscar)
+        setClientes(clienteResponse.data)
       } catch (error: any) {
-        mensagemErro(error.response.data)
+        mensagemErro('Erro ao tentar buscar cliente.')
+      } finally {
+        setFoiCarregado(true)
       }
     }
-    buscarTodos()
-  }, [])
+    buscarPorCpf()
+  }, [valorInputBuscar, campoSelecionado])
+
+  const handleRadioClick = (campo: string) => {
+    if (campoSelecionado === campo) {
+      setCampoSelecionado('')
+    }
+  }
+
+  if (!foiCarregado) {
+    return <h1 className="carregando">Carregando...</h1>
+  }
 
   return (
-    <div>
-      {
-        clientes.length > 1 ? (
-          <h1 className="centered-text">O sistema possui {clientes.length} Clientes cadastrados</h1>
-        ) : clientes.length === 1 ? (
-          <h1 className="centered-text">O sistema possui {clientes.length} Cliente cadastrado</h1>
-        ) : clientes.length === 0 && (
-          <h1 className="centered-text">O sistema não possui Clientes cadastrados</h1>
-        )
-      }
-
-      <div>
-        {clientes.map((cliente) => {
-          return (
-            <ClienteCard
-              key={cliente.cpf}
-              cpf={cliente.cpf}
-              nome={cliente.nome}
-              email={cliente.email}
-              telefone={cliente.telefone}
-              endereco={cliente.endereco}
-              dataHoraCadastro={cliente.dataHoraCadastro}
-            />
-          );
-        })}
+    <div className="div-form-container">
+      <h1 className="centered-text">
+        {
+          campoSelecionado === '' ? (
+            clientes.length > 1 ? (
+              <>
+                <Image src={imgCliente} width={60} height={60} alt="" /> {clientes.length} Clientes cadastrados
+              </>
+            ) : clientes.length === 1 ? (
+              <>
+                <Image src={imgCliente} width={60} height={60} alt="" /> {clientes.length} Cliente cadastrado
+              </>
+            ) : (
+              'Nenhum Cliente cadastrado no sistema'
+            )
+          ) : campoSelecionado !== '' && valorInputBuscar !== '' && (
+            <>
+              {
+                clientes.length === 1 ? (
+                  <strong>{clientes.length} Cliente encontrado</strong>
+                ) : clientes.length > 1 ? (
+                  <strong>{clientes.length} Clientes encontrados</strong>
+                ) : (
+                  'Nenhum Cliente encontrado'
+                )
+              }
+            </>
+          )
+        }
+      </h1>
+      <div className="div-container-buscar">
+        <div className="div-buscar">
+          <Search size={50} strokeWidth={3} />
+          {
+            campoSelecionado === '' ? (
+              <strong>Selecione uma opção de busca: Nome, CPF, Email ou Telefone.</strong>
+            ) : campoSelecionado === 'nome' ? (
+              <input
+                className="input-buscar"
+                placeholder="Digite o Nome"
+                type="search"
+                onChange={(e) => setValorInputBuscar(e.target.value)}
+              />
+            ) : campoSelecionado === 'email' ? (
+              <input
+                className="input-buscar"
+                placeholder="Digite o Email"
+                type="search"
+                onChange={(e) => setValorInputBuscar(e.target.value)}
+              />
+            ) : campoSelecionado === 'cpf' ? (
+              <InputCpf
+                placeholder="Digite o CPF"
+                type="search"
+                value={valorInputBuscar}
+                onChange={(e) => setValorInputBuscar(e.target.value)}
+              />
+            ) : campoSelecionado === 'telefone' && (
+              <InputTelefone
+                placeholder="Digite o Telefone"
+                type="search"
+                value={valorInputBuscar}
+                onChange={(e) => setValorInputBuscar(e.target.value)}
+              />
+            )
+          }
+        </div>
+        <div className="div-radios">
+          <label htmlFor="opcaoNome">Nome:</label>
+          <input
+            className="input-radio"
+            type="radio"
+            name="opcao"
+            id="opcaoNome"
+            value={campoSelecionado}
+            onChange={() => setCampoSelecionado('nome')}
+            onClick={() => handleRadioClick('nome')}
+            checked={campoSelecionado === 'nome'}
+          />
+          <label htmlFor="opcaoCPF">CPF:</label>
+          <input
+            className="input-radio"
+            type="radio"
+            name="opcao"
+            id="opcaoCPF"
+            value={campoSelecionado}
+            onChange={() => setCampoSelecionado('cpf')}
+            onClick={() => handleRadioClick('cpf')}
+            checked={campoSelecionado === 'cpf'}
+          />
+          <label htmlFor="opcaoEmail">Email:</label>
+          <input
+            className="input-radio"
+            type="radio"
+            name="opcao"
+            id="opcaoEmail"
+            value={campoSelecionado}
+            onChange={() => setCampoSelecionado('email')}
+            onClick={() => handleRadioClick('email')}
+            checked={campoSelecionado === 'email'}
+          />
+          <label htmlFor="opcaoTelefone">Telefone:</label>
+          <input
+            className="input-radio"
+            type="radio"
+            name="opcao"
+            id="opcaoTelefone"
+            value={campoSelecionado}
+            onChange={() => setCampoSelecionado('telefone')}
+            onClick={() => handleRadioClick('telefone')}
+            checked={campoSelecionado === 'telefone'}
+          />
+        </div>
       </div>
+      {clientes.map((cliente) => {
+        return (
+          <ClienteCard
+            key={cliente.cpf}
+            cliente={cliente}
+            clientes={clientes}
+            setClientes={setClientes}
+          />
+        )
+      })}
     </div>
-  );
+  )
 }
