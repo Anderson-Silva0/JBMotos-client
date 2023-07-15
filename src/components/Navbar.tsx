@@ -6,14 +6,16 @@ import Navbar from 'react-bootstrap/Navbar'
 import NavDropdown from 'react-bootstrap/NavDropdown'
 import '../styles/navbar.css'
 import Image from 'next/image'
+import Logo from '@/images/LogoJB.png'
 
 export function NavBar() {
     return (
         <Navbar className='navbar' expand="lg">
             <div className="image-container">
                 <Image
-                    src="/images/LogoJB.png"
-                    alt=""
+                    src={Logo}
+                    alt="Logo"
+                    priority
                     width={120}
                     height={115}
                     className="rounded-image"
@@ -33,12 +35,6 @@ export function NavBar() {
                             </NavDropdown.Item>
                             <NavDropdown.Item href="/cliente/listar" className="dropdown-item">
                                 Listar Clientes
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/cliente/atualizar" className="dropdown-item">
-                                Atualizar
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/cliente/deletar" className="dropdown-item">
-                                Deletar
                             </NavDropdown.Item>
                             <NavDropdown.Divider />
                         </NavDropdown>
@@ -94,8 +90,24 @@ export function NavBar() {
                             <NavDropdown.Divider />
                         </NavDropdown>
 
-                        <Nav.Link className="link" href="/vendas">Vendas</Nav.Link >
-                        <Nav.Link className="link" href="/estoque">Estoque</Nav.Link >
+                        <NavDropdown title="Venda" id="basic-nav-dropdown">
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item href="/venda/cadastro">
+                                Realizar Venda
+                            </NavDropdown.Item>
+                            <NavDropdown.Item href="/venda/listar" className="dropdown-item">
+                                Listar Vendas
+                            </NavDropdown.Item>
+                            <NavDropdown.Item href="/venda/atualizar" className="dropdown-item">
+                                Atualizar
+                            </NavDropdown.Item>
+                            <NavDropdown.Item href="/venda/deletar" className="dropdown-item">
+                                Deletar
+                            </NavDropdown.Item>
+                            <NavDropdown.Divider />
+                        </NavDropdown>
+
+                        {/* <Nav.Link className="link" href="/estoque">Estoque</Nav.Link > */}
                     </Nav>
                 </Navbar.Collapse >
             </Container >
