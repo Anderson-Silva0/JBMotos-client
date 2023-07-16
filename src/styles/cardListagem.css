@@ -200,8 +200,40 @@
   margin-right: 1vw;
 }
 
-
 @media (max-width: 999px) {
+  .div-container-buscar {
+    display: flex;
+    flex-direction: column;
+    padding: 2vh;
+    justify-content: space-between;
+    gap: 3vh;
+    align-items: center;
+    width: 100vw;
+  }
+
+  .div-radios {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    width: 70%;
+  }
+
+  .input-radio {
+    height: 20vw;
+    width: 20vw;
+    display: inline;
+  }
+
+  .label-radio {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    font-weight: 700;
+    font-size: 4vw;
+  }
+
   .div-dados {
     background-color: #DEE2E6;
     border-radius: 2vh;
@@ -257,11 +289,5 @@
     font-size: 2vh;
     color: #495057;
     font-weight: 700;
-  }
-
-  .input-radio {
-    height: 15vw;
-    width: 15vw;
-    display: inline;
   }
 }

@@ -13,6 +13,7 @@ body {
   overflow-x: hidden;
   background-color: #DEE2E6;
   width: 80vw;
+  height: 100vh;
   justify-content: center;
   align-items: center;
   margin: auto;
