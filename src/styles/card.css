@@ -48,10 +48,10 @@
   font-size: 16pt;
 }
 
-input {
+.card input {
   font-size: 15pt;
   background-color: #DEE2E6;
-  padding: 2%;
+  padding: 4%;
   width: 96%;
   display: block;
   border-radius: 15px;
@@ -61,7 +61,7 @@ input {
   border: none;
 }
 
-input:hover {
+.card input:hover {
   background-color: #CED4DA;
   box-shadow: 4px 2px 20px 1px rgba(255, 255, 255, 0.2);
 }

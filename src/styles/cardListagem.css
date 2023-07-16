@@ -217,13 +217,8 @@
     gap: 4px;
     align-items: center;
     justify-content: center;
-    width: 70%;
-  }
-
-  .input-radio {
-    height: 20vw;
-    width: 20vw;
-    display: inline;
+    width: 95%;
+    height: 4vh;
   }
 
   .label-radio {
