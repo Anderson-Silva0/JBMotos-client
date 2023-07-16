@@ -3,7 +3,7 @@
   margin: 5vh auto;
   border-radius: 2vh;
   background-color: #F8F9FA;
-  padding: 10px;
+  padding: 2vh;
   box-shadow: 0px 4px 5px #495057;
   font-size: 12pt;
 }
@@ -44,7 +44,6 @@
 .info-principal {
   display: flex;
   flex-direction: row;
-  padding: 2vh;
   justify-content: space-between;
   gap: 4vh;
 }
@@ -144,6 +143,7 @@
   width: 6vh;
   height: 6vh;
   cursor: pointer;
+  margin-top: 2vh;
 }
 
 .div-container-buscar {
@@ -157,7 +157,10 @@
 
 .div-buscar {
   display: flex;
-  width: 100%;
+  width: 70%;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
 }
 
 .div-buscar input {
@@ -166,15 +169,99 @@
 }
 
 .input-radio {
-  height: 5vh;
-  width: 5vh;
+  height: 7vw;
+  width: 7vw;
+  display: inline;
+}
+
+.label-radio {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  font-weight: 700;
+}
+
+.input-buscar {
+  border-radius: 2vw;
+  padding: 1.5vh;
+  font-size: 4vh;
+  color: #495057;
+  font-weight: 700;
 }
 
 .div-radios {
   display: flex;
   justify-content: space-between;
   gap: 4px;
+  width: 70%;
 }
+
 .div-radios input {
   margin-right: 1vw;
+}
+
+
+@media (max-width: 999px) {
+  .div-dados {
+    background-color: #DEE2E6;
+    border-radius: 2vh;
+    padding: 1vh;
+    font-weight: 900;
+    width: 85%;
+    margin-bottom: 1%;
+  }
+
+  .div-resultado {
+    font-weight: bold;
+    margin-left: 2%;
+    margin-bottom: 1%;
+    word-wrap: break-word;
+    text-align: justify;
+    width: 100%;
+  }
+
+  .container-items {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .info-principal {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 2%;
+  }
+
+  .items {
+    width: 48%;
+  }
+
+  .icones-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6vw;
+  }
+
+  .icones-atualizacao-e-delecao {
+    width: 4vh;
+    height: 4vh;
+    cursor: pointer;
+  }
+
+  .input-buscar {
+    border-radius: 2vw;
+    padding: 1vh;
+    font-size: 2vh;
+    color: #495057;
+    font-weight: 700;
+  }
+
+  .input-radio {
+    height: 15vw;
+    width: 15vw;
+    display: inline;
+  }
 }

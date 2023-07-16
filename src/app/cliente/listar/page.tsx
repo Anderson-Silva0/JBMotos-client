@@ -98,6 +98,7 @@ export default function ListarClientes() {
               />
             ) : campoSelecionado === 'cpf' ? (
               <InputCpf
+                className="input-buscar"
                 placeholder="Digite o CPF"
                 type="search"
                 value={valorInputBuscar}
@@ -105,6 +106,7 @@ export default function ListarClientes() {
               />
             ) : campoSelecionado === 'telefone' && (
               <InputTelefone
+                className="input-buscar"
                 placeholder="Digite o Telefone"
                 type="search"
                 value={valorInputBuscar}
@@ -114,7 +116,7 @@ export default function ListarClientes() {
           }
         </div>
         <div className="div-radios">
-          <label htmlFor="opcaoNome">Nome:</label>
+          <label className="label-radio" htmlFor="opcaoNome">Nome:</label>
           <input
             className="input-radio"
             type="radio"
@@ -125,7 +127,7 @@ export default function ListarClientes() {
             onClick={() => handleRadioClick('nome')}
             checked={campoSelecionado === 'nome'}
           />
-          <label htmlFor="opcaoCPF">CPF:</label>
+          <label className="label-radio" htmlFor="opcaoCPF">CPF:</label>
           <input
             className="input-radio"
             type="radio"
@@ -136,7 +138,7 @@ export default function ListarClientes() {
             onClick={() => handleRadioClick('cpf')}
             checked={campoSelecionado === 'cpf'}
           />
-          <label htmlFor="opcaoEmail">Email:</label>
+          <label className="label-radio" htmlFor="opcaoEmail">Email:</label>
           <input
             className="input-radio"
             type="radio"
@@ -147,7 +149,7 @@ export default function ListarClientes() {
             onClick={() => handleRadioClick('email')}
             checked={campoSelecionado === 'email'}
           />
-          <label htmlFor="opcaoTelefone">Telefone:</label>
+          <label className="label-radio" htmlFor="opcaoTelefone">Telefone:</label>
           <input
             className="input-radio"
             type="radio"

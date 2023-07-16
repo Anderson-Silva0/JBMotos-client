@@ -92,33 +92,31 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
         <Edit3 className='icones-atualizacao-e-delecao' /> Atualização de Cliente e Endereço
       </h1>
       <Card titulo="Dados do Cliente">
-        <form>
-          <FormGroup label="Nome: *" htmlFor="nome">
-            <input
-              value={cliente.nome}
-              onChange={e => setPropsCliente("nome", e)}
-              id="nome"
-              type="text"
-            />
-            {<ExibeErro erros={erros} nomeInput='nome' />}
-          </FormGroup>
-          <FormGroup label="Email: *" htmlFor="email">
-            <input
-              value={cliente.email}
-              onChange={e => setPropsCliente("email", e)}
-              id="email"
-              type="email"
-            />
-            {<ExibeErro erros={erros} nomeInput='email' />}
-          </FormGroup>
-          <FormGroup label="Telefone: *" htmlFor="telefone">
-            <InputTelefone
-              value={cliente.telefone}
-              onChange={e => setPropsCliente("telefone", e)}
-            />
-            {<ExibeErro erros={erros} nomeInput='telefone' />}
-          </FormGroup>
-        </form>
+        <FormGroup label="Nome: *" htmlFor="nome">
+          <input
+            value={cliente.nome}
+            onChange={e => setPropsCliente("nome", e)}
+            id="nome"
+            type="text"
+          />
+          {<ExibeErro erros={erros} nomeInput='nome' />}
+        </FormGroup>
+        <FormGroup label="Email: *" htmlFor="email">
+          <input
+            value={cliente.email}
+            onChange={e => setPropsCliente("email", e)}
+            id="email"
+            type="email"
+          />
+          {<ExibeErro erros={erros} nomeInput='email' />}
+        </FormGroup>
+        <FormGroup label="Telefone: *" htmlFor="telefone">
+          <InputTelefone
+            value={cliente.telefone}
+            onChange={e => setPropsCliente("telefone", e)}
+          />
+          {<ExibeErro erros={erros} nomeInput='telefone' />}
+        </FormGroup>
       </Card>
       <Card titulo="Endereço do Cliente">
         <FormGroup label="Endereço: *" htmlFor="rua">

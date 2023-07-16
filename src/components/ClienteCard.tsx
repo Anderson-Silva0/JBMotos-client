@@ -70,7 +70,6 @@ export default function ClienteCard({ cliente, clientes, setClientes }: ClienteC
           <div className='div-dados'>Data e Hora de Cadastro</div>
           <div className='div-resultado'>{cliente.dataHoraCadastro}</div>
         </div>
-
         <div className='items'>
           <span id="info-title">Endereço</span>
           <div className='div-dados'>Endereço</div>

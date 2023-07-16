@@ -7,6 +7,7 @@ interface inputProps {
     placeholder?: string
     type?: string
     id?: string
+    className?: string
 }
 
 export const InputCep = (props: inputProps) => (
@@ -15,6 +16,7 @@ export const InputCep = (props: inputProps) => (
         placeholder={props.placeholder}
         type={props.type}
         id={props.id}
+        className={props.className}
         value={props.value}
         onChange={props.onChange}
         maskChar={null}
@@ -27,6 +29,7 @@ export const InputCnpj = (props: inputProps) => (
         placeholder={props.placeholder}
         type={props.type}
         id={props.id}
+        className={props.className}
         value={props.value}
         onChange={props.onChange}
         maskChar={null}
@@ -39,6 +42,7 @@ export const InputCpf = (props: inputProps) => (
         placeholder={props.placeholder}
         type={props.type}
         id={props.id}
+        className={props.className}
         value={props.value}
         onChange={props.onChange}
         maskChar={null}
@@ -52,6 +56,7 @@ export const InputTelefone = (props: inputProps) => (
         placeholder={props.placeholder}
         type={props.type}
         id={props.id}
+        className={props.className}
         value={props.value}
         onChange={props.onChange}
         maskChar={null}
