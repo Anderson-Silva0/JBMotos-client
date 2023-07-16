@@ -54,10 +54,6 @@ nav {
 }
 
 @media (max-width: 999px) {
-    body {
-        overflow-x: hidden;
-    }
-
     .nav-list {
         z-index: 9999;
         position: absolute;
@@ -124,7 +120,6 @@ nav {
     position: relative;
     display: inline-block;
     cursor: pointer;
-    z-index: 9999;
     font-weight: 900;
 }
 
@@ -136,6 +131,7 @@ nav {
     top: calc(100% + 10px);
     left: 50%;
     transform: translateX(-50%);
+    z-index: 9999;
 }
 
 .dropdown-content a {
