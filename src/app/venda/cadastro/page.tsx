@@ -229,54 +229,48 @@ export default function CadastroVenda() {
   return (
     <div className="div-form-container">
       <Card titulo="Detalhes da Venda">
-        <form >
-          <FormGroup label="Selecione o Cliente: *" htmlFor="cpfCliente">
-            <Select
-              styles={selectStyles}
-              placeholder="Selecione..."
-              value={opcaoSelecionadaCliente}
-              onChange={(option: any) => setOpcaoSelecionadaCliente(option)}
-              options={clientes.map(c => ({ label: c.cpf, value: c.cpf }) as OpcoesSelecoes)}
-              instanceId="select-cpfCliente"
-            />
-            {<ExibeErro erros={erros} nomeInput="cpfCliente" />}
-          </FormGroup>
-
-          <FormGroup label="Selecione o Funcionário (Vendedor): *" htmlFor="cpfFuncionario">
-            <Select
-              styles={selectStyles}
-              placeholder="Selecione..."
-              value={opcaoSelecionadaFuncionario}
-              onChange={(option: any) => setOpcaoSelecionadaFuncionario(option)}
-              options={funcionarios.map(f => ({ label: f.nome, value: f.cpf }) as OpcoesSelecoes)}
-              instanceId="select-cpfFuncionario"
-            />
-            {<ExibeErro erros={erros} nomeInput="cpfFuncionario" />}
-          </FormGroup>
-
-          <FormGroup label="Selecione a forma de pagamento*" htmlFor="formaDePagamento">
-            <Select
-              styles={selectStyles}
-              placeholder="Selecione..."
-              value={opcaoSelecionadaFormaDePagamento}
-              onChange={(option: any) => setOpcaoSelecionadaFormaDePagamento(option)}
-              options={formasDePagamento}
-              instanceId="select-formaDePagamento"
-            />
-            {<ExibeErro erros={erros} nomeInput="formaDePagamento" />}
-          </FormGroup>
-
-          <FormGroup label="Observação:" htmlFor="observacao">
-            <input
-              value={pedido.observacao}
-              onChange={(e) => setPedido({ ...pedido, observacao: e.target.value })}
-              id="observacao"
-              type="text"
-            />
-            {<ExibeErro erros={erros} nomeInput='observacao' />}
-          </FormGroup>
-
-        </form>
+        <FormGroup label="Selecione o Cliente: *" htmlFor="cpfCliente">
+          <Select
+            styles={selectStyles}
+            placeholder="Selecione..."
+            value={opcaoSelecionadaCliente}
+            onChange={(option: any) => setOpcaoSelecionadaCliente(option)}
+            options={clientes.map(c => ({ label: c.cpf, value: c.cpf }) as OpcoesSelecoes)}
+            instanceId="select-cpfCliente"
+          />
+          {<ExibeErro erros={erros} nomeInput="cpfCliente" />}
+        </FormGroup>
+        <FormGroup label="Selecione o Funcionário (Vendedor): *" htmlFor="cpfFuncionario">
+          <Select
+            styles={selectStyles}
+            placeholder="Selecione..."
+            value={opcaoSelecionadaFuncionario}
+            onChange={(option: any) => setOpcaoSelecionadaFuncionario(option)}
+            options={funcionarios.map(f => ({ label: f.nome, value: f.cpf }) as OpcoesSelecoes)}
+            instanceId="select-cpfFuncionario"
+          />
+          {<ExibeErro erros={erros} nomeInput="cpfFuncionario" />}
+        </FormGroup>
+        <FormGroup label="Selecione a forma de pagamento*" htmlFor="formaDePagamento">
+          <Select
+            styles={selectStyles}
+            placeholder="Selecione..."
+            value={opcaoSelecionadaFormaDePagamento}
+            onChange={(option: any) => setOpcaoSelecionadaFormaDePagamento(option)}
+            options={formasDePagamento}
+            instanceId="select-formaDePagamento"
+          />
+          {<ExibeErro erros={erros} nomeInput="formaDePagamento" />}
+        </FormGroup>
+        <FormGroup label="Observação:" htmlFor="observacao">
+          <input
+            value={pedido.observacao}
+            onChange={(e) => { setErros([]); setPedido({ ...pedido, observacao: e.target.value }) }}
+            id="observacao"
+            type="text"
+          />
+          {<ExibeErro erros={erros} nomeInput='observacao' />}
+        </FormGroup>
       </Card>
       <TabelaVenda>
         {qtdLinha.map(idLinha => {

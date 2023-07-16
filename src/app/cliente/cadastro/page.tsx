@@ -27,12 +27,14 @@ export default function CadastroCliente() {
 
     const setPropsCliente = (key: string, e: ChangeEvent<HTMLInputElement>) => {
         setCliente({ ...cliente, [key]: e.target.value })
+        setErros([])
     }
 
     const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
 
     const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
         setEndereco({ ...endereco, [key]: e.target.value })
+        setErros([])
     }
 
     const exibirErrosCliente = async () => {
@@ -96,40 +98,40 @@ export default function CadastroCliente() {
     return (
         <div className='div-form-container'>
             <Card titulo="Dados do Cliente">
-                <form>
-                    <FormGroup label="CPF: *" htmlFor="cpf">
-                        <InputCpf
-                            value={cliente.cpf}
-                            onChange={e => setPropsCliente("cpf", e)}
-                        />
-                        {<ExibeErro erros={erros} nomeInput='cpf' />}
-                    </FormGroup>
-                    <FormGroup label="Nome: *" htmlFor="nome">
-                        <input
-                            value={cliente.nome}
-                            onChange={e => setPropsCliente("nome", e)}
-                            id="nome"
-                            type="text"
-                        />
-                        {<ExibeErro erros={erros} nomeInput='nome' />}
-                    </FormGroup>
-                    <FormGroup label="Email: *" htmlFor="email">
-                        <input
-                            value={cliente.email}
-                            onChange={e => setPropsCliente("email", e)}
-                            id="email"
-                            type="email"
-                        />
-                        {<ExibeErro erros={erros} nomeInput='email' />}
-                    </FormGroup>
-                    <FormGroup label="Telefone: *" htmlFor="telefone">
-                        <InputTelefone
-                            value={cliente.telefone}
-                            onChange={e => setPropsCliente("telefone", e)}
-                        />
-                        {<ExibeErro erros={erros} nomeInput='telefone' />}
-                    </FormGroup>
-                </form>
+                <FormGroup label="CPF: *" htmlFor="cpf">
+                    <InputCpf
+                        id='cpf'
+                        value={cliente.cpf}
+                        onChange={e => setPropsCliente("cpf", e)}
+                    />
+                    {<ExibeErro erros={erros} nomeInput='cpf' />}
+                </FormGroup>
+                <FormGroup label="Nome: *" htmlFor="nome">
+                    <input
+                        value={cliente.nome}
+                        onChange={e => setPropsCliente("nome", e)}
+                        id="nome"
+                        type="text"
+                    />
+                    {<ExibeErro erros={erros} nomeInput='nome' />}
+                </FormGroup>
+                <FormGroup label="Email: *" htmlFor="email">
+                    <input
+                        value={cliente.email}
+                        onChange={e => setPropsCliente("email", e)}
+                        id="email"
+                        type="email"
+                    />
+                    {<ExibeErro erros={erros} nomeInput='email' />}
+                </FormGroup>
+                <FormGroup label="Telefone: *" htmlFor="telefone">
+                    <InputTelefone
+                        id='telefone'
+                        value={cliente.telefone}
+                        onChange={e => setPropsCliente("telefone", e)}
+                    />
+                    {<ExibeErro erros={erros} nomeInput='telefone' />}
+                </FormGroup>
             </Card>
             <Card titulo="Endereço do Cliente">
                 <FormGroup label="Endereço: *" htmlFor="rua">
@@ -143,6 +145,7 @@ export default function CadastroCliente() {
                 </FormGroup>
                 <FormGroup label="CEP: *" htmlFor="cep">
                     <InputCep
+                        id='cep'
                         value={endereco.cep}
                         onChange={e => setPropsEndereco("cep", e)}
                     />

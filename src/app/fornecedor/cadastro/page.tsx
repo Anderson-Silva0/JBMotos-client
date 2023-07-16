@@ -27,12 +27,14 @@ export default function CadastroFornecedor() {
 
   const setPropsFornecedor = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setFornecedor({ ...fornecedor, [key]: e.target.value })
+    setErros([])
   }
 
   const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
 
   const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setEndereco({ ...endereco, [key]: e.target.value })
+    setErros([])
   }
 
   const exibirErrosFornecedor = async () => {
@@ -97,31 +99,29 @@ export default function CadastroFornecedor() {
   return (
     <div className='div-form-container'>
       <Card titulo="Dados do Fornecedor">
-        <form >
-          <FormGroup label="CNPJ: *" htmlFor="cnpj">
-            <InputCnpj
-              value={fornecedor.cnpj}
-              onChange={e => setPropsFornecedor("cnpj", e)}
-            />
-            {<ExibeErro erros={erros} nomeInput='cnpj' />}
-          </FormGroup>
-          <FormGroup label="Nome: *" htmlFor="nome">
-            <input
-              value={fornecedor.nome}
-              onChange={e => setPropsFornecedor("nome", e)}
-              id="nome"
-              type="text"
-            />
-            {<ExibeErro erros={erros} nomeInput='nome' />}
-          </FormGroup>
-          <FormGroup label="Telefone: *" htmlFor="telefone">
-            <InputTelefone
-              value={fornecedor.telefone}
-              onChange={e => setPropsFornecedor("telefone", e)}
-            />
-            {<ExibeErro erros={erros} nomeInput='telefone' />}
-          </FormGroup>
-        </form>
+        <FormGroup label="CNPJ: *" htmlFor="cnpj">
+          <InputCnpj
+            value={fornecedor.cnpj}
+            onChange={e => setPropsFornecedor("cnpj", e)}
+          />
+          {<ExibeErro erros={erros} nomeInput='cnpj' />}
+        </FormGroup>
+        <FormGroup label="Nome: *" htmlFor="nome">
+          <input
+            value={fornecedor.nome}
+            onChange={e => setPropsFornecedor("nome", e)}
+            id="nome"
+            type="text"
+          />
+          {<ExibeErro erros={erros} nomeInput='nome' />}
+        </FormGroup>
+        <FormGroup label="Telefone: *" htmlFor="telefone">
+          <InputTelefone
+            value={fornecedor.telefone}
+            onChange={e => setPropsFornecedor("telefone", e)}
+          />
+          {<ExibeErro erros={erros} nomeInput='telefone' />}
+        </FormGroup>
       </Card>
       <Card titulo="Endereço do Fornecedor">
         <FormGroup label="Endereço: *" htmlFor="rua">

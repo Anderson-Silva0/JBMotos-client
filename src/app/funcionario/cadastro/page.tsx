@@ -96,31 +96,29 @@ export default function CadastroFuncionario() {
   return (
     <div className='div-form-container'>
       <Card titulo="Dados do Funcionário">
-        <form >
-          <FormGroup label="CPF: *" htmlFor="cpf">
-            <InputCpf
-              value={funcionario.cpf}
-              onChange={e => setPropsFuncionario("cpf", e)}
-            />
-            {<ExibeErro erros={erros} nomeInput='cpf' />}
-          </FormGroup>
-          <FormGroup label="Nome: *" htmlFor="nome">
-            <input
-              value={funcionario.nome}
-              onChange={e => setPropsFuncionario("nome", e)}
-              id="nome"
-              type="text"
-            />
-            {<ExibeErro erros={erros} nomeInput='nome' />}
-          </FormGroup>
-          <FormGroup label="Telefone: *" htmlFor="telefone">
-            <InputTelefone
-              value={funcionario.telefone}
-              onChange={e => setPropsFuncionario("telefone", e)}
-            />
-            {<ExibeErro erros={erros} nomeInput='telefone' />}
-          </FormGroup>
-        </form>
+        <FormGroup label="CPF: *" htmlFor="cpf">
+          <InputCpf
+            value={funcionario.cpf}
+            onChange={e => setPropsFuncionario("cpf", e)}
+          />
+          {<ExibeErro erros={erros} nomeInput='cpf' />}
+        </FormGroup>
+        <FormGroup label="Nome: *" htmlFor="nome">
+          <input
+            value={funcionario.nome}
+            onChange={e => setPropsFuncionario("nome", e)}
+            id="nome"
+            type="text"
+          />
+          {<ExibeErro erros={erros} nomeInput='nome' />}
+        </FormGroup>
+        <FormGroup label="Telefone: *" htmlFor="telefone">
+          <InputTelefone
+            value={funcionario.telefone}
+            onChange={e => setPropsFuncionario("telefone", e)}
+          />
+          {<ExibeErro erros={erros} nomeInput='telefone' />}
+        </FormGroup>
       </Card>
       <Card titulo="Endereço do Funcionario">
         <FormGroup label="Endereço: *" htmlFor="rua">
