@@ -6,6 +6,7 @@ interface inputProps {
     onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined
     placeholder?: string
     type?: string
+    id?: string
 }
 
 export const InputCep = (props: inputProps) => (
@@ -13,6 +14,7 @@ export const InputCep = (props: inputProps) => (
         mask="99999-999"
         placeholder={props.placeholder}
         type={props.type}
+        id={props.id}
         value={props.value}
         onChange={props.onChange}
         maskChar={null}
@@ -24,6 +26,7 @@ export const InputCnpj = (props: inputProps) => (
         mask="99.999.999/9999-99"
         placeholder={props.placeholder}
         type={props.type}
+        id={props.id}
         value={props.value}
         onChange={props.onChange}
         maskChar={null}
@@ -35,6 +38,7 @@ export const InputCpf = (props: inputProps) => (
         mask="999.999.999-99"
         placeholder={props.placeholder}
         type={props.type}
+        id={props.id}
         value={props.value}
         onChange={props.onChange}
         maskChar={null}
@@ -47,6 +51,7 @@ export const InputTelefone = (props: inputProps) => (
         mask="(99) 99999-9999"
         placeholder={props.placeholder}
         type={props.type}
+        id={props.id}
         value={props.value}
         onChange={props.onChange}
         maskChar={null}
