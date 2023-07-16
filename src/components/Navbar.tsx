@@ -1,116 +1,104 @@
 'use client'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import Container from 'react-bootstrap/Container'
-import Nav from 'react-bootstrap/Nav'
-import Navbar from 'react-bootstrap/Navbar'
-import NavDropdown from 'react-bootstrap/NavDropdown'
+
+import React, { useEffect, useState } from 'react'
 import '../styles/navbar.css'
 import Image from 'next/image'
 import Logo from '@/images/LogoJB.png'
+import Dropdown from './Dropdown'
 
-export function NavBar() {
+export default function NavBar() {
+    const [componenteClicado, setComponenteClicado] = useState<string>('')
+
+    useEffect(() => {
+        const mobileMenu = document.querySelector('.mobile-menu') as HTMLElement
+        const navList = document.querySelector('.nav-list') as HTMLElement
+        const navLinks = document.querySelectorAll('.nav-list li')
+
+        const animateLinks = () => {
+            Array.from(navLinks).forEach((link: any, index: number) => {
+                link.style.animation
+                    ? (link.style.animation = '')
+                    : (link.style.animation = `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`)
+            })
+        }
+
+        const handleClick = () => {
+            navList.classList.toggle('active')
+            mobileMenu.classList.toggle('active')
+            animateLinks()
+        }
+
+        if (mobileMenu) {
+            mobileMenu.addEventListener('click', handleClick)
+        }
+
+        return () => {
+            if (mobileMenu) {
+                mobileMenu.removeEventListener('click', handleClick)
+            }
+        }
+    }, [])
+
     return (
-        <Navbar className='navbar' expand="lg">
-            <div className="image-container">
-                <Image
-                    src={Logo}
-                    alt="Logo"
-                    priority
-                    width={120}
-                    height={115}
-                    className="rounded-image"
-                />
-            </div>
-            <Container>
-                <Navbar.Brand className='nav-brand' href="#home"></Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="me-auto">
-                        <Nav.Link className="link" href="/">Home</Nav.Link>
-
-                        <NavDropdown title="Cliente" id="basic-nav-dropdown">
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item href="/cliente/cadastro">
-                                Cadastrar
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/cliente/listar" className="dropdown-item">
-                                Listar Clientes
-                            </NavDropdown.Item>
-                            <NavDropdown.Divider />
-                        </NavDropdown>
-
-                        <NavDropdown title="Funcionário" id="basic-nav-dropdown">
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item href="/funcionario/cadastro">
-                                Cadastrar
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/funcionario/listar" className="dropdown-item">
-                                Listar Funcionários
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/funcionario/atualizar" className="dropdown-item">
-                                Atualizar
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/funcionario/deletar" className="dropdown-item">
-                                Deletar
-                            </NavDropdown.Item>
-                            <NavDropdown.Divider />
-                        </NavDropdown>
-
-                        <NavDropdown title="Fornecedor" id="basic-nav-dropdown">
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item href="/fornecedor/cadastro">
-                                Cadastrar
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/fornecedor/listar" className="dropdown-item">
-                                Listar Fornecedores
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/fornecedor/atualizar" className="dropdown-item">
-                                Atualizar
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/fornecedor/deletar" className="dropdown-item">
-                                Deletar
-                            </NavDropdown.Item>
-                            <NavDropdown.Divider />
-                        </NavDropdown>
-
-                        <NavDropdown title="Produto" id="basic-nav-dropdown">
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item href="/produto/cadastro">
-                                Cadastrar
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/produto/listar" className="dropdown-item">
-                                Listar Produtos
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/produto/atualizar" className="dropdown-item">
-                                Atualizar
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/produto/deletar" className="dropdown-item">
-                                Deletar
-                            </NavDropdown.Item>
-                            <NavDropdown.Divider />
-                        </NavDropdown>
-
-                        <NavDropdown title="Venda" id="basic-nav-dropdown">
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item href="/venda/cadastro">
-                                Realizar Venda
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/venda/listar" className="dropdown-item">
-                                Listar Vendas
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/venda/atualizar" className="dropdown-item">
-                                Atualizar
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="/venda/deletar" className="dropdown-item">
-                                Deletar
-                            </NavDropdown.Item>
-                            <NavDropdown.Divider />
-                        </NavDropdown>
-
-                        {/* <Nav.Link className="link" href="/estoque">Estoque</Nav.Link > */}
-                    </Nav>
-                </Navbar.Collapse >
-            </Container >
-        </Navbar >
-    );
+        <>
+            <header>
+                <nav>
+                    <Image
+                        src={Logo}
+                        alt="Logo"
+                        priority
+                        width={120}
+                        height={115}
+                        className="rounded-image"
+                    />
+                    <div className="mobile-menu">
+                        <div className="line1"></div>
+                        <div className="line2"></div>
+                        <div className="line3"></div>
+                    </div>
+                    <ul className="nav-list">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        <li>
+                            <Dropdown titulo="Cliente" componenteClicado={componenteClicado}
+                                setComponenteClicado={setComponenteClicado}>
+                                <a href="/cliente/cadastro">Cadastrar</a>
+                                <a href="/cliente/listar">Listar</a>
+                            </Dropdown>
+                        </li>
+                        <li>
+                            <Dropdown titulo="Funcionário" componenteClicado={componenteClicado}
+                                setComponenteClicado={setComponenteClicado}>
+                                <a href="/funcionario/cadastro">Cadastrar</a>
+                                <a href="/funcionario/listar">Listar</a>
+                            </Dropdown>
+                        </li>
+                        <li>
+                            <Dropdown titulo="Fornecedor" componenteClicado={componenteClicado}
+                                setComponenteClicado={setComponenteClicado}>
+                                <a href="/fornecedor/cadastro">Cadastrar</a>
+                                <a href="/fornecedor/listar">Listar</a>
+                            </Dropdown>
+                        </li>
+                        <li>
+                            <Dropdown titulo="Produto" componenteClicado={componenteClicado}
+                                setComponenteClicado={setComponenteClicado}>
+                                <a href="/produto/cadastro">Cadastrar</a>
+                                <a href="/produto/listar">Listar</a>
+                            </Dropdown>
+                        </li>
+                        <li>
+                            <Dropdown titulo="Venda" componenteClicado={componenteClicado}
+                                setComponenteClicado={setComponenteClicado}>
+                                <a href="/venda/cadastro">Cadastrar</a>
+                                <a href="/venda/listar">Listar</a>
+                            </Dropdown>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+            <main></main>
+        </>
+    )
 }
