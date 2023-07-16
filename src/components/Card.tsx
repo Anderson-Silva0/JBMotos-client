@@ -10,6 +10,7 @@ export function Card({ children, titulo }: CardProps) {
     return (
         <div className="card">
             <h3 className="card-header">{titulo}</h3>
+            <hr className="card-hr"/>
             <div className="card-body">
                 {children}
             </div>
