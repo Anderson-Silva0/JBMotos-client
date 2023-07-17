@@ -54,6 +54,10 @@ nav {
 }
 
 @media (max-width: 999px) {
+    nav {
+        height: auto;
+    }
+
     .nav-list {
         z-index: 9999;
         position: absolute;

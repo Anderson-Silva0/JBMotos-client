@@ -78,10 +78,13 @@ export default function ListarClientes() {
       </h1>
       <div className="div-container-buscar">
         <div className="div-buscar">
-          <Search size={50} strokeWidth={3} />
+          <Search size={60} strokeWidth={3} />
           {
             campoSelecionado === '' ? (
-              <strong>Selecione uma opção de busca: Nome, CPF, Email ou Telefone.</strong>
+              <div className="div-msg-busca">
+                <p>Selecione uma opção de busca:</p>
+                <p>Nome, CPF, Email ou Telefone.</p>
+              </div>
             ) : campoSelecionado === 'nome' ? (
               <input
                 className="input-buscar"
@@ -116,50 +119,58 @@ export default function ListarClientes() {
           }
         </div>
         <div className="div-radios">
-          <label className="label-radio" htmlFor="opcaoNome">Nome:</label>
-          <input
-            className="input-radio"
-            type="radio"
-            name="opcao"
-            id="opcaoNome"
-            value={campoSelecionado}
-            onChange={() => setCampoSelecionado('nome')}
-            onClick={() => handleRadioClick('nome')}
-            checked={campoSelecionado === 'nome'}
-          />
-          <label className="label-radio" htmlFor="opcaoCPF">CPF:</label>
-          <input
-            className="input-radio"
-            type="radio"
-            name="opcao"
-            id="opcaoCPF"
-            value={campoSelecionado}
-            onChange={() => setCampoSelecionado('cpf')}
-            onClick={() => handleRadioClick('cpf')}
-            checked={campoSelecionado === 'cpf'}
-          />
-          <label className="label-radio" htmlFor="opcaoEmail">Email:</label>
-          <input
-            className="input-radio"
-            type="radio"
-            name="opcao"
-            id="opcaoEmail"
-            value={campoSelecionado}
-            onChange={() => setCampoSelecionado('email')}
-            onClick={() => handleRadioClick('email')}
-            checked={campoSelecionado === 'email'}
-          />
-          <label className="label-radio" htmlFor="opcaoTelefone">Telefone:</label>
-          <input
-            className="input-radio"
-            type="radio"
-            name="opcao"
-            id="opcaoTelefone"
-            value={campoSelecionado}
-            onChange={() => setCampoSelecionado('telefone')}
-            onClick={() => handleRadioClick('telefone')}
-            checked={campoSelecionado === 'telefone'}
-          />
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoNome">Nome</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoNome"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('nome')}
+              onClick={() => handleRadioClick('nome')}
+              checked={campoSelecionado === 'nome'}
+            />
+          </div>
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoCPF">CPF</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoCPF"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('cpf')}
+              onClick={() => handleRadioClick('cpf')}
+              checked={campoSelecionado === 'cpf'}
+            />
+          </div>
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoEmail">Email</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoEmail"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('email')}
+              onClick={() => handleRadioClick('email')}
+              checked={campoSelecionado === 'email'}
+            />
+          </div>
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoTelefone">Telefone</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoTelefone"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('telefone')}
+              onClick={() => handleRadioClick('telefone')}
+              checked={campoSelecionado === 'telefone'}
+            />
+          </div>
         </div>
       </div>
       {clientes.map((cliente) => {

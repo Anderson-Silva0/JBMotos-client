@@ -157,7 +157,7 @@
 
 .div-buscar {
   display: flex;
-  width: 70%;
+  width: 70vw;
   text-align: center;
   align-items: center;
   justify-content: center;
@@ -168,17 +168,31 @@
   width: 80%;
 }
 
+.div-msg-busca p {
+  font-weight: 700;
+  text-align: center;
+  font-size: 2vw;
+  width: 32vw;
+  margin: 1px;
+}
+
+.div-dupla-radio {
+  display: flex;
+  flex-direction: column;
+}
+
 .input-radio {
-  height: 7vw;
-  width: 7vw;
-  display: inline;
+  height: 2.5vw;
+  width: 2.5vw;
+  margin: 8px auto 0 auto;
 }
 
 .label-radio {
-  display: inline-flex;
-  align-items: center;
-  vertical-align: middle;
   font-weight: 700;
+  margin: auto;
+  border-radius: 10px;
+  background-color: white;
+  padding: 8px;
 }
 
 .input-buscar {
@@ -191,13 +205,8 @@
 
 .div-radios {
   display: flex;
-  justify-content: space-between;
-  gap: 4px;
-  width: 70%;
-}
-
-.div-radios input {
-  margin-right: 1vw;
+  justify-content: space-around;
+  width: 50%;
 }
 
 @media (max-width: 999px) {
@@ -211,14 +220,23 @@
     width: 100vw;
   }
 
+  #info-title {
+    display: flex;
+    font-size: 6.3vw;
+    font-weight: 800;
+    margin-bottom: 4%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .div-radios {
     display: flex;
     justify-content: space-between;
     gap: 4px;
     align-items: center;
     justify-content: center;
-    width: 95%;
-    height: 4vh;
+    width: auto;
+    height: auto;
   }
 
   .label-radio {
@@ -229,6 +247,12 @@
     font-size: 4vw;
   }
 
+  .input-radio {
+    height: 6vw;
+    width: 6vw;
+    margin: 8px auto 0 auto;
+  }
+
   .div-dados {
     background-color: #DEE2E6;
     border-radius: 2vh;
@@ -236,6 +260,7 @@
     font-weight: 900;
     width: 85%;
     margin-bottom: 1%;
+    font-size: 3.3vw;
   }
 
   .div-resultado {
@@ -284,5 +309,13 @@
     font-size: 2vh;
     color: #495057;
     font-weight: 700;
+  }
+
+  .div-msg-busca p {
+    font-weight: 700;
+    text-align: center;
+    font-size: 4vw;
+    width: 32vw;
+    margin: 1px;
   }
 }
