@@ -47,8 +47,6 @@ export default function NavBar() {
                         src={Logo}
                         alt="Logo"
                         priority
-                        width={120}
-                        height={115}
                         className="rounded-image"
                     />
                     <div className="mobile-menu">
