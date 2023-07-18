@@ -39,8 +39,10 @@ export default function CadastroCliente() {
     }
 
     useEffect(() => {
+        if (endereco.cep.length < 9 && endereco.rua || endereco.cidade || endereco.bairro) {
+            setEndereco({ ...endereco, rua: '', bairro: '', cidade: '' })
+        }
         const buscarEndereco = async () => {
-            console.log('teste')
             try {
                 const enderecoResponse = await buscarEnderecoPorCep(endereco.cep)
                 if (enderecoResponse.data.erro) {
