@@ -18,7 +18,8 @@ export default function CadastroCliente() {
     } = ClienteService()
     const {
         salvarEndereco,
-        deletarEndereco
+        deletarEndereco,
+        buscarEnderecoPorCep
     } = EnderecoService()
 
     const [erros, setErros] = useState<Erros[]>([])
@@ -36,6 +37,33 @@ export default function CadastroCliente() {
         setEndereco({ ...endereco, [key]: e.target.value })
         setErros([])
     }
+
+    useEffect(() => {
+        const buscarEndereco = async () => {
+            console.log('teste')
+            try {
+                const enderecoResponse = await buscarEnderecoPorCep(endereco.cep)
+                if (enderecoResponse.data.erro) {
+                    setErros([...erros, {
+                        nomeInput: 'cep',
+                        mensagemErro: 'CEP inexistente. Verifique e corrija.',
+                    }])
+                } else {
+                    setEndereco({
+                        ...endereco,
+                        rua: enderecoResponse.data.logradouro,
+                        bairro: enderecoResponse.data.bairro,
+                        cidade: enderecoResponse.data.localidade
+                    })
+                }
+            } catch (error: any) {
+                mensagemErro('Erro ao tentar buscar Endereço por CEP.')
+            }
+        }
+        if (endereco.cep.length === 9) {
+            buscarEndereco()
+        }
+    }, [endereco.cep])
 
     const exibirErrosCliente = async () => {
         if (erros.length > 0) {
@@ -98,14 +126,6 @@ export default function CadastroCliente() {
     return (
         <div className='div-form-container'>
             <Card titulo="Dados do Cliente">
-                <FormGroup label="CPF: *" htmlFor="cpf">
-                    <InputCpf
-                        id='cpf'
-                        value={cliente.cpf}
-                        onChange={e => setPropsCliente("cpf", e)}
-                    />
-                    {<ExibeErro erros={erros} nomeInput='cpf' />}
-                </FormGroup>
                 <FormGroup label="Nome: *" htmlFor="nome">
                     <input
                         value={cliente.nome}
@@ -114,6 +134,14 @@ export default function CadastroCliente() {
                         type="text"
                     />
                     {<ExibeErro erros={erros} nomeInput='nome' />}
+                </FormGroup>
+                <FormGroup label="CPF: *" htmlFor="cpf">
+                    <InputCpf
+                        id='cpf'
+                        value={cliente.cpf}
+                        onChange={e => setPropsCliente("cpf", e)}
+                    />
+                    {<ExibeErro erros={erros} nomeInput='cpf' />}
                 </FormGroup>
                 <FormGroup label="Email: *" htmlFor="email">
                     <input
@@ -124,7 +152,7 @@ export default function CadastroCliente() {
                     />
                     {<ExibeErro erros={erros} nomeInput='email' />}
                 </FormGroup>
-                <FormGroup label="Telefone: *" htmlFor="telefone">
+                <FormGroup label="Celular: *" htmlFor="telefone">
                     <InputTelefone
                         id='telefone'
                         value={cliente.telefone}
@@ -134,7 +162,18 @@ export default function CadastroCliente() {
                 </FormGroup>
             </Card>
             <Card titulo="Endereço do Cliente">
-                <FormGroup label="Endereço: *" htmlFor="rua">
+                <FormGroup label="CEP: *" htmlFor="cep">
+                    <span className="cep-message">
+                        Digite o CEP para preenchimento automático do endereço.
+                    </span>
+                    <InputCep
+                        id='cep'
+                        value={endereco.cep}
+                        onChange={e => setPropsEndereco("cep", e)}
+                    />
+                    {<ExibeErro erros={erros} nomeInput='cep' />}
+                </FormGroup>
+                <FormGroup label="Logradouro: *" htmlFor="rua">
                     <input
                         value={endereco.rua}
                         onChange={e => setPropsEndereco("rua", e)}
@@ -142,14 +181,6 @@ export default function CadastroCliente() {
                         type="text"
                     />
                     {<ExibeErro erros={erros} nomeInput='rua' />}
-                </FormGroup>
-                <FormGroup label="CEP: *" htmlFor="cep">
-                    <InputCep
-                        id='cep'
-                        value={endereco.cep}
-                        onChange={e => setPropsEndereco("cep", e)}
-                    />
-                    {<ExibeErro erros={erros} nomeInput='cep' />}
                 </FormGroup>
                 <FormGroup label="Número: *" htmlFor="numero">
                     <input

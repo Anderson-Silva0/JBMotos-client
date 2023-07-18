@@ -1,7 +1,8 @@
+import axios from "axios"
 import { ApiService } from "./apiService"
 
 export const EnderecoService = () => {
-    
+
     const url = "/endereco"
 
     const salvarEndereco = (dados: object) => {
@@ -24,11 +25,16 @@ export const EnderecoService = () => {
         return ApiService.delete(`${url}/deletar/${id}`)
     }
 
+    const buscarEnderecoPorCep = (cep: string) => {
+        return axios.get(`https://viacep.com.br/ws/${cep}/json/`)
+    }
+
     return {
         salvarEndereco,
         buscarTodosEnderecos,
         buscarEnderecoPorId,
         atualizarEndereco,
-        deletarEndereco
+        deletarEndereco,
+        buscarEnderecoPorCep
     }
 }

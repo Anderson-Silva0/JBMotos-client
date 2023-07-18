@@ -11,15 +11,14 @@ interface ExibeErroProps {
 }
 
 export function ExibeErro({ erros, nomeInput }: ExibeErroProps) {
-  const erroExistente = erros.find(erro => erro.nomeInput === nomeInput);
+  const erroExistente = erros.find(erro => erro.nomeInput === nomeInput)
 
   if (erroExistente) {
     return (
       <span className="erro">
         {erroExistente.mensagemErro}
       </span>
-    );
+    )
   }
-
-  return null;
+  return null
 }
