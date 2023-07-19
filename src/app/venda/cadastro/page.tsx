@@ -100,7 +100,9 @@ export default function CadastroVenda() {
         setClientes(todosClientesResponse.data)
 
         const todosFuncionariosResponse = await buscarTodosFuncionarios()
-        setFuncionarios(todosFuncionariosResponse.data)
+        const todosFuncionarios = todosFuncionariosResponse.data
+        const funcionariosAtivos = todosFuncionarios.filter((f: Funcionario) => f.statusFuncionario === 'ATIVO')
+        setFuncionarios(funcionariosAtivos)
 
         const todosProdutosResponse = await buscarTodosProdutos()
         setProdutos(todosProdutosResponse.data)
