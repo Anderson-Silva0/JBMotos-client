@@ -1,5 +1,5 @@
-import axios from "axios";
+import axios from "axios"
 
 export const ApiService = axios.create({
-    baseURL: process.env.JBMOTOS_APP_API_BASE_URL
+    baseURL: "https://0294-168-194-66-92.ngrok.io/api"
 })
