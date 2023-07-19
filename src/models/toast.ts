@@ -35,10 +35,10 @@ export function mensagemAlerta(mensagem: string) {
   mostrarMensagem('Alerta', mensagem, 'warning')
 }
 
-export function confirmarDelecao(callback: () => void) {
+export function confirmarDelecao(titulo: string, mensagem: string, callback: () => void) {
   confirmAlert({
-    title: 'Excluir Cliente',
-    message: 'Ao deletar este cliente, todas as informações relacionadas a ele serão permanentemente removidas do sistema, incluindo o endereço cadastrado e quaisquer motocicletas associadas. Além disso, todas as vendas feitas para este cliente serão excluídas permanentemente. Por favor, tenha certeza antes de confirmar a exclusão do cliente, pois essa ação não poderá ser desfeita. Deseja realmente deletar?',
+    title: titulo,
+    message: mensagem,
     buttons: [
       {
         label: 'Sim',
