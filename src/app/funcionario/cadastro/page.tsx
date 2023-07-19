@@ -11,6 +11,7 @@ import { mensagemSucesso, mensagemErro } from "@/models/toast"
 import { EnderecoService } from "@/services/enderecoService"
 import { FuncionarioService } from "@/services/funcionarioService"
 import { useState, ChangeEvent, useEffect, } from "react"
+import { Save } from 'lucide-react'
 
 export default function CadastroFuncionario() {
 
@@ -19,28 +20,61 @@ export default function CadastroFuncionario() {
   } = FuncionarioService()
   const {
     salvarEndereco,
-    deletarEndereco
+    deletarEndereco,
+    buscarEnderecoPorCep
   } = EnderecoService()
 
   const [erros, setErros] = useState<Erros[]>([])
 
   const [funcionario, setFuncionario] = useState<Funcionario>(estadoInicialFuncionario)
 
+  const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
+
   const setPropsFuncionario = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setFuncionario({ ...funcionario, [key]: e.target.value })
+    setErros([])
   }
-
-  const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
 
   const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setEndereco({ ...endereco, [key]: e.target.value })
+    if (endereco.cep.length < 9) {
+      setErros([])
+    }
   }
+
+  useEffect(() => {
+    if (endereco.cep.length < 9 && endereco.rua || endereco.cidade || endereco.bairro) {
+      setEndereco({ ...endereco, rua: '', bairro: '', cidade: '' })
+    }
+    const buscarEndereco = async () => {
+      try {
+        const enderecoResponse = await buscarEnderecoPorCep(endereco.cep)
+        if (enderecoResponse.data.erro) {
+          setErros([...erros, {
+            nomeInput: 'cep',
+            mensagemErro: 'CEP inexistente. Verifique e corrija.',
+          }])
+        } else {
+          setEndereco({
+            ...endereco,
+            rua: enderecoResponse.data.logradouro,
+            bairro: enderecoResponse.data.bairro,
+            cidade: enderecoResponse.data.localidade
+          })
+        }
+      } catch (error: any) {
+        mensagemErro('Erro ao tentar buscar Endereço por CEP.')
+      }
+    }
+    if (endereco.cep.length === 9) {
+      buscarEndereco()
+    }
+  }, [endereco.cep])
 
   const exibirErrosFuncionario = async () => {
     if (erros.length > 0) {
       setErros([])
     }
-
     try {
       await salvarFuncionario(funcionario)
     } catch (error) {
@@ -55,9 +89,30 @@ export default function CadastroFuncionario() {
       setEndereco({ ...endereco, id: responseEndereco.data.id })
       setFuncionario({ ...funcionario, endereco: responseEndereco.data.id })
     } catch (erro: any) {
+      mensagemErro('Erro no preenchimento dos campos.')
       exibirErros(erro)
     }
   }
+
+  useEffect(() => {
+    const salvarFuncionarioAtualizado = async () => {
+      try {
+        await salvarFuncionario(funcionario)
+        mensagemSucesso("Funcionário cadastrado com sucesso!")
+        setFuncionario(estadoInicialFuncionario)
+        setEndereco(estadoInicialEndereco)
+      } catch (erro: any) {
+        erros.map(e => e.nomeInput === 'error' && mensagemErro(e.mensagemErro))
+        await deletarEndereco(endereco.id)
+        setEndereco({ ...endereco, id: 0 })
+        setFuncionario({ ...funcionario, endereco: 0 })
+        mensagemErro('Erro no preenchimento dos campos')
+      }
+    }
+    if (endereco.id !== 0) {
+      salvarFuncionarioAtualizado()
+    }
+  }, [funcionario.endereco])
 
   const exibirErros = (erro: any) => {
     const objErro = erro.response.data
@@ -74,35 +129,12 @@ export default function CadastroFuncionario() {
     }
   }
 
-  useEffect(() => {
-    const salvarFuncionarioAtualizado = async () => {
-      try {
-        await salvarFuncionario(funcionario)
-        mensagemSucesso("Funcionário e endereço salvos com sucesso!")
-        setFuncionario(estadoInicialFuncionario)
-        setEndereco(estadoInicialEndereco)
-      } catch (erro: any) {
-        erros.map(e => e.nomeInput === 'error' && mensagemErro(e.mensagemErro))
-        await deletarEndereco(endereco.id)
-        setEndereco({ ...endereco, id: 0 })
-        setFuncionario({ ...funcionario, endereco: 0 })
-      }
-    }
-    if (endereco.id !== 0) {
-      salvarFuncionarioAtualizado()
-    }
-  }, [funcionario, deletarEndereco, endereco, salvarFuncionario, erros])
-
   return (
     <div className='div-form-container'>
+      <h1 className="centered-text">
+        <Save size='6vh' strokeWidth={3} /> Cadastro de Funcionário
+      </h1>
       <Card titulo="Dados do Funcionário">
-        <FormGroup label="CPF: *" htmlFor="cpf">
-          <InputCpf
-            value={funcionario.cpf}
-            onChange={e => setPropsFuncionario("cpf", e)}
-          />
-          {<ExibeErro erros={erros} nomeInput='cpf' />}
-        </FormGroup>
         <FormGroup label="Nome: *" htmlFor="nome">
           <input
             value={funcionario.nome}
@@ -112,7 +144,14 @@ export default function CadastroFuncionario() {
           />
           {<ExibeErro erros={erros} nomeInput='nome' />}
         </FormGroup>
-        <FormGroup label="Telefone: *" htmlFor="telefone">
+        <FormGroup label="CPF: *" htmlFor="cpf">
+          <InputCpf
+            value={funcionario.cpf}
+            onChange={e => setPropsFuncionario("cpf", e)}
+          />
+          {<ExibeErro erros={erros} nomeInput='cpf' />}
+        </FormGroup>
+        <FormGroup label="Celular: *" htmlFor="telefone">
           <InputTelefone
             value={funcionario.telefone}
             onChange={e => setPropsFuncionario("telefone", e)}
@@ -120,8 +159,19 @@ export default function CadastroFuncionario() {
           {<ExibeErro erros={erros} nomeInput='telefone' />}
         </FormGroup>
       </Card>
-      <Card titulo="Endereço do Funcionario">
-        <FormGroup label="Endereço: *" htmlFor="rua">
+      <Card titulo="Endereço do Funcionário">
+        <FormGroup label="CEP: *" htmlFor="cep">
+          <span className="cep-message">
+            Digite o CEP para preenchimento automático do endereço.
+          </span>
+          <InputCep
+            id='cep'
+            value={endereco.cep}
+            onChange={e => setPropsEndereco("cep", e)}
+          />
+          {<ExibeErro erros={erros} nomeInput='cep' />}
+        </FormGroup>
+        <FormGroup label="Logradouro: *" htmlFor="rua">
           <input
             value={endereco.rua}
             onChange={e => setPropsEndereco("rua", e)}
@@ -129,13 +179,6 @@ export default function CadastroFuncionario() {
             type="text"
           />
           {<ExibeErro erros={erros} nomeInput='rua' />}
-        </FormGroup>
-        <FormGroup label="CEP: *" htmlFor="cep">
-          <InputCep
-            value={endereco.cep}
-            onChange={e => setPropsEndereco("cep", e)}
-          />
-          {<ExibeErro erros={erros} nomeInput='cep' />}
         </FormGroup>
         <FormGroup label="Número: *" htmlFor="numero">
           <input
