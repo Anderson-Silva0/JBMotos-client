@@ -1,7 +1,7 @@
 import { ApiService } from "./apiService"
 
 export const FuncionarioService = () => {
-    
+
     const url = "/funcionario"
 
     const salvarFuncionario = (dados: object) => {
@@ -16,6 +16,14 @@ export const FuncionarioService = () => {
         return ApiService.get(`${url}/buscar/${cpf}`)
     }
 
+    const filtrarFuncionario = (nomeCampo: string, valor: string) => {
+        return ApiService.get(`${url}/filtrar/?${nomeCampo}=${valor}`)
+    }
+
+    const alternarStatusFuncionario = (cpf: string) => {
+        return ApiService.patch(`${url}/alternar-status/${cpf}`)
+    }
+
     const atualizarFuncionario = (cpf: string, dados: object) => {
         return ApiService.put(`${url}/atualizar/${cpf}`, dados)
     }
@@ -28,6 +36,8 @@ export const FuncionarioService = () => {
         salvarFuncionario,
         buscarTodosFuncionarios,
         buscarFuncionarioPorCpf,
+        filtrarFuncionario,
+        alternarStatusFuncionario,
         atualizarFuncionario,
         deletarFuncionario
     }
