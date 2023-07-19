@@ -35,9 +35,11 @@ export default function ClienteCard({ cliente, clientes, setClientes }: ClienteC
   }, [])
 
   const handlerDeletar = () => {
-    confirmarDelecao(() => {
-      deletar()
-    })
+    confirmarDelecao('Excluir Cliente',
+      'Ao deletar este cliente, todas as informações relacionadas a ele serão permanentemente removidas do sistema, incluindo o endereço cadastrado e quaisquer motocicletas associadas. Além disso, todas as vendas feitas para este cliente serão excluídas permanentemente. Por favor, tenha certeza antes de confirmar a exclusão do cliente, pois essa ação não poderá ser desfeita. Deseja realmente deletar?',
+      () => {
+        deletar()
+      })
   }
 
   const deletar = async () => {
