@@ -7,27 +7,39 @@ import { FuncionarioService } from "@/services/funcionarioService"
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import imgFuncionario from "@/images/employee.png"
+import { Search } from "lucide-react"
+import { InputCpf, InputTelefone } from "@/components/Input"
 
 export default function ListarFuncionarios() {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
 
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
 
-  const { buscarTodosFuncionarios } = FuncionarioService()
+  const [valorInputBuscar, setValorInputBuscar] = useState<string>('')
+
+  const [campoSelecionado, setCampoSelecionado] = useState<string>('')
+
+  const { filtrarFuncionario } = FuncionarioService()
 
   useEffect(() => {
-    const buscarTodos = async () => {
+    const buscarPorCpf = async () => {
       try {
-        const response = await buscarTodosFuncionarios()
-        setFuncionarios(response.data)
+        const clienteResponse = await filtrarFuncionario(campoSelecionado, valorInputBuscar)
+        setFuncionarios(clienteResponse.data)
       } catch (error: any) {
-        mensagemErro(error.response.data)
+        mensagemErro('Erro ao tentar buscar funcionário.')
       } finally {
         setFoiCarregado(true)
       }
     }
-    buscarTodos()
-  }, [])
+    buscarPorCpf()
+  }, [valorInputBuscar, campoSelecionado])
+
+  const handleRadioClick = (campo: string) => {
+    if (campoSelecionado === campo) {
+      setCampoSelecionado('')
+    }
+  }
 
   if (!foiCarregado) {
     return <h1 className="carregando">Carregando...</h1>
@@ -37,29 +49,118 @@ export default function ListarFuncionarios() {
     <div className="div-form-container">
       <h1 className="centered-text">
         {
-          funcionarios.length > 1 ? (
+          campoSelecionado === '' ? (
+            funcionarios.length > 1 ? (
+              <>
+                <Image src={imgFuncionario} width={60} height={60} alt="" /> {funcionarios.length} Funcionários cadastrados
+              </>
+            ) : funcionarios.length === 1 ? (
+              <>
+                <Image src={imgFuncionario} width={60} height={60} alt="" /> {funcionarios.length} Funcionário cadastrado
+              </>
+            ) : (
+              'Nenhum Funcionário cadastrado no sistema'
+            )
+          ) : campoSelecionado !== '' && valorInputBuscar !== '' && (
             <>
-              <Image src={imgFuncionario} width={60} height={60} alt="" /> {funcionarios.length} Funcionários cadastrados
+              {
+                funcionarios.length === 1 ? (
+                  <strong>{funcionarios.length} Funcionário encontrado</strong>
+                ) : funcionarios.length > 1 ? (
+                  <strong>{funcionarios.length} Funcionários encontrados</strong>
+                ) : (
+                  'Nenhum Funcionário encontrado'
+                )
+              }
             </>
-          ) : funcionarios.length === 1 ? (
-            <>
-              <Image src={imgFuncionario} width={60} height={60} alt="" /> {funcionarios.length} Funcionário cadastrado
-            </>
-          ) : (
-            'Nenhum Funcionário cadastrado no sistema'
           )
         }
       </h1>
+      <div className="div-container-buscar">
+        <div className="div-buscar">
+          <Search size={60} strokeWidth={3} />
+          {
+            campoSelecionado === '' ? (
+              <div className="div-msg-busca">
+                <p>Selecione uma opção de busca:</p>
+                <p>Nome, CPF ou Telefone.</p>
+              </div>
+            ) : campoSelecionado === 'nome' ? (
+              <input
+                className="input-buscar"
+                placeholder="Digite o Nome"
+                type="search"
+                onChange={(e) => setValorInputBuscar(e.target.value)}
+              />
+            ) : campoSelecionado === 'cpf' ? (
+              <InputCpf
+                className="input-buscar"
+                placeholder="Digite o CPF"
+                type="search"
+                value={valorInputBuscar}
+                onChange={(e) => setValorInputBuscar(e.target.value)}
+              />
+            ) : campoSelecionado === 'telefone' && (
+              <InputTelefone
+                className="input-buscar"
+                placeholder="Digite o Telefone"
+                type="search"
+                value={valorInputBuscar}
+                onChange={(e) => setValorInputBuscar(e.target.value)}
+              />
+            )
+          }
+        </div>
+        <div className="div-radios">
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoNome">Nome</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoNome"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('nome')}
+              onClick={() => handleRadioClick('nome')}
+              checked={campoSelecionado === 'nome'}
+            />
+          </div>
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoCPF">CPF</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoCPF"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('cpf')}
+              onClick={() => handleRadioClick('cpf')}
+              checked={campoSelecionado === 'cpf'}
+            />
+          </div>
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoTelefone">Telefone</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoTelefone"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('telefone')}
+              onClick={() => handleRadioClick('telefone')}
+              checked={campoSelecionado === 'telefone'}
+            />
+          </div>
+        </div>
+      </div>
 
       {funcionarios.map((funcionario) => {
         return (
           <FuncionarioCard
             key={funcionario.cpf}
-            cpf={funcionario.cpf}
-            nome={funcionario.nome}
-            telefone={funcionario.telefone}
-            endereco={funcionario.endereco}
-            dataHoraCadastro={funcionario.dataHoraCadastro}
+            funcionario={funcionario}
+            funcionarios={funcionarios}
+            setFuncionarios={setFuncionarios}
           />
         )
       })}
