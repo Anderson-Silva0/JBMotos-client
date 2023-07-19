@@ -11,6 +11,7 @@ import { ClienteService } from '@/services/clienteService'
 import { EnderecoService } from '@/services/enderecoService'
 import { ExibeErro } from '@/components/ExibeErro'
 import { Erros } from '@/models/erros'
+import { Save } from 'lucide-react'
 
 export default function CadastroCliente() {
     const {
@@ -26,16 +27,18 @@ export default function CadastroCliente() {
 
     const [cliente, setCliente] = useState<Cliente>(estadoInicialCliente)
 
+    const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
+
     const setPropsCliente = (key: string, e: ChangeEvent<HTMLInputElement>) => {
         setCliente({ ...cliente, [key]: e.target.value })
         setErros([])
     }
 
-    const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
-
     const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
         setEndereco({ ...endereco, [key]: e.target.value })
-        setErros([])
+        if (endereco.cep.length < 9) {
+            setErros([])
+        }
     }
 
     useEffect(() => {
@@ -90,6 +93,26 @@ export default function CadastroCliente() {
         }
     }
 
+    useEffect(() => {
+        const salvarClienteAtualizado = async () => {
+            try {
+                await salvarCliente(cliente)
+                mensagemSucesso("Cliente cadastrado com sucesso!")
+                setCliente(estadoInicialCliente)
+                setEndereco(estadoInicialEndereco)
+            } catch (erro: any) {
+                erros.map(e => e.nomeInput === 'error' && mensagemErro(e.mensagemErro))
+                await deletarEndereco(endereco.id)
+                setEndereco({ ...endereco, id: 0 })
+                setCliente({ ...cliente, endereco: 0 })
+                mensagemErro('Erro no preenchimento dos campos')
+            }
+        }
+        if (endereco.id !== 0) {
+            salvarClienteAtualizado()
+        }
+    }, [cliente.endereco])
+
     const salvarErros = (erro: any) => {
         const objErro = erro.response.data
         const keys = Object.keys(objErro)
@@ -105,28 +128,11 @@ export default function CadastroCliente() {
         }
     }
 
-    useEffect(() => {
-        const salvarClienteAtualizado = async () => {
-            try {
-                await salvarCliente(cliente)
-                mensagemSucesso("Cliente e endereço salvos com sucesso!")
-                setCliente(estadoInicialCliente)
-                setEndereco(estadoInicialEndereco)
-            } catch (erro: any) {
-                erros.map(e => e.nomeInput === 'error' && mensagemErro(e.mensagemErro))
-                await deletarEndereco(endereco.id)
-                setEndereco({ ...endereco, id: 0 })
-                setCliente({ ...cliente, endereco: 0 })
-                mensagemErro('Erro no preenchimento dos campos')
-            }
-        }
-        if (endereco.id !== 0) {
-            salvarClienteAtualizado()
-        }
-    }, [cliente, endereco])
-
     return (
         <div className='div-form-container'>
+            <h1 className="centered-text">
+                <Save size='6vh' strokeWidth={3} /> Cadastro de Cliente
+            </h1>
             <Card titulo="Dados do Cliente">
                 <FormGroup label="Nome: *" htmlFor="nome">
                     <input

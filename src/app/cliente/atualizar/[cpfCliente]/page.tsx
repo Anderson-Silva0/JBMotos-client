@@ -29,24 +29,56 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
   } = ClienteService()
   const {
     atualizarEndereco,
-    buscarEnderecoPorId
+    buscarEnderecoPorId,
+    buscarEnderecoPorCep
   } = EnderecoService()
 
   const [erros, setErros] = useState<Erros[]>([])
 
   const [cliente, setCliente] = useState<Cliente>(estadoInicialCliente)
 
+  const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
+
   const setPropsCliente = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setCliente({ ...cliente, [key]: e.target.value })
     setErros([])
   }
 
-  const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
-
   const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setEndereco({ ...endereco, [key]: e.target.value })
-    setErros([])
+    if (endereco.cep.length < 9) {
+      setErros([])
+    }
   }
+
+  useEffect(() => {
+    if (endereco.cep.length < 9 && endereco.rua || endereco.cidade || endereco.bairro) {
+      setEndereco({ ...endereco, rua: '', bairro: '', cidade: '' })
+    }
+    const buscarEndereco = async () => {
+      try {
+        const enderecoResponse = await buscarEnderecoPorCep(endereco.cep)
+        if (enderecoResponse.data.erro) {
+          setErros([...erros, {
+            nomeInput: 'cep',
+            mensagemErro: 'CEP inexistente. Verifique e corrija.',
+          }])
+        } else {
+          setEndereco({
+            ...endereco,
+            rua: enderecoResponse.data.logradouro,
+            bairro: enderecoResponse.data.bairro,
+            cidade: enderecoResponse.data.localidade
+          })
+        }
+      } catch (error: any) {
+        mensagemErro('Erro ao tentar buscar Endereço por CEP.')
+      }
+    }
+    if (endereco.cep.length === 9) {
+      buscarEndereco()
+    }
+  }, [endereco.cep])
 
   useEffect(() => {
     const buscar = async () => {
@@ -63,7 +95,7 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
     try {
       await atualizarCliente(cliente.cpf, cliente)
       await atualizarEndereco(endereco.id, endereco)
-      mensagemSucesso('Cliente e Endereço atualizados com sucesso.')
+      mensagemSucesso('Cliente atualizado com sucesso.')
       router.push('/cliente/listar')
     } catch (erro: any) {
       salvarErros(erro)
@@ -89,7 +121,7 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
   return (
     <div className='div-form-container'>
       <h1 className="centered-text">
-        <Edit3 className='icones-atualizacao-e-delecao' /> Atualização de Cliente e Endereço
+        <Edit3 size='6vh' strokeWidth={3} /> Atualização de Cliente
       </h1>
       <Card titulo="Dados do Cliente">
         <FormGroup label="Nome: *" htmlFor="nome">
@@ -110,7 +142,7 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
           />
           {<ExibeErro erros={erros} nomeInput='email' />}
         </FormGroup>
-        <FormGroup label="Telefone: *" htmlFor="telefone">
+        <FormGroup label="Celular: *" htmlFor="telefone">
           <InputTelefone
             value={cliente.telefone}
             onChange={e => setPropsCliente("telefone", e)}
@@ -119,7 +151,17 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
         </FormGroup>
       </Card>
       <Card titulo="Endereço do Cliente">
-        <FormGroup label="Endereço: *" htmlFor="rua">
+        <FormGroup label="CEP: *" htmlFor="cep">
+          <span className="cep-message">
+            Digite o CEP para preenchimento automático do endereço.
+          </span>
+          <InputCep
+            value={endereco.cep}
+            onChange={e => setPropsEndereco("cep", e)}
+          />
+          {<ExibeErro erros={erros} nomeInput='cep' />}
+        </FormGroup>
+        <FormGroup label="Logradouro: *" htmlFor="rua">
           <input
             value={endereco.rua}
             onChange={e => setPropsEndereco("rua", e)}
@@ -127,13 +169,6 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
             type="text"
           />
           {<ExibeErro erros={erros} nomeInput='rua' />}
-        </FormGroup>
-        <FormGroup label="CEP: *" htmlFor="cep">
-          <InputCep
-            value={endereco.cep}
-            onChange={e => setPropsEndereco("cep", e)}
-          />
-          {<ExibeErro erros={erros} nomeInput='cep' />}
         </FormGroup>
         <FormGroup label="Número: *" htmlFor="numero">
           <input
