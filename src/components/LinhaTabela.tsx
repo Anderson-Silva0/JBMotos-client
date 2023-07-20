@@ -12,7 +12,9 @@ import { ProdutoPedido, estadoInicialProdutoPedido } from "@/models/ProdutoPedid
 import { selectStylesVenda } from '@/models/selectStyles'
 import { Produto } from '@/models/produto'
 import { formatarParaReal } from "@/models/formatadorReal"
-import { mensagemErro } from "@/models/toast"
+import { mensagemAlerta, mensagemErro } from "@/models/toast"
+import { EstoqueService } from "@/services/estoqueService"
+import { Estoque, estadoInicialEstoque } from "@/models/estoque"
 
 
 interface LinhaTabelaProps {
@@ -43,26 +45,45 @@ const estadoInicialOpcaoSelecionada: OpcaoSelecionadaProps = {
 
 export default function LinhaTabela(props: LinhaTabelaProps) {
   const { salvarProdutoPedido } = ProdutoPedidoService()
+  const { buscarEstoquePorId } = EstoqueService()
 
   const [valorTotal, setValorTotal] = useState<number>(0)
   const [produtoPedido, setProdutoPedido] = useState<ProdutoPedido>(estadoInicialProdutoPedido)
   const [opcaoSelecionada, setOpcaoSelecionada] = useState<OpcaoSelecionadaProps>(estadoInicialOpcaoSelecionada)
+  const [estoqueProdutoSelecionado, setEstoqueProdutoSelecionado] = useState<Estoque>(estadoInicialEstoque)
+
+  useEffect(() => {
+    if (opcaoSelecionada.idProduto) {
+      props.atualizarIdProdutoIdLinhaSelecionado(opcaoSelecionada.idProduto, props.idLinha)
+    }
+    const verificarEstoque = async () => {
+      const estoqueResponse = await buscarEstoquePorId(opcaoSelecionada.idEstoqueProduto)
+      setEstoqueProdutoSelecionado(estoqueResponse.data)
+    }
+    if (opcaoSelecionada.idProduto) {
+      verificarEstoque()
+    }
+  }, [opcaoSelecionada.idProduto])
 
   useEffect(() => {
     const setQuantidadeInicial = () => {
-      if (opcaoSelecionada.idProduto) {
-        props.atualizarIdProdutoIdLinhaSelecionado(opcaoSelecionada.idProduto, props.idLinha)
-      }
-
-      if (opcaoSelecionada.idProduto != 0) {
+      if (opcaoSelecionada.idProduto !== 0 && estoqueProdutoSelecionado.status !== 'INDISPONIVEL') {
         setProdutoPedido((prevState) => ({
           ...prevState,
           quantidade: 1
         }))
+      } else {
+        setProdutoPedido((prevState) => ({
+          ...prevState,
+          quantidade: 0
+        }))
+        if (opcaoSelecionada.label !== 'Selecione...') {
+          mensagemAlerta(`${opcaoSelecionada.label} indisponível no estoque.`)
+        }
       }
     }
     setQuantidadeInicial()
-  }, [opcaoSelecionada.idProduto])
+  }, [estoqueProdutoSelecionado])
 
   const atualizarValorTotal = (total: number) => {
     const novoArray = props.valoresTotais.map(item => {
@@ -137,9 +158,18 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
   }
 
   const setPropQuantidade = (e: ChangeEvent<HTMLInputElement>) => {
-    const novoValor = Number(e.target.value)
+    let novoValor = Number(e.target.value)
+    if (novoValor > Number(estoqueProdutoSelecionado.quantidade) && estoqueProdutoSelecionado.status !== 'INDISPONIVEL') {
+      novoValor = Number(estoqueProdutoSelecionado.quantidade)
+      mensagemAlerta(`Limite de estoque atingido. Máximo de ${estoqueProdutoSelecionado.quantidade}
+       unidades disponíveis para ${opcaoSelecionada.label}.`)
+    }
     if (opcaoSelecionada.idProduto) {
-      setProdutoPedido({ ...produtoPedido, quantidade: novoValor < 1 ? 1 : novoValor })
+      if (estoqueProdutoSelecionado.status !== 'INDISPONIVEL') {
+        setProdutoPedido({ ...produtoPedido, quantidade: novoValor < 1 ? 1 : novoValor })
+      } else {
+        setProdutoPedido({ ...produtoPedido, quantidade: 0 })
+      }
     } else {
       setProdutoPedido({ ...produtoPedido, quantidade: novoValor < 0 ? 0 : novoValor })
     }
