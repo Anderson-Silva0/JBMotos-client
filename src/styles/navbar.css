@@ -114,6 +114,8 @@ nav {
         right: 110%;
         padding: 20px;
         position: absolute;
+        justify-content: space-between;
+        gap: 2vh;
     }
 
     .nav-list {

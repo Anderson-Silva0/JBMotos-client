@@ -75,7 +75,7 @@ export default function NavBar() {
                         <li>
                             <Dropdown titulo="Fornecedor" componenteClicado={componenteClicado}
                                 setComponenteClicado={setComponenteClicado}>
-                                <a href="/fornecedor/cadastro">Cadastrar</a>
+                                <a href="/fornecedor/cadastro">Cadastrar</a>    
                                 <a href="/fornecedor/listar">Listar</a>
                             </Dropdown>
                         </li>
