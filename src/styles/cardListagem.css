@@ -266,6 +266,7 @@
   }
 
   .div-resultado {
+    word-break: break-all;
     font-weight: bold;
     margin-left: 2%;
     margin-bottom: 1%;
