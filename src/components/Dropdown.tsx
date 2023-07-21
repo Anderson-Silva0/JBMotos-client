@@ -25,9 +25,6 @@ export default function Dropdown({
       if (computedDisplay === 'none' && !isOpen && componenteClicado === '') {
         dropdownContent.display = 'flex'
         dropdownContent.flexDirection = 'column'
-        dropdownContent.padding = '20px'
-        dropdownContent.position = 'absolute'
-        dropdownContent.zIndex = '9999'
         setIsOpen(true)
         setComponenteClicado(titulo)
       } else if (isOpen && titulo === componenteClicado) {
@@ -58,12 +55,6 @@ export default function Dropdown({
       document.removeEventListener('click', handleClickAnywhere)
     }
   }, [isOpen])
-
-  useEffect(() => {
-    return () => {
-      document.removeEventListener('click', handleClickAnywhere)
-    }
-  }, [])
 
   return (
     <div onClick={handleClickContent} className="dropdown">
