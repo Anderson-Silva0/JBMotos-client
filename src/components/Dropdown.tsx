@@ -1,3 +1,4 @@
+import { Plus } from 'lucide-react'
 import { useRef, ReactNode, useState, useEffect, Dispatch } from 'react'
 
 interface DropdownProps {
@@ -58,7 +59,10 @@ export default function Dropdown({
 
   return (
     <div onClick={handleClickContent} className="dropdown">
-      <span className='dropdown-titulo'>{titulo}</span>
+      <span className='dropdown-titulo'>
+        {titulo}
+        <Plus strokeWidth={3} style={{ verticalAlign: 'middle' }} />
+      </span>
       <div className="dropdown-content" ref={contentRef}>
         {children}
       </div>
