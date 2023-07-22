@@ -63,11 +63,13 @@ th {
 .botao-add-line {
   margin: 1vw;
   border-radius: 15px;
+  cursor: pointer;
 }
 
 .botao-remove-line {
   margin: 1vw;
   border-radius: 15px;
+  cursor: pointer;
 }
 
 #valor-total-pedido {
@@ -101,7 +103,7 @@ th {
     padding: 2vh;
     border-radius: 4vh;
     background-color: #F8F9FA;
-    font-size: 2.8vw;
+    font-size: 3vw;
   }
 
   #input-number-tabela {
@@ -117,5 +119,12 @@ th {
     border: none;
     vertical-align: middle;
     transition: background-color 0.2s, box-shadow 0.2s;
+  }
+
+  #valor-total-pedido span {
+    color: #495057;
+    font-size: 3.2vw;
+    font-weight: 700;
+    padding: 5px;
   }
 }
