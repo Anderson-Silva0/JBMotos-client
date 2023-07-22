@@ -36,7 +36,7 @@ body {
 
 .div-principal {
   width: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,34 +94,6 @@ label {
 
 .carregando {
   font-weight: 800;
-}
-
-.css-qbdosj-Input {
-  color: red;
-}
-
-#valor-total-pedido {
-  user-select: none;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  margin-top: 0.3rem;
-  border-radius: 4vh;
-  padding: 10px;
-  background-color: #0466C8;
-}
-
-#valor-total-pedido span {
-  color: #979DAC;
-  font-size: 20pt;
-  font-weight: 800;
-  padding: 5px;
-  box-shadow: 5px 5px 20px 12px #0466C8;
-}
-
-#select-idProduto {
-  width: max-content;
-  margin: auto;
 }
 
 .form-group {

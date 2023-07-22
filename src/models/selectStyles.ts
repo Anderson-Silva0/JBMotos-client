@@ -1,67 +1,95 @@
 export const selectStyles = {
-  control: (provided: any, state: any) => ({
+  control: (provided: any) => ({
     ...provided,
     backgroundColor: '#DEE2E6',
-    padding: '7px',
+    padding: '1.8%',
     width: '100%',
     display: 'flex',
     alignItems: 'center',
     borderRadius: '15px',
-    color: 'white',
-    transition: 'background-color 0.5s, box-shadow 0.5s',
+    color: '#495057',
+    fontWeight: '700',
+    fontSize: '18px',
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#CED4DA',
+      boxShadow: '1px 2px 3px 1px #495057'
+    },
+    transition: 'background-color 0.2s, box-shadow 0.2s'
+  }),
+  option: (provided: any) => ({
+    ...provided,
+    backgroundColor: '#DEE2E6',
+    color: '#495057',
+    fontWeight: 'bold',
+    fontSize: '22px',
+    '&:hover': {
+      backgroundColor: '#ADB5BD'
+    }
+  }),
+  singleValue: (provided: any) => ({
+    ...provided,
+    color: '#495057',
+    fontWeight: 'bold'
+  }),
+  menu: (provided: any) => ({
+    ...provided,
+    borderRadius: '15px',
+    padding: '12px'
+  })
+}
+
+export const selectStylesVenda = {
+  control: (provided: any) => ({
+    ...provided,
+    backgroundColor: '#DEE2E6',
+    padding: '9px',
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    borderRadius: '15px',
+    color: '#495057',
+    fontSize: '1.8vw',
     fontWeight: 'bold',
     cursor: 'pointer',
     '&:hover': {
-      boxShadow: '8px 4px 20px 2px rgba(255, 255, 255, 0.2)',
+      backgroundColor: '#CED4DA',
+      boxShadow: '1px 2px 3px 1px #CED4DA'
     },
+    transition: 'background-color 0.2s, box-shadow 0.2s',
+    border: 'none',
+    '@media screen and (max-width: 999px)': {
+      fontSize: '2.8vw',
+      padding: '6px',
+      borderRadius: '10px',
+      wordBreak: 'break-word',
+      maxHeight: '1000px',
+      overflow: 'auto',
+      whiteSpace: 'normal',
+      width: '35vw'
+    },
+
+
   }),
-  option: (provided: any, state: any) => ({
+  option: (provided: any) => ({
     ...provided,
-    backgroundColor: '#001233',
-    color: '#979DAC',
-    fontWeight: 'bold',
+    backgroundColor: '#DEE2E6',
+    color: '#495057',
+    fontWeight: '700',
+    '&:hover': {
+      backgroundColor: '#ADB5BD'
+    }
   }),
-  singleValue: (provided: any, state: any) => ({
+  singleValue: (provided: any) => ({
     ...provided,
     color: '#495057',
     fontWeight: 'bold',
+    whiteSpace: 'normal'
   }),
-  menu: (provided: any, state: any) => ({
+  menu: (provided: any) => ({
     ...provided,
-    borderRadius: '5px',
-  }),
-};
-
-export const selectStylesVenda = {
-  control: (provided: any, state: any) => ({
-    ...provided,
-    backgroundColor: '#001233',
-    padding: '7px',
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
     borderRadius: '15px',
-    color: 'white',
-    transition: 'background-color 0.5s, box-shadow 0.5s',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    '&:hover': {
-      boxShadow: '8px 4px 20px 2px rgba(255, 255, 255, 0.2)',
-    },
-  }),
-  option: (provided: any, state: any) => ({
-    ...provided,
-    backgroundColor: '#001233',
-    color: '#979DAC',
-    fontWeight: '700',
-  }),
-  singleValue: (provided: any, state: any) => ({
-    ...provided,
-    color: '#979DAC',
-    fontWeight: 'bold',
-  }),
-  menu: (provided: any, state: any) => ({
-    ...provided,
-    borderRadius: '5px',
-  }),
-};
+    padding: '12px',
+    overflowX: 'hidden'
+  })
+}

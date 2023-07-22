@@ -3,7 +3,6 @@ import { ChangeEvent, Dispatch, useEffect, useState, SetStateAction } from "reac
 import Select from 'react-select'
 import '@/styles/tabelaVenda.css'
 
-import { FormGroup } from '@/components/Form-group'
 import { ValoresTotaisProps } from "@/app/venda/cadastro/page"
 
 import { ProdutoPedidoService } from '@/services/ProdutoPedidoService'
@@ -159,10 +158,13 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
 
   const setPropQuantidade = (e: ChangeEvent<HTMLInputElement>) => {
     let novoValor = Number(e.target.value)
-    if (novoValor > Number(estoqueProdutoSelecionado.quantidade) && estoqueProdutoSelecionado.status !== 'INDISPONIVEL') {
+    if (novoValor > Number(estoqueProdutoSelecionado.quantidade) && estoqueProdutoSelecionado.status !== 'INDISPONIVEL'
+    ) {
       novoValor = Number(estoqueProdutoSelecionado.quantidade)
-      mensagemAlerta(`Limite de estoque atingido. Máximo de ${estoqueProdutoSelecionado.quantidade}
+      if (opcaoSelecionada.label !== 'Selecione...') {
+        mensagemAlerta(`Limite de estoque atingido. Máximo de ${estoqueProdutoSelecionado.quantidade}
        unidades disponíveis para ${opcaoSelecionada.label}.`)
+      }
     }
     if (opcaoSelecionada.idProduto) {
       if (estoqueProdutoSelecionado.status !== 'INDISPONIVEL') {
@@ -183,21 +185,19 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
     <tr>
       <td id="col-NomeProduto">
         {
-          <FormGroup label="" htmlFor="idProduto">
-            <Select styles={selectStylesVenda}
-              placeholder="Selecione..."
-              value={opcaoSelecionada}
-              onChange={(option: any) => setOpcaoSelecionada(option)}
-              options={props.produtos.map(p => ({
-                label: p.nome,
-                idProduto: p.id,
-                valorUnidade: p.precoVenda,
-                idEstoqueProduto: p.idEstoque
-              }) as OpcaoSelecionadaProps)}
-              instanceId="select-idProduto"
-              id="select-idProduto"
-            />
-          </FormGroup>
+          <Select styles={selectStylesVenda}
+            placeholder="Selecione..."
+            value={opcaoSelecionada}
+            onChange={(option: any) => setOpcaoSelecionada(option)}
+            options={props.produtos.map(p => ({
+              label: p.nome,
+              idProduto: p.id,
+              valorUnidade: p.precoVenda,
+              idEstoqueProduto: p.idEstoque
+            }) as OpcaoSelecionadaProps)}
+            instanceId="select-idProduto"
+            id="select-idProduto"
+          />
         }
       </td>
       <td>
