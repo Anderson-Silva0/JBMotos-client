@@ -11,6 +11,7 @@ import { mensagemSucesso, mensagemErro } from "@/models/toast"
 import { EnderecoService } from "@/services/enderecoService"
 import { FornecedorService } from "@/services/fornecedorService"
 import { useState, ChangeEvent, useEffect } from "react"
+import { Save } from 'lucide-react'
 
 export default function CadastroFornecedor() {
 
@@ -18,24 +19,59 @@ export default function CadastroFornecedor() {
 
   const {
     salvarEndereco,
-    deletarEndereco
+    deletarEndereco,
+    buscarEnderecoPorCep
   } = EnderecoService()
 
   const [erros, setErros] = useState<Erros[]>([])
 
   const [fornecedor, setFornecedor] = useState<Fornecedor>(estadoInicialFornecedor)
 
+  const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
+
   const setPropsFornecedor = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setFornecedor({ ...fornecedor, [key]: e.target.value })
     setErros([])
   }
 
-  const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
-
   const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setEndereco({ ...endereco, [key]: e.target.value })
     setErros([])
   }
+
+  useEffect(() => {
+    if (endereco.cep.length < 9 && endereco.rua || endereco.cidade || endereco.bairro) {
+      setEndereco({ ...endereco, rua: '', bairro: '', cidade: '' })
+    }
+    const buscarEndereco = async () => {
+      try {
+        const enderecoResponse = await buscarEnderecoPorCep(endereco.cep)
+        if (enderecoResponse.data.erro) {
+          setErros([...erros, {
+            nomeInput: 'cep',
+            mensagemErro: 'CEP inexistente. Verifique e corrija.',
+          }])
+        } else if (enderecoResponse.data.uf === 'PE') {
+          setEndereco({
+            ...endereco,
+            rua: enderecoResponse.data.logradouro,
+            bairro: enderecoResponse.data.bairro,
+            cidade: enderecoResponse.data.localidade
+          })
+        } else {
+          setErros([...erros, {
+            nomeInput: 'cep',
+            mensagemErro: 'Verifique o CEP, não é de Pernambuco.',
+          }])
+        }
+      } catch (error: any) {
+        mensagemErro('Erro ao tentar buscar Endereço por CEP.')
+      }
+    }
+    if (endereco.cep.length === 9) {
+      buscarEndereco()
+    }
+  }, [endereco.cep])
 
   const exibirErrosFornecedor = async () => {
     if (erros.length > 0) {
@@ -56,23 +92,8 @@ export default function CadastroFornecedor() {
       setEndereco({ ...endereco, id: responseEndereco.data.id })
       setFornecedor({ ...fornecedor, endereco: responseEndereco.data.id })
     } catch (erro: any) {
-      exibirErros(erro)
       mensagemErro('Erro no preenchimento dos campos.')
-    }
-  }
-
-  const exibirErros = (erro: any) => {
-    const objErro = erro.response.data
-    const keys = Object.keys(objErro)
-    if (!objErro.error && erros.length <= 8) {
-      setErros((errosAntigos) => {
-        const novosErros = keys.map((k) => ({ nomeInput: k, mensagemErro: objErro[k] }));
-        return [...errosAntigos, ...novosErros];
-      });
-    }
-    const erroIgnorado = "Endereço não encontrado para o Id informado."
-    if (objErro.error && objErro.error !== erroIgnorado) {
-      setErros((errosAntigos) => [...errosAntigos, { nomeInput: 'error', mensagemErro: objErro.error }])
+      exibirErros(erro)
     }
   }
 
@@ -80,7 +101,7 @@ export default function CadastroFornecedor() {
     const salvarFornecedorAtualizado = async () => {
       try {
         await salvarFornecedor(fornecedor)
-        mensagemSucesso("Fornecedor e endereço salvos com sucesso!")
+        mensagemSucesso("Fornecedor cadastrado com sucesso!")
         setFornecedor(estadoInicialFornecedor)
         setEndereco(estadoInicialEndereco)
       } catch (erro: any) {
@@ -96,16 +117,27 @@ export default function CadastroFornecedor() {
     }
   }, [fornecedor])
 
+  const exibirErros = (erro: any) => {
+    const objErro = erro.response.data
+    const keys = Object.keys(objErro)
+    if (!objErro.error && erros.length <= 8) {
+      setErros((errosAntigos) => {
+        const novosErros = keys.map((k) => ({ nomeInput: k, mensagemErro: objErro[k] }))
+        return [...errosAntigos, ...novosErros]
+      })
+    }
+    const erroIgnorado = "Endereço não encontrado para o Id informado."
+    if (objErro.error && objErro.error !== erroIgnorado) {
+      setErros((errosAntigos) => [...errosAntigos, { nomeInput: 'error', mensagemErro: objErro.error }])
+    }
+  }
+
   return (
     <div className='div-form-container'>
+      <h1 className="centered-text">
+        <Save size='6vh' strokeWidth={3} /> Cadastro de Fornecedor
+      </h1>
       <Card titulo="Dados do Fornecedor">
-        <FormGroup label="CNPJ: *" htmlFor="cnpj">
-          <InputCnpj
-            value={fornecedor.cnpj}
-            onChange={e => setPropsFornecedor("cnpj", e)}
-          />
-          {<ExibeErro erros={erros} nomeInput='cnpj' />}
-        </FormGroup>
         <FormGroup label="Nome: *" htmlFor="nome">
           <input
             value={fornecedor.nome}
@@ -115,7 +147,14 @@ export default function CadastroFornecedor() {
           />
           {<ExibeErro erros={erros} nomeInput='nome' />}
         </FormGroup>
-        <FormGroup label="Telefone: *" htmlFor="telefone">
+        <FormGroup label="CNPJ: *" htmlFor="cnpj">
+          <InputCnpj
+            value={fornecedor.cnpj}
+            onChange={e => setPropsFornecedor("cnpj", e)}
+          />
+          {<ExibeErro erros={erros} nomeInput='cnpj' />}
+        </FormGroup>
+        <FormGroup label="Celular: *" htmlFor="telefone">
           <InputTelefone
             value={fornecedor.telefone}
             onChange={e => setPropsFornecedor("telefone", e)}
@@ -124,7 +163,18 @@ export default function CadastroFornecedor() {
         </FormGroup>
       </Card>
       <Card titulo="Endereço do Fornecedor">
-        <FormGroup label="Endereço: *" htmlFor="rua">
+        <FormGroup label="CEP: *" htmlFor="cep">
+          <span className="cep-message">
+            Digite o CEP para preenchimento automático do endereço.
+          </span>
+          <InputCep
+            id='cep'
+            value={endereco.cep}
+            onChange={e => setPropsEndereco("cep", e)}
+          />
+          {<ExibeErro erros={erros} nomeInput='cep' />}
+        </FormGroup>
+        <FormGroup label="Logradouro: *" htmlFor="rua">
           <input
             value={endereco.rua}
             onChange={e => setPropsEndereco("rua", e)}
@@ -132,13 +182,6 @@ export default function CadastroFornecedor() {
             type="text"
           />
           {<ExibeErro erros={erros} nomeInput='rua' />}
-        </FormGroup>
-        <FormGroup label="CEP: *" htmlFor="cep">
-          <InputCep
-            value={endereco.cep}
-            onChange={e => setPropsEndereco("cep", e)}
-          />
-          {<ExibeErro erros={erros} nomeInput='cep' />}
         </FormGroup>
         <FormGroup label="Número: *" htmlFor="numero">
           <input
