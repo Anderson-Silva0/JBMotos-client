@@ -35,7 +35,7 @@ export function mensagemAlerta(mensagem: string) {
   mostrarMensagem('Alerta', mensagem, 'warning')
 }
 
-export function confirmarDelecao(titulo: string, mensagem: string, callback: () => void) {
+export function confirmarDecisao(titulo: string, mensagem: string, callback: () => void) {
   confirmAlert({
     title: titulo,
     message: mensagem,
