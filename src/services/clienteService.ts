@@ -20,6 +20,10 @@ export const ClienteService = () => {
         return ApiService.get(`${url}/filtrar/?${nomeCampo}=${valor}`)
     }
 
+    const alternarStatusCliente = (cpf: string) => {
+        return ApiService.patch(`${url}/alternar-status/${cpf}`)
+    }
+
     const atualizarCliente = (cpf: string, dados: object) => {
         return ApiService.put(`${url}/atualizar/${cpf}`, dados)
     }
@@ -33,6 +37,7 @@ export const ClienteService = () => {
         buscarTodosClientes,
         buscarClientePorCpf,
         filtrarCliente,
+        alternarStatusCliente,
         atualizarCliente,
         deletarCliente
     }
