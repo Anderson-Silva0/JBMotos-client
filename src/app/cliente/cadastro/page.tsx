@@ -20,7 +20,7 @@ export default function CadastroCliente() {
     const {
         salvarEndereco,
         deletarEndereco,
-        buscarEnderecoPorCep
+        obterEnderecoPorCep
     } = EnderecoService()
 
     const [erros, setErros] = useState<Erros[]>([])
@@ -42,32 +42,7 @@ export default function CadastroCliente() {
     }
 
     useEffect(() => {
-        if (endereco.cep.length < 9 && endereco.rua || endereco.cidade || endereco.bairro) {
-            setEndereco({ ...endereco, rua: '', bairro: '', cidade: '' })
-        }
-        const buscarEndereco = async () => {
-            try {
-                const enderecoResponse = await buscarEnderecoPorCep(endereco.cep)
-                if (enderecoResponse.data.erro) {
-                    setErros([...erros, {
-                        nomeInput: 'cep',
-                        mensagemErro: 'CEP inexistente. Verifique e corrija.',
-                    }])
-                } else {
-                    setEndereco({
-                        ...endereco,
-                        rua: enderecoResponse.data.logradouro,
-                        bairro: enderecoResponse.data.bairro,
-                        cidade: enderecoResponse.data.localidade
-                    })
-                }
-            } catch (error: any) {
-                mensagemErro('Erro ao tentar buscar Endereço por CEP.')
-            }
-        }
-        if (endereco.cep.length === 9) {
-            buscarEndereco()
-        }
+        obterEnderecoPorCep(endereco, setEndereco, erros, setErros)
     }, [endereco.cep])
 
     const exibirErrosCliente = async () => {
