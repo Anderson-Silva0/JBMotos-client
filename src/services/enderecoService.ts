@@ -1,5 +1,9 @@
 import axios from "axios"
 import { ApiService } from "./apiService"
+import { Endereco } from "@/models/endereco"
+import { Dispatch, SetStateAction } from "react"
+import { Erros } from "@/models/erros"
+import { mensagemErro } from "@/models/toast"
 
 export const EnderecoService = () => {
 
@@ -29,12 +33,51 @@ export const EnderecoService = () => {
         return axios.get(`https://viacep.com.br/ws/${cep}/json/`)
     }
 
+    const obterEnderecoPorCep = async (
+        endereco: Endereco,
+        setEndereco: Dispatch<SetStateAction<Endereco>>,
+        erros: Erros[],
+        setErros: Dispatch<SetStateAction<Erros[]>>
+    ) => {
+        if (endereco.cep.length < 9 && endereco.rua || endereco.cidade || endereco.bairro) {
+            setEndereco({ ...endereco, rua: '', bairro: '', cidade: '' })
+        }
+        const buscarEndereco = async () => {
+            try {
+                const enderecoResponse = await buscarEnderecoPorCep(endereco.cep)
+                if (enderecoResponse.data.erro) {
+                    setErros([...erros, {
+                        nomeInput: 'cep',
+                        mensagemErro: 'CEP inexistente. Verifique e corrija.',
+                    }])
+                } else if (enderecoResponse.data.uf === 'PE') {
+                    setEndereco({
+                        ...endereco,
+                        rua: enderecoResponse.data.logradouro,
+                        bairro: enderecoResponse.data.bairro,
+                        cidade: enderecoResponse.data.localidade
+                    })
+                } else {
+                    setErros([...erros, {
+                        nomeInput: 'cep',
+                        mensagemErro: 'Verifique o CEP, não é de Pernambuco.',
+                    }])
+                }
+            } catch (error: any) {
+                mensagemErro('Erro ao tentar buscar Endereço por CEP.')
+            }
+        }
+        if (endereco.cep.length === 9) {
+            buscarEndereco()
+        }
+    }
+
     return {
         salvarEndereco,
         buscarTodosEnderecos,
         buscarEnderecoPorId,
         atualizarEndereco,
         deletarEndereco,
-        buscarEnderecoPorCep
+        obterEnderecoPorCep
     }
 }
