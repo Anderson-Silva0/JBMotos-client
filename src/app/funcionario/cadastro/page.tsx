@@ -21,7 +21,7 @@ export default function CadastroFuncionario() {
   const {
     salvarEndereco,
     deletarEndereco,
-    buscarEnderecoPorCep
+    obterEnderecoPorCep
   } = EnderecoService()
 
   const [erros, setErros] = useState<Erros[]>([])
@@ -43,32 +43,7 @@ export default function CadastroFuncionario() {
   }
 
   useEffect(() => {
-    if (endereco.cep.length < 9 && endereco.rua || endereco.cidade || endereco.bairro) {
-      setEndereco({ ...endereco, rua: '', bairro: '', cidade: '' })
-    }
-    const buscarEndereco = async () => {
-      try {
-        const enderecoResponse = await buscarEnderecoPorCep(endereco.cep)
-        if (enderecoResponse.data.erro) {
-          setErros([...erros, {
-            nomeInput: 'cep',
-            mensagemErro: 'CEP inexistente. Verifique e corrija.',
-          }])
-        } else {
-          setEndereco({
-            ...endereco,
-            rua: enderecoResponse.data.logradouro,
-            bairro: enderecoResponse.data.bairro,
-            cidade: enderecoResponse.data.localidade
-          })
-        }
-      } catch (error: any) {
-        mensagemErro('Erro ao tentar buscar Endereço por CEP.')
-      }
-    }
-    if (endereco.cep.length === 9) {
-      buscarEndereco()
-    }
+    obterEnderecoPorCep(endereco, setEndereco, erros, setErros)
   }, [endereco.cep])
 
   const exibirErrosFuncionario = async () => {
@@ -78,7 +53,7 @@ export default function CadastroFuncionario() {
     try {
       await salvarFuncionario(funcionario)
     } catch (error) {
-      exibirErros(error)
+      salvarErros(error)
     }
   }
 
@@ -90,7 +65,7 @@ export default function CadastroFuncionario() {
       setFuncionario({ ...funcionario, endereco: responseEndereco.data.id })
     } catch (erro: any) {
       mensagemErro('Erro no preenchimento dos campos.')
-      exibirErros(erro)
+      salvarErros(erro)
     }
   }
 
@@ -114,14 +89,14 @@ export default function CadastroFuncionario() {
     }
   }, [funcionario.endereco])
 
-  const exibirErros = (erro: any) => {
+  const salvarErros = (erro: any) => {
     const objErro = erro.response.data
     const keys = Object.keys(objErro)
     if (!objErro.error && erros.length <= 8) {
       setErros((errosAntigos) => {
-        const novosErros = keys.map((k) => ({ nomeInput: k, mensagemErro: objErro[k] }));
-        return [...errosAntigos, ...novosErros];
-      });
+        const novosErros = keys.map((k) => ({ nomeInput: k, mensagemErro: objErro[k] }))
+        return [...errosAntigos, ...novosErros]
+      })
     }
     const erroIgnorado = "Endereço não encontrado para o Id informado."
     if (objErro.error && objErro.error !== erroIgnorado) {
