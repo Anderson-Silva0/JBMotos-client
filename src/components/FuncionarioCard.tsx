@@ -2,19 +2,18 @@ import { Funcionario } from '@/models/funcionario'
 import { Endereco, estadoInicialEndereco } from '../models/endereco'
 import { EnderecoService } from '../services/enderecoService'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { confirmarDelecao, mensagemErro, mensagemSucesso } from '@/models/toast'
-import { Check, DoorClosed, Edit, Trash2, UserCheck, X } from 'lucide-react'
-import '../styles/cardListagem.css'
+import { confirmarDecisao, mensagemErro, mensagemSucesso } from '@/models/toast'
+import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { FuncionarioService } from '@/services/funcionarioService'
+import '../styles/cardListagem.css'
 
 interface FuncionarioCardProps {
   funcionario: Funcionario
-  funcionarios: Funcionario[]
   setFuncionarios: Dispatch<SetStateAction<Funcionario[]>>
 }
 
-export default function FuncionarioCard({ funcionario, funcionarios, setFuncionarios }: FuncionarioCardProps) {
+export default function FuncionarioCard({ funcionario, setFuncionarios }: FuncionarioCardProps) {
   const router = useRouter()
 
   const [enderecosState, setEnderecoState] = useState<Endereco>(estadoInicialEndereco)
@@ -36,13 +35,13 @@ export default function FuncionarioCard({ funcionario, funcionarios, setFunciona
 
   const handlerAlternar = () => {
     if (funcionario.statusFuncionario === 'ATIVO') {
-      confirmarDelecao('Desativar Funcionário',
+      confirmarDecisao('Desativar Funcionário',
         'Ao confirmar, o Funcionário será marcado como inativo e suas informações ainda serão mantidas no sistema, mas ele não poderá realizar serviços ou vendas até que seja reativado. Deseja realmente desativar o Funcionário?',
         () => {
           alternarStatus()
         })
     } else if (funcionario.statusFuncionario === 'INATIVO') {
-      confirmarDelecao('Ativar Funcionário',
+      confirmarDecisao('Ativar Funcionário',
         'Ao confirmar, o Funcionário será marcado como ativo e poderá realizar serviços e vendas normalmente. Deseja realmente ativar o Funcionário?',
         () => {
           alternarStatus()
@@ -61,10 +60,10 @@ export default function FuncionarioCard({ funcionario, funcionarios, setFunciona
     } catch (error) {
       mensagemErro('Erro ao tentar definir o Status do Funcionário.')
     }
-    await atualizarFuncionarios()
+    await atualizarListagem()
   }
 
-  const atualizarFuncionarios = async () => {
+  const atualizarListagem = async () => {
     try {
       const todosFuncionariosResponse = await buscarTodosFuncionarios()
       setFuncionarios(todosFuncionariosResponse.data)
@@ -109,7 +108,7 @@ export default function FuncionarioCard({ funcionario, funcionarios, setFunciona
         </div>
         <div className='items'>
           <span id="info-title">Endereço</span>
-          <div className='div-dados'>Endereço</div>
+          <div className='div-dados'>Logradouro</div>
           <div className='div-resultado'>{enderecosState.rua}</div>
           <div className='div-dados'>CEP</div>
           <div className='div-resultado'>{enderecosState.cep}</div>
@@ -128,7 +127,7 @@ export default function FuncionarioCard({ funcionario, funcionarios, setFunciona
         {
           funcionario.statusFuncionario === 'ATIVO' ? (
             <div onClick={handlerAlternar} title='Desativar'>
-              <Trash2 className='icones-atualizacao-e-delecao' />
+              <UserX className='icones-atualizacao-e-delecao' />
             </div>
           ) : funcionario.statusFuncionario === 'INATIVO' && (
             <div onClick={handlerAlternar} title='Ativar'>
@@ -136,7 +135,6 @@ export default function FuncionarioCard({ funcionario, funcionarios, setFunciona
             </div>
           )
         }
-
       </div>
     </div>
   )
