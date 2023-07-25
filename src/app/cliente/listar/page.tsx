@@ -178,7 +178,6 @@ export default function ListarClientes() {
           <ClienteCard
             key={cliente.cpf}
             cliente={cliente}
-            clientes={clientes}
             setClientes={setClientes}
           />
         )
