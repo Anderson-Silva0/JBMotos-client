@@ -24,10 +24,10 @@ export default function ListarFuncionarios() {
   useEffect(() => {
     const buscarPorCpf = async () => {
       try {
-        const clienteResponse = await filtrarFuncionario(campoSelecionado, valorInputBuscar)
-        setFuncionarios(clienteResponse.data)
+        const funcionarioResponse = await filtrarFuncionario(campoSelecionado, valorInputBuscar)
+        setFuncionarios(funcionarioResponse.data)
       } catch (error: any) {
-        mensagemErro('Erro ao tentar buscar funcionário.')
+        mensagemErro('Erro ao tentar buscar Funcionário.')
       } finally {
         setFoiCarregado(true)
       }
@@ -159,7 +159,6 @@ export default function ListarFuncionarios() {
           <FuncionarioCard
             key={funcionario.cpf}
             funcionario={funcionario}
-            funcionarios={funcionarios}
             setFuncionarios={setFuncionarios}
           />
         )
