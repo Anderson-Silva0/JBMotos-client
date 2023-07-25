@@ -60,8 +60,10 @@ export default function CadastroProduto() {
   useEffect(() => {
     const buscarFornecedores = async () => {
       try {
-        const response = await buscarTodosFornecedores()
-        setFornecedores(response.data)
+        const todosFornecedoresResponse = await buscarTodosFornecedores()
+        const todosFornecedores = todosFornecedoresResponse.data
+        const fornecedoresAtivos = todosFornecedores.filter((f: Fornecedor) => f.statusFornecedor === 'ATIVO')
+        setFornecedores(fornecedoresAtivos)
       } catch (erro: any) {
         mensagemErro(erro.response.data)
       }
