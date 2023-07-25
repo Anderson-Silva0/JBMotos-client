@@ -3,23 +3,22 @@ import { Endereco, estadoInicialEndereco } from '../models/endereco'
 import { EnderecoService } from '../services/enderecoService'
 import '../styles/cardListagem.css'
 import { useEffect, useState, Dispatch, SetStateAction } from 'react'
-import { confirmarDelecao, mensagemErro, mensagemSucesso } from '@/models/toast'
-import { Edit, Trash2 } from 'lucide-react'
+import { confirmarDecisao, mensagemErro, mensagemSucesso } from '@/models/toast'
+import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
 import { ClienteService } from '@/services/clienteService'
 import { useRouter } from 'next/navigation'
 
 interface ClienteCardProps {
   cliente: Cliente
-  clientes: Cliente[]
   setClientes: Dispatch<SetStateAction<Cliente[]>>
 }
 
-export default function ClienteCard({ cliente, clientes, setClientes }: ClienteCardProps) {
+export default function ClienteCard({ cliente, setClientes }: ClienteCardProps) {
   const router = useRouter()
 
   const [enderecosState, setEnderecoState] = useState<Endereco>(estadoInicialEndereco)
 
-  const { deletarCliente } = ClienteService()
+  const { buscarTodosClientes, alternarStatusCliente } = ClienteService()
   const { buscarEnderecoPorId } = EnderecoService()
 
   useEffect(() => {
@@ -34,21 +33,45 @@ export default function ClienteCard({ cliente, clientes, setClientes }: ClienteC
     buscar()
   }, [])
 
-  const handlerDeletar = () => {
-    confirmarDelecao('Excluir Cliente',
-      'Ao deletar este cliente, todas as informações relacionadas a ele serão permanentemente removidas do sistema, incluindo o endereço cadastrado e quaisquer motocicletas associadas. Além disso, todas as vendas feitas para este cliente serão excluídas permanentemente. Por favor, tenha certeza antes de confirmar a exclusão do cliente, pois essa ação não poderá ser desfeita. Deseja realmente deletar?',
-      () => {
-        deletar()
-      })
+  const handlerAlternar = () => {
+    if (cliente.statusCliente === 'ATIVO') {
+      confirmarDecisao(
+        'Desativar Cliente',
+        'Ao confirmar, o Cliente será marcado como inativo e suas informações ainda serão mantidas no sistema, mas ele não poderá realizar compras ou serviços e suas motos não poderão ser alvo de serviços. Deseja realmente desativar o Cliente?',
+        () => {
+          alternarStatus()
+        }
+      )
+    } else if (cliente.statusCliente === 'INATIVO') {
+      confirmarDecisao(
+        'Ativar Cliente',
+        'Ao confirmar, o Cliente será marcado como ativo e poderá realizar compras e serviços e suas motos poderão ser alvo de serviços normalmente. Deseja realmente ativar o Cliente?',
+        () => {
+          alternarStatus()
+        })
+    }
   }
 
-  const deletar = async () => {
+  const alternarStatus = async () => {
     try {
-      await deletarCliente(cliente.cpf)
-      setClientes(clientes.filter(c => c.cpf !== cliente.cpf))
-      mensagemSucesso('Cliente deletado com sucesso.')
+      const statusResponse = await alternarStatusCliente(cliente.cpf)
+      if (statusResponse.data === 'ATIVO') {
+        mensagemSucesso('Cliente Ativado com sucesso.')
+      } else if (statusResponse.data === 'INATIVO') {
+        mensagemSucesso('Cliente Desativado com sucesso.')
+      }
     } catch (error) {
-      mensagemErro('Erro ao tentar deletar Cliente.')
+      mensagemErro('Erro ao tentar definir o Status do Cliente.')
+    }
+    await atualizarListagem()
+  }
+
+  const atualizarListagem = async () => {
+    try {
+      const todosClientesResponse = await buscarTodosClientes()
+      setClientes(todosClientesResponse.data)
+    } catch (error) {
+      mensagemErro('Erro ao tentar buscar todos Clientes.')
     }
   }
 
@@ -69,12 +92,28 @@ export default function ClienteCard({ cliente, clientes, setClientes }: ClienteC
           <div className='div-resultado'>{cliente.email}</div>
           <div className='div-dados'>Telefone</div>
           <div className='div-resultado'>{cliente.telefone}</div>
+
+          <div className='div-dados'>Status do Cliente</div>
+          {
+            cliente.statusCliente === 'ATIVO' ? (
+              <div style={{ color: 'green' }} className='div-resultado'>
+                {cliente.statusCliente}
+                <Check strokeWidth={3} />
+              </div>
+            ) : cliente.statusCliente === 'INATIVO' && (
+              <div style={{ color: 'red' }} className='div-resultado'>
+                {cliente.statusCliente}
+                <X strokeWidth={3} />
+              </div>
+            )
+          }
+
           <div className='div-dados'>Data e Hora de Cadastro</div>
           <div className='div-resultado'>{cliente.dataHoraCadastro}</div>
         </div>
         <div className='items'>
           <span id="info-title">Endereço</span>
-          <div className='div-dados'>Endereço</div>
+          <div className='div-dados'>Logradouro</div>
           <div className='div-resultado'>{enderecosState.rua}</div>
           <div className='div-dados'>CEP</div>
           <div className='div-resultado'>{enderecosState.cep}</div>
@@ -90,9 +129,17 @@ export default function ClienteCard({ cliente, clientes, setClientes }: ClienteC
         <div onClick={atualizar} title='Editar'>
           <Edit className='icones-atualizacao-e-delecao' />
         </div>
-        <div onClick={handlerDeletar} title='Deletar'>
-          <Trash2 className='icones-atualizacao-e-delecao' />
-        </div>
+        {
+          cliente.statusCliente === 'ATIVO' ? (
+            <div onClick={handlerAlternar} title='Desativar'>
+              <UserX className='icones-atualizacao-e-delecao' />
+            </div>
+          ) : cliente.statusCliente === 'INATIVO' && (
+            <div onClick={handlerAlternar} title='Ativar'>
+              <UserCheck className='icones-atualizacao-e-delecao' />
+            </div>
+          )
+        }
       </div>
     </div>
   )
