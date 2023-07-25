@@ -9,10 +9,24 @@ body {
   overflow-x: hidden;
   background-color: #DEE2E6;
   width: 80vw;
-  height: 100vh;
+  height: 100%;
   justify-content: center;
   align-items: center;
   margin: auto;
+}
+
+.div-principal {
+  width: 100%;
+  height: 100%;
+  padding: 3%;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17pt;
+  position: relative;
+  color: #495057;
 }
 
 .erro {
@@ -32,18 +46,6 @@ body {
   flex-direction: column;
   align-items: center;
   width: 100%;
-}
-
-.div-principal {
-  width: 100%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 17pt;
-  position: relative;
-  color: #495057;
-  margin-bottom: 4%;
 }
 
 label {
