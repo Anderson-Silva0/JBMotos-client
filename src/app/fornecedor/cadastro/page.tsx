@@ -14,13 +14,12 @@ import { useState, ChangeEvent, useEffect } from "react"
 import { Save } from 'lucide-react'
 
 export default function CadastroFornecedor() {
-
   const { salvarFornecedor } = FornecedorService()
 
   const {
     salvarEndereco,
     deletarEndereco,
-    buscarEnderecoPorCep
+    obterEnderecoPorCep
   } = EnderecoService()
 
   const [erros, setErros] = useState<Erros[]>([])
@@ -40,37 +39,7 @@ export default function CadastroFornecedor() {
   }
 
   useEffect(() => {
-    if (endereco.cep.length < 9 && endereco.rua || endereco.cidade || endereco.bairro) {
-      setEndereco({ ...endereco, rua: '', bairro: '', cidade: '' })
-    }
-    const buscarEndereco = async () => {
-      try {
-        const enderecoResponse = await buscarEnderecoPorCep(endereco.cep)
-        if (enderecoResponse.data.erro) {
-          setErros([...erros, {
-            nomeInput: 'cep',
-            mensagemErro: 'CEP inexistente. Verifique e corrija.',
-          }])
-        } else if (enderecoResponse.data.uf === 'PE') {
-          setEndereco({
-            ...endereco,
-            rua: enderecoResponse.data.logradouro,
-            bairro: enderecoResponse.data.bairro,
-            cidade: enderecoResponse.data.localidade
-          })
-        } else {
-          setErros([...erros, {
-            nomeInput: 'cep',
-            mensagemErro: 'Verifique o CEP, não é de Pernambuco.',
-          }])
-        }
-      } catch (error: any) {
-        mensagemErro('Erro ao tentar buscar Endereço por CEP.')
-      }
-    }
-    if (endereco.cep.length === 9) {
-      buscarEndereco()
-    }
+    obterEnderecoPorCep(endereco, setEndereco, erros, setErros)
   }, [endereco.cep])
 
   const exibirErrosFornecedor = async () => {
