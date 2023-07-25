@@ -31,6 +31,7 @@
 .cardListagem-container-venda:active {
   box-shadow: 0px 2px 4px #495057;
   transform: translateY(0);
+  cursor: wait;
 }
 
 .container-items {
