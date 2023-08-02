@@ -1,32 +1,28 @@
 'use client'
 
-import { useEffect, useState } from "react"
-import Select from 'react-select'
-import Image from "next/image"
-
-import imgAdicionarLinha from '@/images/icons8-insert-row-48.png'
-import imgRemoverLinha from '@/images/icons8-delete-row-100.png'
-
 import { Card } from "@/components/Card"
 import { ExibeErro } from "@/components/ExibeErro"
 import { FormGroup } from "@/components/Form-group"
-import TabelaVenda from "@/components/TabelaVenda"
 import LinhaTabela from "@/components/LinhaTabela"
-
-import { ClienteService } from "@/services/clienteService"
-import { FuncionarioService } from "@/services/funcionarioService"
-import { ProdutoService } from "@/services/produtoService"
-import { PedidoService } from "@/services/PedidoService"
-
+import TabelaVenda from "@/components/TabelaVenda"
+import imgRemoverLinha from '@/images/icons8-delete-row-100.png'
+import imgAdicionarLinha from '@/images/icons8-insert-row-48.png'
+import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from "@/models/Selecoes"
 import { Cliente } from "@/models/cliente"
 import { Erros } from "@/models/erros"
+import { formatarParaReal } from "@/models/formatadorReal"
 import { Funcionario } from "@/models/funcionario"
 import { Pedido, estadoInicialPedido } from "@/models/pedido"
 import { Produto } from "@/models/produto"
 import { selectStyles } from "@/models/selectStyles"
 import { mensagemAlerta, mensagemErro, mensagemSucesso } from "@/models/toast"
-import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from "@/models/Selecoes"
-import { formatarParaReal } from "@/models/formatadorReal"
+import { PedidoService } from "@/services/PedidoService"
+import { ClienteService } from "@/services/clienteService"
+import { FuncionarioService } from "@/services/funcionarioService"
+import { ProdutoService } from "@/services/produtoService"
+import Image from "next/image"
+import { useEffect, useState } from "react"
+import Select from 'react-select'
 
 
 interface IdProdutoEIdLinha {
@@ -183,13 +179,28 @@ export default function CadastroVenda() {
     }
   }
 
+  const gerarMensagemAlertaProdutosAtivos = (produtosAtivos: Produto[]) => {
+    let mensagem = ''
+    if (produtos.length > 1 && produtosAtivos.length > 1) {
+      mensagem = `Não é possível adicionar mais linhas, pois existem  
+      ${produtos.length} produtos no total, mas apenas ${produtosAtivos.length} estão ativos.`
+    } else if (produtos.length > 1 && produtosAtivos.length === 1) {
+      mensagem = `Não é possível adicionar mais linhas, pois existem  
+      ${produtos.length} produtos no total, mas apenas ${produtosAtivos.length} ativo.`
+    } else if (produtos.length === 1) {
+      mensagem = `Não é possível adicionar mais linhas, pois existe  
+      ${produtos.length} produto no total, e ${produtosAtivos.length} ativo.`
+    }
+    return mensagem
+  }
+
   const adicionarLinha = () => {
-    if (qtdLinha.length < produtos.length) {
+    const produtosAtivos = produtos.filter(p => p.statusProduto === 'ATIVO')
+    if (qtdLinha.length < produtosAtivos.length) {
       const newId = Math.floor(Math.random() * 1000000)
       setQtdLinha([...qtdLinha, newId])
-    } else if (qtdLinha.length === produtos.length) {
-      mensagemAlerta(`Não é possível adicionar mais linhas, pois existem apenas 
-      ${produtos.length} produtos disponíveis.`)
+    } else if (qtdLinha.length === produtosAtivos.length) {
+      mensagemAlerta(gerarMensagemAlertaProdutosAtivos(produtosAtivos))
     }
   }
 
