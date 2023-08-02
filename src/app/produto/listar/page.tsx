@@ -1,12 +1,12 @@
 'use client'
 
 import ProdutoCard from "@/components/ProdutoCard"
+import imgProduto from '@/images/checklist.png'
 import { Produto } from "@/models/produto"
 import { mensagemErro } from "@/models/toast"
 import { ProdutoService } from "@/services/produtoService"
-import { useState, useEffect } from "react"
-import imgProduto from '@/images/checklist.png'
 import Image from "next/image"
+import { useEffect, useState } from "react"
 
 export default function ListarProdutos() {
   const [produtos, setProdutos] = useState<Produto[]>([])
@@ -55,13 +55,8 @@ export default function ListarProdutos() {
         return (
           <ProdutoCard
             key={produto.id}
-            id={produto.id}
-            nome={produto.nome}
-            precoCusto={produto.precoCusto}
-            precoVenda={produto.precoVenda}
-            marca={produto.marca}
-            idEstoque={produto.idEstoque}
-            cnpjFornecedor={produto.cnpjFornecedor}
+            produto={produto}
+            setProdutos={setProdutos}
           />
         )
       })}
