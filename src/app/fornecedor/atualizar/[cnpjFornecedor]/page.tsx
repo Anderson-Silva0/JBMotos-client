@@ -1,18 +1,18 @@
 'use client'
 
-import { ChangeEvent, useEffect, useState } from 'react'
 import { Card } from '@/components/Card'
-import { FormGroup } from '@/components/Form-group'
-import { InputCep, InputCnpj, InputTelefone } from '@/components/Input'
-import { mensagemErro, mensagemSucesso } from '@/models/toast'
-import { Fornecedor, estadoInicialFornecedor } from '@/models/fornecedor'
-import { Endereco, estadoInicialEndereco } from '@/models/endereco'
-import { FornecedorService } from '@/services/fornecedorService'
-import { EnderecoService } from '@/services/enderecoService'
 import { ExibeErro } from '@/components/ExibeErro'
+import { FormGroup } from '@/components/Form-group'
+import { InputCep, InputTelefone } from '@/components/Input'
+import { Endereco, estadoInicialEndereco } from '@/models/endereco'
 import { Erros } from '@/models/erros'
+import { Fornecedor, estadoInicialFornecedor } from '@/models/fornecedor'
+import { mensagemErro, mensagemSucesso } from '@/models/toast'
+import { EnderecoService } from '@/services/enderecoService'
+import { FornecedorService } from '@/services/fornecedorService'
 import { Edit3 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { ChangeEvent, useEffect, useState } from 'react'
 
 interface AtualizarFornecedorProps {
   params: {
@@ -171,7 +171,7 @@ export default function AtualizarFornecedor({ params }: AtualizarFornecedorProps
         <button
           onClick={submit}
           type="submit">
-          Cadastrar Fornecedor
+          Atualizar Fornecedor
         </button>
       </div>
     </div>
