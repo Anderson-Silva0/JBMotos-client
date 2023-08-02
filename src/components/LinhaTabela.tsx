@@ -1,19 +1,16 @@
 
-import { ChangeEvent, Dispatch, useEffect, useState, SetStateAction } from "react"
-import Select from 'react-select'
-import '@/styles/tabelaVenda.css'
-
 import { ValoresTotaisProps } from "@/app/venda/cadastro/page"
-
-import { ProdutoPedidoService } from '@/services/ProdutoPedidoService'
-
 import { ProdutoPedido, estadoInicialProdutoPedido } from "@/models/ProdutoPedido"
-import { selectStylesVenda } from '@/models/selectStyles'
-import { Produto } from '@/models/produto'
-import { formatarParaReal } from "@/models/formatadorReal"
-import { mensagemAlerta, mensagemErro } from "@/models/toast"
-import { EstoqueService } from "@/services/estoqueService"
 import { Estoque, estadoInicialEstoque } from "@/models/estoque"
+import { formatarParaReal } from "@/models/formatadorReal"
+import { Produto } from '@/models/produto'
+import { selectStylesVenda } from '@/models/selectStyles'
+import { mensagemAlerta, mensagemErro } from "@/models/toast"
+import { ProdutoPedidoService } from '@/services/ProdutoPedidoService'
+import { EstoqueService } from "@/services/estoqueService"
+import '@/styles/tabelaVenda.css'
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react"
+import Select from 'react-select'
 
 
 interface LinhaTabelaProps {
@@ -50,6 +47,16 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
   const [produtoPedido, setProdutoPedido] = useState<ProdutoPedido>(estadoInicialProdutoPedido)
   const [opcaoSelecionada, setOpcaoSelecionada] = useState<OpcaoSelecionadaProps>(estadoInicialOpcaoSelecionada)
   const [estoqueProdutoSelecionado, setEstoqueProdutoSelecionado] = useState<Estoque>(estadoInicialEstoque)
+  const [produtosAtivos, setProdutosAtivos] = useState<Produto[]>([])
+
+  useEffect(() => {
+    const buscarProdutosAtivos = () => {
+      setProdutosAtivos(props.produtos.filter(p => p.statusProduto === 'ATIVO'))
+    }
+    if (props.produtos) {
+      buscarProdutosAtivos()
+    }
+  }, [props.produtos])
 
   useEffect(() => {
     if (opcaoSelecionada.idProduto) {
@@ -189,7 +196,7 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
             placeholder="Selecione..."
             value={opcaoSelecionada}
             onChange={(option: any) => setOpcaoSelecionada(option)}
-            options={props.produtos.map(p => ({
+            options={produtosAtivos.map(p => ({
               label: p.nome,
               idProduto: p.id,
               valorUnidade: p.precoVenda,
