@@ -16,6 +16,10 @@ export const ProdutoService = () => {
     return ApiService.get(`${url}/buscar/${id}`)
   }
 
+  const alternarStatusProduto = (idProduto: number) => {
+    return ApiService.patch(`${url}/alternar-status/${idProduto}`)
+  }
+
   const atualizarProduto = (id: number, dados: object) => {
     return ApiService.put(`${url}/atualizar/${id}`, dados)
   }
@@ -32,6 +36,7 @@ export const ProdutoService = () => {
     salvarProduto,
     buscarTodosProdutos,
     buscarProdutoPorId,
+    alternarStatusProduto,
     atualizarProduto,
     deletarProduto,
     lucroProduto
