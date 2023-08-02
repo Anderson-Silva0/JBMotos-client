@@ -1,20 +1,30 @@
-import { Produto } from '@/models/produto'
-import { Estoque, estadoInicialEstoque } from '../models/estoque'
-import { EstoqueService } from '../services/estoqueService'
-import '../styles/cardListagem.css'
-import { useEffect, useState } from 'react'
-import { mensagemErro } from '@/models/toast'
-import { Fornecedor, estadoInicialFornecedor } from '@/models/fornecedor'
-import { FornecedorService } from '@/services/fornecedorService'
+import { Estoque, estadoInicialEstoque } from '@/models/estoque'
 import { formatarParaReal } from '@/models/formatadorReal'
+import { Fornecedor, estadoInicialFornecedor } from '@/models/fornecedor'
+import { Produto } from '@/models/produto'
+import { confirmarDecisao, mensagemErro, mensagemSucesso } from '@/models/toast'
+import { EstoqueService } from '@/services/estoqueService'
+import { FornecedorService } from '@/services/fornecedorService'
+import { ProdutoService } from '@/services/produtoService'
+import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import '../styles/cardListagem.css'
 
-export default function ProdutoCard(produto: Produto) {
+interface ProdutoCardProps {
+  produto: Produto
+  setProdutos: Dispatch<SetStateAction<Produto[]>>
+}
+
+export default function ProdutoCard({ produto, setProdutos }: ProdutoCardProps) {
+  const router = useRouter()
 
   const [estoqueState, setEstoqueState] = useState<Estoque>(estadoInicialEstoque)
   const [fornecedorState, setFornecedorState] = useState<Fornecedor>(estadoInicialFornecedor)
 
   const { buscarEstoquePorId } = EstoqueService()
   const { buscarFornecedorPorCnpj } = FornecedorService()
+  const { buscarTodosProdutos, alternarStatusProduto } = ProdutoService()
 
   useEffect(() => {
     async function buscar() {
@@ -30,6 +40,53 @@ export default function ProdutoCard(produto: Produto) {
     }
     buscar()
   }, [])
+
+  const handlerAlternar = () => {
+    if (produto.statusProduto === 'ATIVO') {
+      confirmarDecisao(
+        'Desativar Produto',
+        'Ao confirmar, o Produto será marcado como inativo e não poderá ser vendido ou utilizado em serviços. Deseja realmente desativar o Produto?',
+        () => {
+          alternarStatus()
+        }
+      )
+    } else if (produto.statusProduto === 'INATIVO') {
+      confirmarDecisao(
+        'Ativar Produto',
+        'Ao confirmar, o Produto será marcado como ativo e poderá ser vendido e utilizado em serviços normalmente. Deseja realmente ativar o Produto?',
+        () => {
+          alternarStatus()
+        }
+      )
+    }
+  }
+
+  const alternarStatus = async () => {
+    try {
+      const statusResponse = await alternarStatusProduto(produto.id)
+      if (statusResponse.data === 'ATIVO') {
+        mensagemSucesso('Produto Ativado com sucesso.')
+      } else if (statusResponse.data === 'INATIVO') {
+        mensagemSucesso('Produto Desativado com sucesso.')
+      }
+    } catch (error) {
+      mensagemErro('Erro ao tentar definir o Status do Produto.')
+    }
+    await atualizarListagem()
+  }
+
+  const atualizarListagem = async () => {
+    try {
+      const todosProdutosResponse = await buscarTodosProdutos()
+      setProdutos(todosProdutosResponse.data)
+    } catch (error) {
+      mensagemErro('Erro ao tentar buscar todos Produtos.')
+    }
+  }
+
+  const atualizar = () => {
+    router.push(`/produto/atualizar/${produto.id}`)
+  }
 
   const lucroProduto = Number(produto.precoVenda) - Number(produto.precoCusto)
 
@@ -59,7 +116,7 @@ export default function ProdutoCard(produto: Produto) {
           <div className='div-resultado'>{estoqueState.estoqueMaximo}</div>
           <div className='div-dados'>Quantidade</div>
           <div className='div-resultado'>{estoqueState.quantidade}</div>
-          <div className='div-dados'>Status Atual</div>
+          <div className='div-dados'>Status do Estoque</div>
           <div className='div-resultado'>
             {estoqueState.status === 'DISPONIVEL' ? (
               <strong className="item"><span style={{ color: 'green' }}>Disponível</span></strong>
@@ -71,7 +128,39 @@ export default function ProdutoCard(produto: Produto) {
               <strong className="item"><span style={{ color: 'darkred' }}>Estoque Baixo</span></strong>
             )}
           </div>
+
+          <div className='div-dados'>Status do Produto</div>
+          {
+            produto.statusProduto === 'ATIVO' ? (
+              <div style={{ color: 'green' }} className='div-resultado'>
+                {produto.statusProduto}
+                <Check strokeWidth={3} />
+              </div>
+            ) : produto.statusProduto === 'INATIVO' && (
+              <div style={{ color: 'red' }} className='div-resultado'>
+                {produto.statusProduto}
+                <X strokeWidth={3} />
+              </div>
+            )
+          }
+
         </div>
+      </div>
+      <div className='icones-container'>
+        <div onClick={atualizar} title='Editar'>
+          <Edit className='icones-atualizacao-e-delecao' />
+        </div>
+        {
+          produto.statusProduto === 'ATIVO' ? (
+            <div onClick={handlerAlternar} title='Desativar'>
+              <UserX className='icones-atualizacao-e-delecao' />
+            </div>
+          ) : produto.statusProduto === 'INATIVO' && (
+            <div onClick={handlerAlternar} title='Ativar'>
+              <UserCheck className='icones-atualizacao-e-delecao' />
+            </div>
+          )
+        }
       </div>
     </div>
   )
