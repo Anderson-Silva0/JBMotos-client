@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import '../styles/navbar.css'
-import Image from 'next/image'
 import Logo from '@/images/LogoJB.png'
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
+import '../styles/navbar.css'
 import Dropdown from './Dropdown'
 
 export default function NavBar() {
@@ -45,9 +45,9 @@ export default function NavBar() {
                 <nav>
                     <Image
                         src={Logo}
-                        alt="Logo"
+                        alt="Logo-JBMotos"
                         priority
-                        className="rounded-image"
+                        className="logo"
                     />
                     <div className="mobile-menu">
                         <div className="line1"></div>
@@ -75,7 +75,7 @@ export default function NavBar() {
                         <li>
                             <Dropdown titulo="Fornecedor" componenteClicado={componenteClicado}
                                 setComponenteClicado={setComponenteClicado}>
-                                <a href="/fornecedor/cadastro">Cadastrar</a>    
+                                <a href="/fornecedor/cadastro">Cadastrar</a>
                                 <a href="/fornecedor/listar">Listar</a>
                             </Dropdown>
                         </li>
@@ -91,6 +91,20 @@ export default function NavBar() {
                                 setComponenteClicado={setComponenteClicado}>
                                 <a href="/venda/cadastro">Realizar</a>
                                 <a href="/venda/listar">Listar</a>
+                            </Dropdown>
+                        </li>
+                        <li>
+                            <Dropdown titulo="Serviço" componenteClicado={componenteClicado}
+                                setComponenteClicado={setComponenteClicado}>
+                                <a href="/servico/cadastro">Realizar</a>
+                                <a href="/servico/listar">Listar</a>
+                            </Dropdown>
+                        </li>
+                        <li>
+                            <Dropdown titulo="Moto" componenteClicado={componenteClicado}
+                                setComponenteClicado={setComponenteClicado}>
+                                <a href="/moto/cadastro">Cadastrar</a>
+                                <a href="/moto/listar">Listar</a>
                             </Dropdown>
                         </li>
                     </ul>
