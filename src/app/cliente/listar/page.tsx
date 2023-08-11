@@ -1,14 +1,14 @@
 'use client'
 
 import ClienteCard from "@/components/ClienteCard"
+import { InputCpf, InputTelefone } from "@/components/Input"
+import imgCliente from "@/images/client.png"
 import { Cliente } from "@/models/cliente"
 import { mensagemErro } from "@/models/toast"
 import { ClienteService } from "@/services/clienteService"
-import Image from "next/image"
-import { useState, useEffect } from "react"
-import imgCliente from "@/images/client.png"
-import { InputCpf, InputTelefone } from "@/components/Input"
 import { Search } from "lucide-react"
+import Image from "next/image"
+import { useEffect, useState } from "react"
 
 export default function ListarClientes() {
   const [clientes, setClientes] = useState<Cliente[]>([])
@@ -34,6 +34,10 @@ export default function ListarClientes() {
     }
     buscarPorCpf()
   }, [valorInputBuscar, campoSelecionado])
+
+  useEffect(() => {
+    setValorInputBuscar('')
+  }, [campoSelecionado])
 
   const handleRadioClick = (campo: string) => {
     if (campoSelecionado === campo) {
