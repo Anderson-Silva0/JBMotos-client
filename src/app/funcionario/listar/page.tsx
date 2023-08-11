@@ -1,14 +1,14 @@
 'use client'
 
 import FuncionarioCard from "@/components/FuncionarioCard"
+import { InputCpf, InputTelefone } from "@/components/Input"
+import imgFuncionario from "@/images/employee.png"
 import { Funcionario } from "@/models/funcionario"
 import { mensagemErro } from "@/models/toast"
 import { FuncionarioService } from "@/services/funcionarioService"
-import Image from "next/image"
-import { useState, useEffect } from "react"
-import imgFuncionario from "@/images/employee.png"
 import { Search } from "lucide-react"
-import { InputCpf, InputTelefone } from "@/components/Input"
+import Image from "next/image"
+import { useEffect, useState } from "react"
 
 export default function ListarFuncionarios() {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
@@ -34,6 +34,10 @@ export default function ListarFuncionarios() {
     }
     buscarPorCpf()
   }, [valorInputBuscar, campoSelecionado])
+
+  useEffect(() => {
+    setValorInputBuscar('')
+  }, [campoSelecionado])
 
   const handleRadioClick = (campo: string) => {
     if (campoSelecionado === campo) {
