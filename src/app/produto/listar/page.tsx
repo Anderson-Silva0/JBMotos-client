@@ -5,6 +5,7 @@ import imgProduto from '@/images/checklist.png'
 import { Produto } from "@/models/produto"
 import { mensagemErro } from "@/models/toast"
 import { ProdutoService } from "@/services/produtoService"
+import { Search } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 
@@ -13,21 +14,35 @@ export default function ListarProdutos() {
 
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
 
-  const { buscarTodosProdutos } = ProdutoService()
+  const [valorInputBuscar, setValorInputBuscar] = useState<string>('')
+
+  const [campoSelecionado, setCampoSelecionado] = useState<string>('')
+
+  const { filtrarProduto } = ProdutoService()
 
   useEffect(() => {
-    const buscarTodos = async () => {
+    const buscarPorId = async () => {
       try {
-        const response = await buscarTodosProdutos()
-        setProdutos(response.data)
+        const produtoResponse = await filtrarProduto(campoSelecionado, valorInputBuscar)
+        setProdutos(produtoResponse.data)
       } catch (error: any) {
-        mensagemErro(error.response.data)
+        mensagemErro('Erro ao tentar buscar Produto.')
       } finally {
         setFoiCarregado(true)
       }
     }
-    buscarTodos()
-  }, [])
+    buscarPorId()
+  }, [valorInputBuscar, campoSelecionado])
+
+  useEffect(() => {
+    setValorInputBuscar('')
+  }, [campoSelecionado])
+
+  const handleRadioClick = (campo: string) => {
+    if (campoSelecionado === campo) {
+      setCampoSelecionado('')
+    }
+  }
 
   if (!foiCarregado) {
     return <h1 className="carregando">Carregando...</h1>
@@ -37,19 +52,124 @@ export default function ListarProdutos() {
     <div className="div-form-container">
       <h1 className="centered-text">
         {
-          produtos.length > 1 ? (
+          campoSelecionado === '' ? (
+            produtos.length > 1 ? (
+              <>
+                <Image src={imgProduto} width={60} height={60} alt="" /> {produtos.length} Produtos cadastrados
+              </>
+            ) : produtos.length === 1 ? (
+              <>
+                <Image src={imgProduto} width={60} height={60} alt="" /> {produtos.length} Produto cadastrado
+              </>
+            ) : (
+              'Nenhum Produto cadastrado no sistema'
+            )
+          ) : campoSelecionado !== '' && valorInputBuscar !== '' && (
             <>
-              <Image src={imgProduto} width={60} height={60} alt="" /> {produtos.length} Produtos cadastrados
+              {
+                produtos.length === 1 ? (
+                  <strong>{produtos.length} Produto encontrado</strong>
+                ) : produtos.length > 1 ? (
+                  <strong>{produtos.length} Produtos encontrados</strong>
+                ) : (
+                  'Nenhum Produto encontrado'
+                )
+              }
             </>
-          ) : produtos.length === 1 ? (
-            <>
-              <Image src={imgProduto} width={60} height={60} alt="" /> {produtos.length} Produto cadastrado
-            </>
-          ) : (
-            'Nenhum Produto cadastrado no sistema'
           )
         }
       </h1>
+      <div className="div-container-buscar">
+        <div className="div-buscar">
+          <Search size={60} strokeWidth={3} />
+          {
+            campoSelecionado === '' ? (
+              <div className="div-msg-busca">
+                <p>Selecione uma opção de busca:</p>
+                <p>Nome, Marca ou Status do Produto.</p>
+              </div>
+            ) : campoSelecionado === 'nome' ? (
+              <input
+                className="input-buscar"
+                placeholder="Digite o Nome"
+                type="search"
+                onChange={(e) => setValorInputBuscar(e.target.value)}
+              />
+            ) : campoSelecionado === 'marca' ? (
+              <input
+                className="input-buscar"
+                placeholder="Digite a marca"
+                type="search"
+                onChange={(e) => setValorInputBuscar(e.target.value)}
+              />
+            ) : campoSelecionado === 'statusProduto' && (
+              <>
+                <div style={{ marginRight: '2vw' }}>
+                  <label className="label-radio" htmlFor="opcaoStatusProduto">ATIVO</label>
+                  <input
+                    className="input-radio"
+                    type="radio"
+                    name="status"
+                    value={campoSelecionado}
+                    onChange={() => setValorInputBuscar('ATIVO')}
+                  />
+                </div>
+                <div>
+                  <label className="label-radio" htmlFor="opcaoStatusProduto">INATIVO</label>
+                  <input
+                    className="input-radio"
+                    type="radio"
+                    name="status"
+                    value={campoSelecionado}
+                    onChange={() => setValorInputBuscar('INATIVO')}
+                  />
+                </div>
+              </>
+            )
+          }
+        </div>
+        <div className="div-radios">
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoNome">Nome</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoNome"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('nome')}
+              onClick={() => handleRadioClick('nome')}
+              checked={campoSelecionado === 'nome'}
+            />
+          </div>
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoMarca">Marca</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoMarca"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('marca')}
+              onClick={() => handleRadioClick('marca')}
+              checked={campoSelecionado === 'marca'}
+            />
+          </div>
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoStatusProduto">Status do Produto</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoStatusProduto"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('statusProduto')}
+              onClick={() => handleRadioClick('statusProduto')}
+              checked={campoSelecionado === 'statusProduto'}
+            />
+          </div>
+        </div>
+      </div>
 
       {produtos.map((produto) => {
         return (
