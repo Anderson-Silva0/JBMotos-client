@@ -16,6 +16,10 @@ export const ProdutoService = () => {
     return ApiService.get(`${url}/buscar/${id}`)
   }
 
+  const filtrarProduto = (nomeCampo: string, valor: string) => {
+    return ApiService.get(`${url}/filtrar/?${nomeCampo}=${valor}`)
+}
+
   const alternarStatusProduto = (idProduto: number) => {
     return ApiService.patch(`${url}/alternar-status/${idProduto}`)
   }
@@ -36,6 +40,7 @@ export const ProdutoService = () => {
     salvarProduto,
     buscarTodosProdutos,
     buscarProdutoPorId,
+    filtrarProduto,
     alternarStatusProduto,
     atualizarProduto,
     deletarProduto,
