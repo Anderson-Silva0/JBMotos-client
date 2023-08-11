@@ -1,14 +1,14 @@
 'use client'
 
 import FornecedorCard from "@/components/FornecedorCard"
+import { InputCnpj, InputTelefone } from "@/components/Input"
+import imgFornecedor from "@/images/supplier.png"
 import { Fornecedor } from "@/models/fornecedor"
 import { mensagemErro } from "@/models/toast"
 import { FornecedorService } from "@/services/fornecedorService"
-import Image from "next/image"
-import { useState, useEffect } from "react"
-import imgFornecedor from "@/images/supplier.png"
 import { Search } from "lucide-react"
-import { InputCnpj, InputTelefone } from "@/components/Input"
+import Image from "next/image"
+import { useEffect, useState } from "react"
 
 export default function ListarFornecedores() {
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([])
@@ -34,6 +34,10 @@ export default function ListarFornecedores() {
     }
     buscarPorCnpj()
   }, [valorInputBuscar, campoSelecionado])
+
+  useEffect(() => {
+    setValorInputBuscar('')
+  }, [campoSelecionado])
 
   const handleRadioClick = (campo: string) => {
     if (campoSelecionado === campo) {
