@@ -186,18 +186,31 @@
   flex-direction: column;
 }
 
+.div-dupla-check {
+  width: 74%;
+  align-items: end;
+  display: flex;
+  flex-direction: column;
+}
+
 .input-radio {
   height: 2.5vw;
   width: 2.5vw;
   margin: 8px auto 0 auto;
 }
 
+.input-check {
+  height: 2.5vw;
+  width: 2.5vw;
+}
+
 .label-radio {
   font-weight: 700;
-  margin: auto;
+  margin: auto 1vw 0.5vw auto;
   border-radius: 10px;
   background-color: white;
-  padding: 8px;
+  padding: 6px;
+  white-space: nowrap;
 }
 
 .input-buscar {
@@ -256,6 +269,11 @@
     height: 6vw;
     width: 6vw;
     margin: 8px auto 0 auto;
+  }
+
+  .input-check {
+    height: 6vw;
+    width: 6vw;
   }
 
   .div-dados {
