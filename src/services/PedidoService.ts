@@ -16,6 +16,10 @@ export const PedidoService = () => {
     return ApiService.get(`${url}/buscar/${id}`)
   }
 
+  const filtrarPedido = (nomeCampo: string, valor: string) => {
+    return ApiService.get(`${url}/filtrar/?${nomeCampo}=${valor}`)
+  }
+
   const atualizarPedido = (id: number, dados: object) => {
     return ApiService.put(`${url}/atualizar/${id}`, dados)
   }
@@ -40,6 +44,7 @@ export const PedidoService = () => {
     salvarPedido,
     buscarTodosPedidos,
     buscarPedidoPorId,
+    filtrarPedido,
     atualizarPedido,
     deletarPedido,
     lucroDoPedido,
