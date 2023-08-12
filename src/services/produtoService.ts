@@ -18,7 +18,7 @@ export const ProdutoService = () => {
 
   const filtrarProduto = (nomeCampo: string, valor: string) => {
     return ApiService.get(`${url}/filtrar/?${nomeCampo}=${valor}`)
-}
+  }
 
   const alternarStatusProduto = (idProduto: number) => {
     return ApiService.patch(`${url}/alternar-status/${idProduto}`)
