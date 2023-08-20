@@ -63,3 +63,16 @@ export const InputTelefone = (props: inputProps) => (
     />
 )
 
+export const InputPlaca = (props: inputProps) => (
+    <InputMask
+        mask="aaa-9*99"
+        placeholder={props.placeholder}
+        type={props.type}
+        id={props.id}
+        className={props.className}
+        value={props.value}
+        onChange={props.onChange}
+        maskChar={null}
+    />
+)
+
