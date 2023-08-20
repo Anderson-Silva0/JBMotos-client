@@ -1,12 +1,12 @@
 import { Cliente } from '@/models/cliente'
+import { confirmarDecisao, mensagemErro, mensagemSucesso } from '@/models/toast'
+import { ClienteService } from '@/services/clienteService'
+import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Endereco, estadoInicialEndereco } from '../models/endereco'
 import { EnderecoService } from '../services/enderecoService'
 import '../styles/cardListagem.css'
-import { useEffect, useState, Dispatch, SetStateAction } from 'react'
-import { confirmarDecisao, mensagemErro, mensagemSucesso } from '@/models/toast'
-import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
-import { ClienteService } from '@/services/clienteService'
-import { useRouter } from 'next/navigation'
 
 interface ClienteCardProps {
   cliente: Cliente
