@@ -2,6 +2,7 @@
 
 import ProdutoCard from "@/components/ProdutoCard"
 import imgProduto from '@/images/checklist.png'
+import { parseDate } from "@/models/StringParaDate"
 import { Produto } from "@/models/produto"
 import { mensagemErro } from "@/models/toast"
 import { ProdutoService } from "@/services/produtoService"
@@ -19,6 +20,26 @@ export default function ListarProdutos() {
   const [campoSelecionado, setCampoSelecionado] = useState<string>('')
 
   const { filtrarProduto } = ProdutoService()
+
+  const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
+
+  const alternarSelecaoCheckbox = (value: string) => {
+    setValorSelecionado(value === valorSelecionado ? null : value)
+  }
+
+  useEffect(() => {
+    if (valorSelecionado === 'antigo') {
+      const sortedProdutosRecentes = [...produtos].sort((a: Produto, b: Produto) =>
+        parseDate(a.dataHoraCadastro).getTime() - parseDate(b.dataHoraCadastro).getTime()
+      )
+      setProdutos(sortedProdutosRecentes)
+    } else if (valorSelecionado === 'recente') {
+      const sortedProdutosRecentes = [...produtos].sort((a: Produto, b: Produto) =>
+        parseDate(b.dataHoraCadastro).getTime() - parseDate(a.dataHoraCadastro).getTime()
+      )
+      setProdutos(sortedProdutosRecentes)
+    }
+  }, [valorSelecionado])
 
   useEffect(() => {
     const buscarPorId = async () => {
@@ -85,8 +106,7 @@ export default function ListarProdutos() {
           {
             campoSelecionado === '' ? (
               <div className="div-msg-busca">
-                <p>Selecione uma opção de busca:</p>
-                <p>Nome, Marca ou Status do Produto.</p>
+                <p>Selecione o filtro desejado:</p>
               </div>
             ) : campoSelecionado === 'nome' ? (
               <input
@@ -105,8 +125,9 @@ export default function ListarProdutos() {
             ) : campoSelecionado === 'statusProduto' && (
               <>
                 <div style={{ marginRight: '2vw' }}>
-                  <label className="label-radio" htmlFor="opcaoStatusProduto">ATIVO</label>
+                  <label className="label-radio" htmlFor="opcaoStatusProduto1">ATIVO</label>
                   <input
+                    id="opcaoStatusProduto1"
                     className="input-radio"
                     type="radio"
                     name="status"
@@ -115,8 +136,9 @@ export default function ListarProdutos() {
                   />
                 </div>
                 <div>
-                  <label className="label-radio" htmlFor="opcaoStatusProduto">INATIVO</label>
+                  <label className="label-radio" htmlFor="opcaoStatusProduto2">INATIVO</label>
                   <input
+                    id="opcaoStatusProduto2"
                     className="input-radio"
                     type="radio"
                     name="status"
@@ -168,6 +190,32 @@ export default function ListarProdutos() {
               checked={campoSelecionado === 'statusProduto'}
             />
           </div>
+        </div>
+      </div>
+      <div className="div-dupla-check">
+        <div style={{ display: 'flex', whiteSpace: 'nowrap', fontWeight: 'bolder' }}>
+          <label className="label-radio" htmlFor="recente">Mais recente</label>
+          <input
+            className="input-check"
+            type="checkbox"
+            name="filtroData"
+            id="recente"
+            value="recente"
+            checked={valorSelecionado === 'recente'}
+            onChange={() => alternarSelecaoCheckbox('recente')}
+          />
+        </div>
+        <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
+          <label className="label-radio" htmlFor="antigo">Mais antigo</label>
+          <input
+            className="input-check"
+            type="checkbox"
+            name="filtroData"
+            id="antigo"
+            value="antigo"
+            checked={valorSelecionado === 'antigo'}
+            onChange={() => alternarSelecaoCheckbox('antigo')}
+          />
         </div>
       </div>
 
