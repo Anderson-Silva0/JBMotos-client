@@ -3,6 +3,7 @@
 import ClienteCard from "@/components/ClienteCard"
 import { InputCpf, InputTelefone } from "@/components/Input"
 import imgCliente from "@/images/client.png"
+import { parseDate } from "@/models/StringParaDate"
 import { Cliente } from "@/models/cliente"
 import { mensagemErro } from "@/models/toast"
 import { ClienteService } from "@/services/clienteService"
@@ -20,6 +21,26 @@ export default function ListarClientes() {
   const [campoSelecionado, setCampoSelecionado] = useState<string>('')
 
   const { filtrarCliente } = ClienteService()
+
+  const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
+
+  const alternarSelecaoCheckbox = (value: string) => {
+    setValorSelecionado(value === valorSelecionado ? null : value)
+  }
+
+  useEffect(() => {
+    if (valorSelecionado === 'antigo') {
+      const sortedClientesRecentes = [...clientes].sort((a: Cliente, b: Cliente) =>
+        parseDate(a.dataHoraCadastro).getTime() - parseDate(b.dataHoraCadastro).getTime()
+      )
+      setClientes(sortedClientesRecentes)
+    } else if (valorSelecionado === 'recente') {
+      const sortedClientesRecentes = [...clientes].sort((a: Cliente, b: Cliente) =>
+        parseDate(b.dataHoraCadastro).getTime() - parseDate(a.dataHoraCadastro).getTime()
+      )
+      setClientes(sortedClientesRecentes)
+    }
+  }, [valorSelecionado])
 
   useEffect(() => {
     const buscarPorCpf = async () => {
@@ -86,8 +107,7 @@ export default function ListarClientes() {
           {
             campoSelecionado === '' ? (
               <div className="div-msg-busca">
-                <p>Selecione uma opção de busca:</p>
-                <p>Nome, CPF, Email ou Telefone.</p>
+                <p>Selecione o filtro desejado:</p>
               </div>
             ) : campoSelecionado === 'nome' ? (
               <input
@@ -111,7 +131,7 @@ export default function ListarClientes() {
                 value={valorInputBuscar}
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
-            ) : campoSelecionado === 'telefone' && (
+            ) : campoSelecionado === 'telefone' ? (
               <InputTelefone
                 className="input-buscar"
                 placeholder="Digite o Telefone"
@@ -119,6 +139,31 @@ export default function ListarClientes() {
                 value={valorInputBuscar}
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
+            ) : campoSelecionado === 'statusCliente' && (
+              <>
+                <div style={{ marginRight: '2vw' }}>
+                  <label className="label-radio" htmlFor="opcaoStatusCliente1">ATIVO</label>
+                  <input
+                    id="opcaoStatusCliente1"
+                    className="input-radio"
+                    type="radio"
+                    name="status"
+                    value={campoSelecionado}
+                    onChange={() => setValorInputBuscar('ATIVO')}
+                  />
+                </div>
+                <div>
+                  <label className="label-radio" htmlFor="opcaoStatusCliente2">INATIVO</label>
+                  <input
+                    id="opcaoStatusCliente2"
+                    className="input-radio"
+                    type="radio"
+                    name="status"
+                    value={campoSelecionado}
+                    onChange={() => setValorInputBuscar('INATIVO')}
+                  />
+                </div>
+              </>
             )
           }
         </div>
@@ -175,8 +220,48 @@ export default function ListarClientes() {
               checked={campoSelecionado === 'telefone'}
             />
           </div>
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoStatusCliente">Status do Cliente</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoStatusCliente"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('statusCliente')}
+              onClick={() => handleRadioClick('statusCliente')}
+              checked={campoSelecionado === 'statusCliente'}
+            />
+          </div>
         </div>
       </div>
+      <div className="div-dupla-check">
+        <div style={{ display: 'flex', whiteSpace: 'nowrap', fontWeight: 'bolder' }}>
+          <label className="label-radio" htmlFor="recente">Mais recente</label>
+          <input
+            className="input-check"
+            type="checkbox"
+            name="filtroData"
+            id="recente"
+            value="recente"
+            checked={valorSelecionado === 'recente'}
+            onChange={() => alternarSelecaoCheckbox('recente')}
+          />
+        </div>
+        <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
+          <label className="label-radio" htmlFor="antigo">Mais antigo</label>
+          <input
+            className="input-check"
+            type="checkbox"
+            name="filtroData"
+            id="antigo"
+            value="antigo"
+            checked={valorSelecionado === 'antigo'}
+            onChange={() => alternarSelecaoCheckbox('antigo')}
+          />
+        </div>
+      </div>
+
       {clientes.map((cliente) => {
         return (
           <ClienteCard
