@@ -3,6 +3,7 @@
 import FornecedorCard from "@/components/FornecedorCard"
 import { InputCnpj, InputTelefone } from "@/components/Input"
 import imgFornecedor from "@/images/supplier.png"
+import { parseDate } from "@/models/StringParaDate"
 import { Fornecedor } from "@/models/fornecedor"
 import { mensagemErro } from "@/models/toast"
 import { FornecedorService } from "@/services/fornecedorService"
@@ -20,6 +21,26 @@ export default function ListarFornecedores() {
   const [campoSelecionado, setCampoSelecionado] = useState<string>('')
 
   const { filtrarFornecedor } = FornecedorService()
+
+  const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
+
+  const alternarSelecaoCheckbox = (value: string) => {
+    setValorSelecionado(value === valorSelecionado ? null : value)
+  }
+
+  useEffect(() => {
+    if (valorSelecionado === 'antigo') {
+      const sortedFornecedoresRecentes = [...fornecedores].sort((a: Fornecedor, b: Fornecedor) =>
+        parseDate(a.dataHoraCadastro).getTime() - parseDate(b.dataHoraCadastro).getTime()
+      )
+      setFornecedores(sortedFornecedoresRecentes)
+    } else if (valorSelecionado === 'recente') {
+      const sortedFornecedoresRecentes = [...fornecedores].sort((a: Fornecedor, b: Fornecedor) =>
+        parseDate(b.dataHoraCadastro).getTime() - parseDate(a.dataHoraCadastro).getTime()
+      )
+      setFornecedores(sortedFornecedoresRecentes)
+    }
+  }, [valorSelecionado])
 
   useEffect(() => {
     const buscarPorCnpj = async () => {
@@ -86,8 +107,7 @@ export default function ListarFornecedores() {
           {
             campoSelecionado === '' ? (
               <div className="div-msg-busca">
-                <p>Selecione uma opção de busca:</p>
-                <p>Nome, CNPJ ou Telefone.</p>
+                <p>Selecione o filtro desejado:</p>
               </div>
             ) : campoSelecionado === 'nome' ? (
               <input
@@ -104,7 +124,7 @@ export default function ListarFornecedores() {
                 value={valorInputBuscar}
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
-            ) : campoSelecionado === 'telefone' && (
+            ) : campoSelecionado === 'telefone' ? (
               <InputTelefone
                 className="input-buscar"
                 placeholder="Digite o Telefone"
@@ -112,6 +132,31 @@ export default function ListarFornecedores() {
                 value={valorInputBuscar}
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
+            ) : campoSelecionado === 'statusFornecedor' && (
+              <>
+                <div style={{ marginRight: '2vw' }}>
+                  <label className="label-radio" htmlFor="opcaoStatusFornecedor1">ATIVO</label>
+                  <input
+                    id="opcaoStatusFornecedor1"
+                    className="input-radio"
+                    type="radio"
+                    name="status"
+                    value={campoSelecionado}
+                    onChange={() => setValorInputBuscar('ATIVO')}
+                  />
+                </div>
+                <div>
+                  <label className="label-radio" htmlFor="opcaoStatusFornecedor2">INATIVO</label>
+                  <input
+                    id="opcaoStatusFornecedor2"
+                    className="input-radio"
+                    type="radio"
+                    name="status"
+                    value={campoSelecionado}
+                    onChange={() => setValorInputBuscar('INATIVO')}
+                  />
+                </div>
+              </>
             )
           }
         </div>
@@ -155,6 +200,45 @@ export default function ListarFornecedores() {
               checked={campoSelecionado === 'telefone'}
             />
           </div>
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoStatusFornecedor">Status do Fornecedor</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoStatusFornecedor"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('statusFornecedor')}
+              onClick={() => handleRadioClick('statusFornecedor')}
+              checked={campoSelecionado === 'statusFornecedor'}
+            />
+          </div>
+        </div>
+      </div>
+      <div className="div-dupla-check">
+        <div style={{ display: 'flex', whiteSpace: 'nowrap', fontWeight: 'bolder' }}>
+          <label className="label-radio" htmlFor="recente">Mais recente</label>
+          <input
+            className="input-check"
+            type="checkbox"
+            name="filtroData"
+            id="recente"
+            value="recente"
+            checked={valorSelecionado === 'recente'}
+            onChange={() => alternarSelecaoCheckbox('recente')}
+          />
+        </div>
+        <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
+          <label className="label-radio" htmlFor="antigo">Mais antigo</label>
+          <input
+            className="input-check"
+            type="checkbox"
+            name="filtroData"
+            id="antigo"
+            value="antigo"
+            checked={valorSelecionado === 'antigo'}
+            onChange={() => alternarSelecaoCheckbox('antigo')}
+          />
         </div>
       </div>
 
