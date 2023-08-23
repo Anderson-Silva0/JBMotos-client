@@ -7,6 +7,7 @@ export interface Produto {
   idEstoque: number
   cnpjFornecedor: string
   statusProduto: string
+  dataHoraCadastro: string
 }
 
 export const estadoInicialProduto: Produto = {
@@ -17,5 +18,6 @@ export const estadoInicialProduto: Produto = {
   marca: '',
   idEstoque: 0,
   cnpjFornecedor: '',
-  statusProduto: ''
+  statusProduto: '',
+  dataHoraCadastro: ''
 }
