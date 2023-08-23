@@ -107,6 +107,8 @@ export default function ProdutoCard({ produto, setProdutos }: ProdutoCardProps) 
           <div className='div-resultado'>{produto.marca}</div>
           <div className='div-dados'>Fornecedor</div>
           <div className='div-resultado'>{fornecedorState.nome}</div>
+          <div className='div-dados'>Data e Hora de Cadastro</div>
+          <div className='div-resultado'>{produto.dataHoraCadastro}</div>
         </div>
         <div className='items'>
           <span id="info-title">Estoque</span>
