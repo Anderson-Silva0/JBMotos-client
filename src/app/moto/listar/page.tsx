@@ -3,6 +3,7 @@
 import { InputCpf, InputPlaca } from "@/components/Input"
 import MotoCard from "@/components/MotoCard"
 import imgMoto from "@/images/moto.png"
+import { parseDate } from "@/models/StringParaDate"
 import { Moto } from "@/models/moto"
 import { mensagemErro } from "@/models/toast"
 import { MotoService } from "@/services/motoService"
@@ -20,6 +21,26 @@ export default function ListarMotos() {
   const [campoSelecionado, setCampoSelecionado] = useState<string>('')
 
   const { filtrarMoto } = MotoService()
+
+  const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
+
+  const alternarSelecaoCheckbox = (value: string) => {
+    setValorSelecionado(value === valorSelecionado ? null : value)
+  }
+
+  useEffect(() => {
+    if (valorSelecionado === 'antiga') {
+      const sortedProdutosRecentes = [...motos].sort((a: Moto, b: Moto) =>
+        parseDate(a.dataHoraCadastro).getTime() - parseDate(b.dataHoraCadastro).getTime()
+      )
+      setMotos(sortedProdutosRecentes)
+    } else if (valorSelecionado === 'recente') {
+      const sortedProdutosRecentes = [...motos].sort((a: Moto, b: Moto) =>
+        parseDate(b.dataHoraCadastro).getTime() - parseDate(a.dataHoraCadastro).getTime()
+      )
+      setMotos(sortedProdutosRecentes)
+    }
+  }, [valorSelecionado])
 
   useEffect(() => {
     const buscarPorId = async () => {
@@ -86,8 +107,7 @@ export default function ListarMotos() {
           {
             campoSelecionado === '' ? (
               <div className="div-msg-busca">
-                <p>Selecione uma opção de busca:</p>
-                <p>Placa, Marca, Modelo ou CPF do Cliente.</p>
+                <p>Selecione o filtro desejado:</p>
               </div>
             ) : campoSelecionado === 'placa' ? (
               <InputPlaca
@@ -111,7 +131,7 @@ export default function ListarMotos() {
                 value={valorInputBuscar}
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
-            ) : campoSelecionado === 'cpfCliente' && (
+            ) : campoSelecionado === 'cpfCliente' ? (
               <InputCpf
                 className="input-buscar"
                 placeholder="Digite o CPF do Cliente"
@@ -119,6 +139,31 @@ export default function ListarMotos() {
                 value={valorInputBuscar}
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
+            ) : campoSelecionado === 'statusMoto' && (
+              <>
+                <div style={{ marginRight: '2vw' }}>
+                  <label className="label-radio" htmlFor="opcaoStatusMoto1">ATIVO</label>
+                  <input
+                    id="opcaoStatusMoto1"
+                    className="input-radio"
+                    type="radio"
+                    name="status"
+                    value={campoSelecionado}
+                    onChange={() => setValorInputBuscar('ATIVO')}
+                  />
+                </div>
+                <div>
+                  <label className="label-radio" htmlFor="opcaoStatusMoto2">INATIVO</label>
+                  <input
+                    id="opcaoStatusMoto2"
+                    className="input-radio"
+                    type="radio"
+                    name="status"
+                    value={campoSelecionado}
+                    onChange={() => setValorInputBuscar('INATIVO')}
+                  />
+                </div>
+              </>
             )
           }
         </div>
@@ -175,8 +220,48 @@ export default function ListarMotos() {
               checked={campoSelecionado === 'cpfCliente'}
             />
           </div>
+          <div className="div-dupla-radio">
+            <label className="label-radio" htmlFor="opcaoStatusMoto">Status da Moto</label>
+            <input
+              className="input-radio"
+              type="radio"
+              name="opcao"
+              id="opcaoStatusMoto"
+              value={campoSelecionado}
+              onChange={() => setCampoSelecionado('statusMoto')}
+              onClick={() => handleRadioClick('statusMoto')}
+              checked={campoSelecionado === 'statusMoto'}
+            />
+          </div>
         </div>
       </div>
+      <div className="div-dupla-check">
+        <div style={{ display: 'flex', whiteSpace: 'nowrap', fontWeight: 'bolder' }}>
+          <label className="label-radio" htmlFor="recente">Mais recente</label>
+          <input
+            className="input-check"
+            type="checkbox"
+            name="filtroData"
+            id="recente"
+            value="recente"
+            checked={valorSelecionado === 'recente'}
+            onChange={() => alternarSelecaoCheckbox('recente')}
+          />
+        </div>
+        <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
+          <label className="label-radio" htmlFor="antiga">Mais antiga</label>
+          <input
+            className="input-check"
+            type="checkbox"
+            name="filtroData"
+            id="antiga"
+            value="antiga"
+            checked={valorSelecionado === 'antiga'}
+            onChange={() => alternarSelecaoCheckbox('antiga')}
+          />
+        </div>
+      </div>
+
       {motos.map((moto) => {
         return (
           <MotoCard
