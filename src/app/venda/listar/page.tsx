@@ -3,6 +3,7 @@
 import { InputCpf } from "@/components/Input"
 import VendaCard from "@/components/VendaCard"
 import imgVenda from "@/images/vendas.png"
+import { parseDate } from "@/models/StringParaDate"
 import { Pedido } from "@/models/pedido"
 import { mensagemErro } from "@/models/toast"
 import { PedidoService } from "@/services/PedidoService"
@@ -23,7 +24,7 @@ export default function ListarVendas() {
 
   const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
 
-  const handleCheckboxChange = (value: string) => {
+  const alternarSelecaoCheckbox = (value: string) => {
     setValorSelecionado(value === valorSelecionado ? null : value)
   }
 
@@ -40,14 +41,6 @@ export default function ListarVendas() {
       setPedidos(sortedPedidosRecentes)
     }
   }, [valorSelecionado])
-
-  // Função para fazer parsing da string de data para Date
-  const parseDate = (dateStr: string) => {
-    const [datePart, timePart] = dateStr.split(' ')
-    const [day, month, year] = datePart.split('/')
-    const [hours, minutes] = timePart.split(':')
-    return new Date(Number(year), Number(month) - 1, Number(day), Number(hours), Number(minutes))
-  }
 
   useEffect(() => {
     const buscarPorId = async () => {
@@ -114,8 +107,7 @@ export default function ListarVendas() {
           {
             campoSelecionado === '' ? (
               <div className="div-msg-busca">
-                <p>Selecione uma opção de busca:</p>
-                <p>CPF do Cliente, CPF do Funcionário ou Filtro por data.</p>
+                <p>Selecione o filtro desejado:</p>
               </div>
             ) : campoSelecionado === 'cpfCliente' ? (
               <InputCpf
@@ -175,7 +167,7 @@ export default function ListarVendas() {
             id="recente"
             value="recente"
             checked={valorSelecionado === 'recente'}
-            onChange={() => handleCheckboxChange('recente')}
+            onChange={() => alternarSelecaoCheckbox('recente')}
           />
         </div>
         <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
@@ -187,7 +179,7 @@ export default function ListarVendas() {
             id="antiga"
             value="antiga"
             checked={valorSelecionado === 'antiga'}
-            onChange={() => handleCheckboxChange('antiga')}
+            onChange={() => alternarSelecaoCheckbox('antiga')}
           />
         </div>
       </div>
