@@ -1,17 +1,17 @@
 'use client'
 
-import { ChangeEvent, useEffect, useState } from 'react'
 import { Card } from '@/components/Card'
+import { ExibeErro } from '@/components/ExibeErro'
 import { FormGroup } from '@/components/Form-group'
 import { InputCep, InputCpf, InputTelefone } from '@/components/Input'
-import { mensagemErro, mensagemSucesso } from '@/models/toast'
 import { Cliente, estadoInicialCliente } from '@/models/cliente'
 import { Endereco, estadoInicialEndereco } from '@/models/endereco'
+import { Erros, salvarErros } from '@/models/erros'
+import { mensagemErro, mensagemSucesso } from '@/models/toast'
 import { ClienteService } from '@/services/clienteService'
 import { EnderecoService } from '@/services/enderecoService'
-import { ExibeErro } from '@/components/ExibeErro'
-import { Erros } from '@/models/erros'
 import { Save } from 'lucide-react'
+import { ChangeEvent, useEffect, useState } from 'react'
 
 export default function CadastroCliente() {
     const {
@@ -52,7 +52,7 @@ export default function CadastroCliente() {
         try {
             await salvarCliente(cliente)
         } catch (error) {
-            salvarErros(error)
+            salvarErros(error, erros, setErros)
         }
     }
 
@@ -62,9 +62,9 @@ export default function CadastroCliente() {
             const responseEndereco = await salvarEndereco(endereco)
             setEndereco({ ...endereco, id: responseEndereco.data.id })
             setCliente({ ...cliente, endereco: responseEndereco.data.id })
-        } catch (erro: any) {
+        } catch (error: any) {
             mensagemErro('Erro no preenchimento dos campos.')
-            salvarErros(erro)
+            salvarErros(error, erros, setErros)
         }
     }
 
@@ -87,21 +87,6 @@ export default function CadastroCliente() {
             salvarClienteAtualizado()
         }
     }, [cliente.endereco])
-
-    const salvarErros = (erro: any) => {
-        const objErro = erro.response.data
-        const keys = Object.keys(objErro)
-        if (!objErro.error && erros.length <= 8) {
-            setErros((errosAntigos) => {
-                const novosErros = keys.map((k) => ({ nomeInput: k, mensagemErro: objErro[k] }))
-                return [...errosAntigos, ...novosErros]
-            })
-        }
-        const erroIgnorado = "Endereço não encontrado para o Id informado."
-        if (objErro.error && objErro.error !== erroIgnorado) {
-            setErros((errosAntigos) => [...errosAntigos, { nomeInput: 'error', mensagemErro: objErro.error }])
-        }
-    }
 
     return (
         <div className='div-form-container'>

@@ -1,18 +1,18 @@
 'use client'
 
-import { ChangeEvent, useEffect, useState } from 'react'
 import { Card } from '@/components/Card'
+import { ExibeErro } from '@/components/ExibeErro'
 import { FormGroup } from '@/components/Form-group'
 import { InputCep, InputTelefone } from '@/components/Input'
-import { mensagemErro, mensagemSucesso } from '@/models/toast'
 import { Cliente, estadoInicialCliente } from '@/models/cliente'
 import { Endereco, estadoInicialEndereco } from '@/models/endereco'
+import { Erros, salvarErros } from '@/models/erros'
+import { mensagemErro, mensagemSucesso } from '@/models/toast'
 import { ClienteService } from '@/services/clienteService'
 import { EnderecoService } from '@/services/enderecoService'
-import { ExibeErro } from '@/components/ExibeErro'
-import { Erros } from '@/models/erros'
 import { Edit3 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { ChangeEvent, useEffect, useState } from 'react'
 
 interface AtualizarClienteProps {
   params: {
@@ -72,24 +72,9 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
       await atualizarEndereco(endereco.id, endereco)
       mensagemSucesso('Cliente atualizado com sucesso.')
       router.push('/cliente/listar')
-    } catch (erro: any) {
-      salvarErros(erro)
+    } catch (error: any) {
+      salvarErros(error, erros, setErros)
       mensagemErro('Erro no preenchimento dos campos.')
-    }
-  }
-
-  const salvarErros = (erro: any) => {
-    const objErro = erro.response.data
-    const keys = Object.keys(objErro)
-    if (!objErro.error && erros.length <= 8) {
-      setErros((errosAntigos) => {
-        const novosErros = keys.map((k) => ({ nomeInput: k, mensagemErro: objErro[k] }));
-        return [...errosAntigos, ...novosErros];
-      });
-    }
-    const erroIgnorado = "Endereço não encontrado para o Id informado."
-    if (objErro.error && objErro.error !== erroIgnorado) {
-      setErros((errosAntigos) => [...errosAntigos, { nomeInput: 'error', mensagemErro: objErro.error }])
     }
   }
 

@@ -1,14 +1,14 @@
+import { Olho } from "@/components/Olho"
+import imgProduto from '@/images/checklist.png'
+import imgVenda from '@/images/vendas.png'
 import { ProdutoPedido } from "@/models/ProdutoPedido"
 import { formatarParaReal } from "@/models/formatadorReal"
 import { Produto } from "@/models/produto"
 import { PedidoService } from "@/services/PedidoService"
 import { ProdutoPedidoService } from "@/services/ProdutoPedidoService"
 import { ProdutoService } from "@/services/produtoService"
-import imgVenda from '@/images/vendas.png'
-import imgProduto from '@/images/checklist.png'
 import '@/styles/cardListagem.css'
 import Image from "next/image"
-import { Olho } from "@/components/Olho"
 
 interface ProdutosDoPedidoProps {
   params: {

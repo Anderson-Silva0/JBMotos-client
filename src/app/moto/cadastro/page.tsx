@@ -6,7 +6,7 @@ import { FormGroup } from "@/components/Form-group";
 import { InputPlaca } from "@/components/Input";
 import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from "@/models/Selecoes";
 import { Cliente } from "@/models/cliente";
-import { Erros } from "@/models/erros";
+import { Erros, salvarErros } from "@/models/erros";
 import { Moto, estadoInicialMoto } from "@/models/moto";
 import { selectStyles } from "@/models/selectStyles";
 import { mensagemErro, mensagemSucesso } from "@/models/toast";
@@ -65,24 +65,9 @@ export default function CadastroMoto() {
       mensagemSucesso("Moto cadastrada com sucesso!")
       setMoto(estadoInicialMoto)
       setOpcaoSelecionadaCliente(estadoInicialOpcoesSelecoes)
-    } catch (erro: any) {
+    } catch (error: any) {
       mensagemErro('Erro no preenchimento dos campos.')
-      salvarErros(erro)
-    }
-  }
-
-  const salvarErros = (erro: any) => {
-    const objErro = erro.response.data
-    const keys = Object.keys(objErro)
-    if (!objErro.error && erros.length <= 8) {
-      setErros((errosAntigos) => {
-        const novosErros = keys.map((k) => ({ nomeInput: k, mensagemErro: objErro[k] }))
-        return [...errosAntigos, ...novosErros]
-      })
-    }
-    const erroIgnorado = "Endereço não encontrado para o Id informado."
-    if (objErro.error && objErro.error !== erroIgnorado) {
-      setErros((errosAntigos) => [...errosAntigos, { nomeInput: 'error', mensagemErro: objErro.error }])
+      salvarErros(error, erros, setErros)
     }
   }
 

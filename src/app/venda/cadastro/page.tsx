@@ -9,7 +9,7 @@ import imgRemoverLinha from '@/images/icons8-delete-row-100.png'
 import imgAdicionarLinha from '@/images/icons8-insert-row-48.png'
 import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from "@/models/Selecoes"
 import { Cliente } from "@/models/cliente"
-import { Erros } from "@/models/erros"
+import { Erros, salvarErros } from "@/models/erros"
 import { formatarParaReal } from "@/models/formatadorReal"
 import { Funcionario } from "@/models/funcionario"
 import { Pedido, estadoInicialPedido } from "@/models/pedido"
@@ -152,8 +152,8 @@ export default function CadastroVenda() {
         setIdPedido(response.data.id)
         setErros([])
         setIdProdutoIdLinhaSelecionado([])
-      } catch (erro: any) {
-        salvarErros(erro)
+      } catch (error: any) {
+        salvarErros(error, erros, setErros)
         mensagemErro('Erro no preenchimento dos campos.')
       }
     } else if (verificarIdProdutosComRepeticoes(idProdutoIdLinhaSelecionado)) {
@@ -162,20 +162,6 @@ export default function CadastroVenda() {
       setIdProdutoIdLinhaSelecionado([])
       setValoresTotais([])
       handleRepeticao = !handleRepeticao ? true : false
-    }
-  }
-
-  const salvarErros = (erro: any) => {
-    const objErro = erro.response.data
-    const keys = Object.keys(objErro)
-    if (!objErro.error && erros.length <= 8) {
-      setErros((errosAntigos) => {
-        const novosErros = keys.map((k) => ({ nomeInput: k, mensagemErro: objErro[k] }))
-        return [...errosAntigos, ...novosErros]
-      })
-    }
-    if (objErro.error) {
-      setErros((errosAntigos) => [...errosAntigos, { nomeInput: 'error', mensagemErro: objErro.error }])
     }
   }
 

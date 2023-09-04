@@ -5,7 +5,7 @@ import { ExibeErro } from '@/components/ExibeErro'
 import { FormGroup } from '@/components/Form-group'
 import { InputCep, InputTelefone } from '@/components/Input'
 import { Endereco, estadoInicialEndereco } from '@/models/endereco'
-import { Erros } from '@/models/erros'
+import { Erros, salvarErros } from '@/models/erros'
 import { Fornecedor, estadoInicialFornecedor } from '@/models/fornecedor'
 import { mensagemErro, mensagemSucesso } from '@/models/toast'
 import { EnderecoService } from '@/services/enderecoService'
@@ -72,24 +72,9 @@ export default function AtualizarFornecedor({ params }: AtualizarFornecedorProps
       await atualizarEndereco(endereco.id, endereco)
       mensagemSucesso('Fornecedor atualizado com sucesso.')
       router.push('/fornecedor/listar')
-    } catch (erro: any) {
-      salvarErros(erro)
+    } catch (error: any) {
+      salvarErros(error, erros, setErros)
       mensagemErro('Erro no preenchimento dos campos.')
-    }
-  }
-
-  const salvarErros = (erro: any) => {
-    const objErro = erro.response.data
-    const keys = Object.keys(objErro)
-    if (!objErro.error && erros.length <= 8) {
-      setErros((errosAntigos) => {
-        const novosErros = keys.map((k) => ({ nomeInput: k, mensagemErro: objErro[k] }));
-        return [...errosAntigos, ...novosErros];
-      });
-    }
-    const erroIgnorado = "Endereço não encontrado para o Id informado."
-    if (objErro.error && objErro.error !== erroIgnorado) {
-      setErros((errosAntigos) => [...errosAntigos, { nomeInput: 'error', mensagemErro: objErro.error }])
     }
   }
 

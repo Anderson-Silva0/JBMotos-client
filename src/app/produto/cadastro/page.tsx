@@ -1,24 +1,21 @@
 'use client'
 
+import { Card } from '@/components/Card'
+import { ExibeErro } from '@/components/ExibeErro'
+import { FormGroup } from '@/components/Form-group'
+import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from '@/models/Selecoes'
+import { Erros, salvarErros } from '@/models/erros'
+import { Estoque, estadoInicialEstoque } from '@/models/estoque'
+import { formatarParaReal } from '@/models/formatadorReal'
+import { Fornecedor } from '@/models/fornecedor'
+import { Produto, estadoInicialProduto } from '@/models/produto'
+import { selectStyles } from '@/models/selectStyles'
+import { mensagemErro, mensagemSucesso } from '@/models/toast'
+import { EstoqueService } from '@/services/estoqueService'
+import { FornecedorService } from '@/services/fornecedorService'
+import { ProdutoService } from '@/services/produtoService'
 import { ChangeEvent, useEffect, useState } from 'react'
 import Select from 'react-select'
-
-import { Card } from '@/components/Card'
-import { FormGroup } from '@/components/Form-group'
-import { ExibeErro } from '@/components/ExibeErro'
-
-import { EstoqueService } from '@/services/estoqueService'
-import { ProdutoService } from '@/services/produtoService'
-import { FornecedorService } from '@/services/fornecedorService'
-
-import { mensagemErro, mensagemSucesso } from '@/models/toast'
-import { Produto, estadoInicialProduto } from '@/models/produto'
-import { Estoque, estadoInicialEstoque } from '@/models/estoque'
-import { Erros } from '@/models/erros'
-import { Fornecedor } from '@/models/fornecedor'
-import { selectStyles } from '@/models/selectStyles'
-import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from '@/models/Selecoes'
-import { formatarParaReal } from '@/models/formatadorReal'
 
 export default function CadastroProduto() {
   const { salvarProduto } = ProdutoService()
@@ -85,7 +82,7 @@ export default function CadastroProduto() {
     try {
       await salvarProduto(produto)
     } catch (error) {
-      salvarErros(error)
+      salvarErros(error, erros, setErros)
     }
   }
 
@@ -95,23 +92,9 @@ export default function CadastroProduto() {
       const responseEstoque = await salvarEstoque(estoque)
       setEstoque({ ...estoque, id: responseEstoque.data.id })
       setProduto({ ...produto, idEstoque: responseEstoque.data.id })
-    } catch (erro: any) {
-      salvarErros(erro)
+    } catch (error: any) {
+      salvarErros(error, erros, setErros)
       mensagemErro('Erro no preenchimento dos campos.')
-    }
-  }
-
-  const salvarErros = (erro: any) => {
-    const objErro = erro.response.data
-    const keys = Object.keys(objErro)
-    if (!objErro.error && erros.length <= 8) {
-      setErros((errosAntigos) => {
-        const novosErros = keys.map((k) => ({ nomeInput: k, mensagemErro: objErro[k] }))
-        return [...errosAntigos, ...novosErros]
-      })
-    }
-    if (objErro.error) {
-      setErros((errosAntigos) => [...errosAntigos, { nomeInput: 'error', mensagemErro: objErro.error }])
     }
   }
 
@@ -125,7 +108,6 @@ export default function CadastroProduto() {
         setEstoque(estadoInicialEstoque)
       } catch (erro: any) {
         mensagemErro('Erro no preenchimento dos campos.')
-        salvarErros(erro)
         erros.map(e => e.nomeInput === 'error' && mensagemErro(e.mensagemErro))
         await deletarEstoque(estoque.id)
         setEstoque({ ...estoque, id: 0 })

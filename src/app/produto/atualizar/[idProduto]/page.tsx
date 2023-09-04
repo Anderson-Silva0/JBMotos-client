@@ -4,7 +4,7 @@ import { Card } from "@/components/Card"
 import { ExibeErro } from "@/components/ExibeErro"
 import { FormGroup } from "@/components/Form-group"
 import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from "@/models/Selecoes"
-import { Erros } from "@/models/erros"
+import { Erros, salvarErros } from "@/models/erros"
 import { Estoque, estadoInicialEstoque } from "@/models/estoque"
 import { formatarParaReal } from "@/models/formatadorReal"
 import { Fornecedor } from "@/models/fornecedor"
@@ -103,23 +103,9 @@ export default function AtualizarProduto({ params }: AtualizarProdutoProps) {
       await atualizarEstoque(estoque.id, estoque)
       mensagemSucesso('Produto e Estoque atualizados com sucesso.')
       router.push('/produto/listar')
-    } catch (erro: any) {
-      salvarErros(erro)
+    } catch (error: any) {
+      salvarErros(error, erros, setErros)
       mensagemErro('Erro no preenchimento dos campos.')
-    }
-  }
-
-  const salvarErros = (erro: any) => {
-    const objErro = erro.response.data
-    const keys = Object.keys(objErro)
-    if (!objErro.error && erros.length <= 8) {
-      setErros((errosAntigos) => {
-        const novosErros = keys.map((k) => ({ nomeInput: k, mensagemErro: objErro[k] }))
-        return [...errosAntigos, ...novosErros]
-      })
-    }
-    if (objErro.error) {
-      setErros((errosAntigos) => [...errosAntigos, { nomeInput: 'error', mensagemErro: objErro.error }])
     }
   }
 
