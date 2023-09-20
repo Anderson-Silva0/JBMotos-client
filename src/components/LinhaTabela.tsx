@@ -1,9 +1,9 @@
 
-import { ValoresTotaisProps } from "@/app/venda/cadastro/page"
+import { ValoresTotaisProps, produtoSelecionadoProps } from "@/app/venda/cadastro/page"
 import { ProdutoPedido, estadoInicialProdutoPedido } from "@/models/ProdutoPedido"
 import { Estoque, estadoInicialEstoque } from "@/models/estoque"
 import { formatarParaReal } from "@/models/formatadorReal"
-import { Produto } from '@/models/produto'
+import { Produto, estadoInicialProduto } from '@/models/produto'
 import { selectStylesVenda } from '@/models/selectStyles'
 import { mensagemAlerta, mensagemErro } from "@/models/toast"
 import { ProdutoPedidoService } from '@/services/ProdutoPedidoService'
@@ -11,7 +11,6 @@ import { EstoqueService } from "@/services/estoqueService"
 import '@/styles/tabelaVenda.css'
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react"
 import Select from 'react-select'
-
 
 interface LinhaTabelaProps {
   idLinha: number
@@ -23,26 +22,29 @@ interface LinhaTabelaProps {
   valoresTotais: ValoresTotaisProps[]
   setValoresTotais: Dispatch<SetStateAction<ValoresTotaisProps[]>>
   atualizarIdProdutoIdLinhaSelecionado: (idProduto: number, idLinhaAtual: number) => void
+  setProdutos: Dispatch<SetStateAction<Produto[]>>
+  produtosSelecionados: produtoSelecionadoProps[]
+  setProdutosSelecionados: Dispatch<SetStateAction<produtoSelecionadoProps[]>>
 }
 
 interface OpcaoSelecionadaProps {
   label: string
-  idProduto: number
-  valorUnidade: number
-  idEstoqueProduto: number
+  produto: Produto
 }
 
 const estadoInicialOpcaoSelecionada: OpcaoSelecionadaProps = {
   label: 'Selecione...',
-  idProduto: 0,
-  valorUnidade: 0,
-  idEstoqueProduto: 0
+  produto: estadoInicialProduto
 }
 
-export default function LinhaTabela(props: LinhaTabelaProps) {
+export function LinhaTabela(props: LinhaTabelaProps) {
   const { salvarProdutoPedido } = ProdutoPedidoService()
   const { buscarEstoquePorId } = EstoqueService()
 
+  const [produtoAnterior, setProdutoAnterior] = useState<produtoSelecionadoProps>({
+    idLinhaTabela: 0,
+    produto: estadoInicialProduto
+  })
   const [valorTotal, setValorTotal] = useState<number>(0)
   const [produtoPedido, setProdutoPedido] = useState<ProdutoPedido>(estadoInicialProdutoPedido)
   const [opcaoSelecionada, setOpcaoSelecionada] = useState<OpcaoSelecionadaProps>(estadoInicialOpcaoSelecionada)
@@ -59,21 +61,67 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
   }, [props.produtos])
 
   useEffect(() => {
-    if (opcaoSelecionada.idProduto) {
-      props.atualizarIdProdutoIdLinhaSelecionado(opcaoSelecionada.idProduto, props.idLinha)
+    const atualizarProdutosSelecionados = () => {
+      if (props.produtosSelecionados.length) {
+        props.produtosSelecionados.map(produtoSelecionado => {
+          if (produtoSelecionado.idLinhaTabela === props.idLinha) {
+            if (produtoAnterior.produto.id !== opcaoSelecionada.produto.id) {
+              let indice = props.produtosSelecionados.findIndex(objeto => objeto.idLinhaTabela === produtoSelecionado.idLinhaTabela)
+              const produtoParaDevolver = props.produtosSelecionados[indice].produto
+              if (!props.produtos.includes(produtoParaDevolver)) {
+                props.setProdutos([...props.produtos, produtoParaDevolver])
+              }
+              props.produtosSelecionados.splice(indice, 1)
+            }
+          }
+        })
+      }
+
+      if (produtoAnterior.produto === estadoInicialProduto || produtoAnterior.produto !== opcaoSelecionada.produto) {
+        const produtoSelecionado: produtoSelecionadoProps = {
+          idLinhaTabela: props.idLinha,
+          produto: opcaoSelecionada.produto
+        }
+
+        if (!props.produtosSelecionados.includes(produtoSelecionado)) {
+          props.setProdutosSelecionados([...props.produtosSelecionados, produtoSelecionado])
+          setProdutoAnterior(produtoSelecionado)
+        }
+      }
+    }
+
+    if (opcaoSelecionada.produto.id) {
+      atualizarProdutosSelecionados()
+    }
+  }, [props.produtos])
+
+  useEffect(() => {
+    const removerProdutoSelecionado = () => {
+      const produtosAtualizado = props.produtos.filter(produto => produto.id !== opcaoSelecionada.produto.id)
+      props.setProdutos(produtosAtualizado)
+    }
+
+    if (opcaoSelecionada.produto.id) {
+      removerProdutoSelecionado()
+    }
+  }, [opcaoSelecionada])
+
+  useEffect(() => {
+    if (opcaoSelecionada.produto.id) {
+      props.atualizarIdProdutoIdLinhaSelecionado(opcaoSelecionada.produto.id, props.idLinha)
     }
     const verificarEstoque = async () => {
-      const estoqueResponse = await buscarEstoquePorId(opcaoSelecionada.idEstoqueProduto)
+      const estoqueResponse = await buscarEstoquePorId(opcaoSelecionada.produto.idEstoque)
       setEstoqueProdutoSelecionado(estoqueResponse.data)
     }
-    if (opcaoSelecionada.idProduto) {
+    if (opcaoSelecionada.produto.id) {
       verificarEstoque()
     }
-  }, [opcaoSelecionada.idProduto])
+  }, [opcaoSelecionada.produto.id])
 
   useEffect(() => {
     const setQuantidadeInicial = () => {
-      if (opcaoSelecionada.idProduto !== 0 && estoqueProdutoSelecionado.status !== 'INDISPONIVEL') {
+      if (opcaoSelecionada.produto.id !== 0 && estoqueProdutoSelecionado.status !== 'INDISPONIVEL') {
         setProdutoPedido((prevState) => ({
           ...prevState,
           quantidade: 1
@@ -106,7 +154,7 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
 
   useEffect(() => {
     const calculo = () => {
-      const total = Number(opcaoSelecionada?.valorUnidade) * produtoPedido.quantidade
+      const total = Number(opcaoSelecionada?.produto.precoVenda) * produtoPedido.quantidade
       setValorTotal(total)
       if (total !== 0) {
         if (props.valoresTotais.some(item => item.idLinha === props.idLinha)) {
@@ -118,7 +166,7 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
       }
     }
     calculo()
-  }, [produtoPedido.quantidade, opcaoSelecionada?.valorUnidade])
+  }, [produtoPedido.quantidade, opcaoSelecionada?.produto.precoVenda])
 
   useEffect(() => {
     setOpcaoSelecionada(estadoInicialOpcaoSelecionada)
@@ -131,7 +179,7 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
         const produtoPedidoAtualizado = {
           ...produtoPedido,
           idPedido: props.idPedido,
-          idProduto: opcaoSelecionada.idProduto
+          idProduto: opcaoSelecionada.produto.id
         }
         await salvarProdutoPedido(produtoPedidoAtualizado)
         props.setOcorrenciasErros(prevState => [...prevState, 'sucesso'])
@@ -173,7 +221,7 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
        unidades disponíveis para ${opcaoSelecionada.label}.`)
       }
     }
-    if (opcaoSelecionada.idProduto) {
+    if (opcaoSelecionada.produto.id) {
       if (estoqueProdutoSelecionado.status !== 'INDISPONIVEL') {
         setProdutoPedido({ ...produtoPedido, quantidade: novoValor < 1 ? 1 : novoValor })
       } else {
@@ -196,11 +244,9 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
             placeholder="Selecione..."
             value={opcaoSelecionada}
             onChange={(option: any) => setOpcaoSelecionada(option)}
-            options={produtosAtivos.map(p => ({
-              label: p.nome,
-              idProduto: p.id,
-              valorUnidade: p.precoVenda,
-              idEstoqueProduto: p.idEstoque
+            options={produtosAtivos.map(produto => ({
+              label: produto.nome,
+              produto: produto
             }) as OpcaoSelecionadaProps)}
             instanceId="select-idProduto"
             id="select-idProduto"
@@ -217,7 +263,7 @@ export default function LinhaTabela(props: LinhaTabelaProps) {
           onWheel={(e) => e.currentTarget.blur()}
         />
       </td>
-      <td>{formatarParaReal(Number(opcaoSelecionada.valorUnidade))}</td>
+      <td>{formatarParaReal(Number(opcaoSelecionada.produto.precoVenda))}</td>
       <td>{formatarParaReal(valorTotal)}</td>
     </tr>
   )
