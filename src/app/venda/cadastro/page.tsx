@@ -3,7 +3,7 @@
 import { Card } from "@/components/Card"
 import { ExibeErro } from "@/components/ExibeErro"
 import { FormGroup } from "@/components/Form-group"
-import LinhaTabela from "@/components/LinhaTabela"
+import { LinhaTabela } from "@/components/LinhaTabela"
 import TabelaVenda from "@/components/TabelaVenda"
 import imgRemoverLinha from '@/images/icons8-delete-row-100.png'
 import imgAdicionarLinha from '@/images/icons8-insert-row-48.png'
@@ -24,6 +24,10 @@ import Image from "next/image"
 import { useEffect, useState } from "react"
 import Select from 'react-select'
 
+export interface produtoSelecionadoProps {
+  idLinhaTabela: number,
+  produto: Produto
+}
 
 interface IdProdutoEIdLinha {
   idProduto: number
@@ -43,8 +47,11 @@ export default function CadastroVenda() {
   const { buscarTodosProdutos } = ProdutoService()
   const { salvarPedido, deletarPedido } = PedidoService()
 
+  const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
+  const [produtosSelecionados, setProdutosSelecionados] = useState<produtoSelecionadoProps[]>([])
   const [erros, setErros] = useState<Erros[]>([])
   const [produtos, setProdutos] = useState<Produto[]>([])
+  const [todosProdutos, setTodosProdutos] = useState<Produto[]>([])
   const [pedido, setPedido] = useState<Pedido>(estadoInicialPedido)
   const [idPedido, setIdPedido] = useState<number>(0)
   const [qtdLinha, setQtdLinha] = useState<number[]>([1])
@@ -85,29 +92,33 @@ export default function CadastroVenda() {
       { value: 'Dinheiro', label: 'Dinheiro' },
       { value: 'Cartão de débito', label: 'Cartão de Débito' },
       { value: 'Cartão de Crédito', label: 'Cartão de Crédito' },
-      { value: 'Boleto Bancário', label: 'Boleto Bancário' },
+      { value: 'Boleto Bancário', label: 'Boleto Bancário' }
     ])
   }, [])
 
-  useEffect(() => {
-    const buscarTodos = async () => {
-      try {
-        const todosClientesResponse = await buscarTodosClientes()
-        const todosClientes = todosClientesResponse.data
-        const clientesAtivos = todosClientes.filter((c: Cliente) => c.statusCliente === 'ATIVO')
-        setClientes(clientesAtivos)
+  const buscarTodos = async () => {
+    try {
+      const todosClientesResponse = await buscarTodosClientes()
+      const todosClientes = todosClientesResponse.data
+      const clientesAtivos = todosClientes.filter((c: Cliente) => c.statusCliente === 'ATIVO')
+      setClientes(clientesAtivos)
 
-        const todosFuncionariosResponse = await buscarTodosFuncionarios()
-        const todosFuncionarios = todosFuncionariosResponse.data
-        const funcionariosAtivos = todosFuncionarios.filter((f: Funcionario) => f.statusFuncionario === 'ATIVO')
-        setFuncionarios(funcionariosAtivos)
+      const todosFuncionariosResponse = await buscarTodosFuncionarios()
+      const todosFuncionarios = todosFuncionariosResponse.data
+      const funcionariosAtivos = todosFuncionarios.filter((f: Funcionario) => f.statusFuncionario === 'ATIVO')
+      setFuncionarios(funcionariosAtivos)
 
-        const todosProdutosResponse = await buscarTodosProdutos()
-        setProdutos(todosProdutosResponse.data)
-      } catch (erro: any) {
-        mensagemErro(erro.response.data)
-      }
+      const todosProdutosResponse = await buscarTodosProdutos()
+      setProdutos(todosProdutosResponse.data)
+      setTodosProdutos(todosProdutosResponse.data)
+    } catch (erro: any) {
+      mensagemErro(erro.response.data)
+    } finally {
+      setFoiCarregado(true)
     }
+  }
+
+  useEffect(() => {
     buscarTodos()
   }, [])
 
@@ -136,52 +147,44 @@ export default function CadastroVenda() {
     definirEstadoInicialSelecaoPedido()
     setPedido(estadoInicialPedido)
     setIdPedido(0)
+    buscarTodos()
   }
 
   useEffect(() => {
     if (ocorrenciasErros.length === qtdLinha.length) {
       exibirResultados()
     }
-
   }, [ocorrenciasErros])
 
   const submit = async () => {
-    if (!verificarIdProdutosComRepeticoes(idProdutoIdLinhaSelecionado)) {
-      try {
-        const response = await salvarPedido(pedido)
-        setIdPedido(response.data.id)
-        setErros([])
-        setIdProdutoIdLinhaSelecionado([])
-      } catch (error: any) {
-        salvarErros(error, erros, setErros)
-        mensagemErro('Erro no preenchimento dos campos.')
-      }
-    } else if (verificarIdProdutosComRepeticoes(idProdutoIdLinhaSelecionado)) {
-      mensagemErro('Você selecionou Produtos repetidos. Selecione novamente para realizar a Venda.')
-      setQtdLinha([1])
+    try {
+      const response = await salvarPedido(pedido)
+      setIdPedido(response.data.id)
+      setErros([])
       setIdProdutoIdLinhaSelecionado([])
-      setValoresTotais([])
-      handleRepeticao = !handleRepeticao ? true : false
+    } catch (error: any) {
+      salvarErros(error, erros, setErros)
+      mensagemErro('Erro no preenchimento dos campos.')
     }
   }
 
   const gerarMensagemAlertaProdutosAtivos = (produtosAtivos: Produto[]) => {
     let mensagem = ''
-    if (produtos.length > 1 && produtosAtivos.length > 1) {
+    if (todosProdutos.length > 1 && produtosAtivos.length > 1) {
       mensagem = `Não é possível adicionar mais linhas, pois existem  
-      ${produtos.length} produtos no total, mas apenas ${produtosAtivos.length} estão ativos.`
-    } else if (produtos.length > 1 && produtosAtivos.length === 1) {
+      ${todosProdutos.length} produtos no total, mas apenas ${produtosAtivos.length} estão ativos.`
+    } else if (todosProdutos.length > 1 && produtosAtivos.length === 1) {
       mensagem = `Não é possível adicionar mais linhas, pois existem  
-      ${produtos.length} produtos no total, mas apenas ${produtosAtivos.length} ativo.`
-    } else if (produtos.length === 1) {
+      ${todosProdutos.length} produtos no total, mas apenas ${produtosAtivos.length} ativo.`
+    } else if (todosProdutos.length === 1) {
       mensagem = `Não é possível adicionar mais linhas, pois existe  
-      ${produtos.length} produto no total, e ${produtosAtivos.length} ativo.`
+      ${todosProdutos.length} produto no total, e ${produtosAtivos.length} ativo.`
     }
     return mensagem
   }
 
   const adicionarLinha = () => {
-    const produtosAtivos = produtos.filter(p => p.statusProduto === 'ATIVO')
+    const produtosAtivos = todosProdutos.filter(p => p.statusProduto === 'ATIVO')
     if (qtdLinha.length < produtosAtivos.length) {
       const newId = Math.floor(Math.random() * 1000000)
       setQtdLinha([...qtdLinha, newId])
@@ -222,9 +225,8 @@ export default function CadastroVenda() {
     }
   }
 
-  const verificarIdProdutosComRepeticoes = (meuArray: IdProdutoEIdLinha[]): boolean => {
-    const set = new Set(meuArray.map(item => item.idProduto))
-    return set.size !== meuArray.length
+  if (!foiCarregado) {
+    return <h1 className="carregando">Carregando...</h1>
   }
 
   return (
@@ -286,6 +288,9 @@ export default function CadastroVenda() {
               handleRepeticao={handleRepeticao}
               valoresTotais={valoresTotais}
               setValoresTotais={setValoresTotais}
+              setProdutos={setProdutos}
+              produtosSelecionados={produtosSelecionados}
+              setProdutosSelecionados={setProdutosSelecionados}
             />
           )
         })
