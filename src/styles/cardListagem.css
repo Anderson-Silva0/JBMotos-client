@@ -228,6 +228,16 @@
 }
 
 @media (max-width: 999px) {
+  .cardListagem-container {
+    width: 90%;
+    margin: 5vh auto;
+    border-radius: 2vh;
+    background-color: #F8F9FA;
+    padding: 2vh;
+    box-shadow: 0px 4px 5px #495057;
+    font-size: 12pt;
+  }
+
   .div-container-buscar {
     display: flex;
     flex-direction: column;
