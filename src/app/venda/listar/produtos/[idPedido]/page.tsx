@@ -1,4 +1,6 @@
+import { LinhaProduto } from "@/components/LinhaProduto"
 import { Olho } from "@/components/Olho"
+import TabelaVenda from "@/components/TabelaVenda"
 import imgProduto from '@/images/checklist.png'
 import imgVenda from '@/images/vendas.png'
 import { ProdutoPedido } from "@/models/ProdutoPedido"
@@ -17,7 +19,6 @@ interface ProdutosDoPedidoProps {
 }
 
 export default async function ProdutosDoPedido({ params }: ProdutosDoPedidoProps) {
-
   const { buscarProdutoPorId } = ProdutoService()
 
   const { buscarTodosPorIdPedido } = ProdutoPedidoService()
@@ -33,7 +34,6 @@ export default async function ProdutosDoPedido({ params }: ProdutosDoPedidoProps
     const produtoResponse = (await buscarProdutoPorId(idProduto)).data as Produto
     return produtoResponse.nome
   }
-
 
   return (
     <div className="div-container-produtoPedido">
@@ -68,19 +68,22 @@ export default async function ProdutosDoPedido({ params }: ProdutosDoPedidoProps
             )
           }
         </span>
-        {produtosDoPedidoResponse.map((produtoPedido) => (
-          <div id="div-produtoPedido-venda" key={produtoPedido.id}>
-            <span id="info-title-venda">Produto</span>
-            <div className='div-dados'>Nome</div>
-            <div className='div-resultado'>{obterNomeProduto(produtoPedido.idProduto)}</div>
-            <div className='div-dados'>Quantidade</div>
-            <div className='div-resultado'>{produtoPedido.quantidade}</div>
-            <div className='div-dados'>Valor Unidade</div>
-            <div className='div-resultado'>{formatarParaReal(produtoPedido.valorUnidade)}</div>
-            <div className='div-dados'>Valor Total</div>
-            <div className='div-resultado'>{formatarParaReal(produtoPedido.valorTotal)}</div>
-          </div>
-        ))}
+        <TabelaVenda>
+          {
+            await Promise.all(
+              produtosDoPedidoResponse.map(async (produtoPedido) => {
+                const nomeProduto = await obterNomeProduto(produtoPedido.idProduto)
+                return (
+                  <LinhaProduto
+                    key={produtoPedido.id}
+                    nome={nomeProduto}
+                    produtoPedido={produtoPedido}
+                  />
+                )
+              })
+            )
+          }
+        </TabelaVenda>
       </div>
       <div className="value-box-venda">
         <div className='div-dados-title'>Total da Venda</div>
