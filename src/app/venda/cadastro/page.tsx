@@ -3,6 +3,7 @@
 import { Card } from "@/components/Card"
 import { ExibeErro } from "@/components/ExibeErro"
 import { FormGroup } from "@/components/Form-group"
+import { GeradorPDF, removerProdutoOrcamento } from "@/components/GeradorPDF"
 import { LinhaTabela } from "@/components/LinhaTabela"
 import TabelaVenda from "@/components/TabelaVenda"
 import imgRemoverLinha from '@/images/icons8-delete-row-100.png'
@@ -15,7 +16,7 @@ import { Funcionario } from "@/models/funcionario"
 import { Pedido, estadoInicialPedido } from "@/models/pedido"
 import { Produto } from "@/models/produto"
 import { selectStyles } from "@/models/selectStyles"
-import { mensagemAlerta, mensagemErro, mensagemSucesso } from "@/models/toast"
+import { confirmarDecisao, mensagemAlerta, mensagemErro, mensagemSucesso } from "@/models/toast"
 import { PedidoService } from "@/services/PedidoService"
 import { ClienteService } from "@/services/clienteService"
 import { FuncionarioService } from "@/services/funcionarioService"
@@ -24,7 +25,15 @@ import Image from "next/image"
 import { useEffect, useState } from "react"
 import Select from 'react-select'
 
-export interface produtoSelecionadoProps {
+export interface RegistroProdutoSelecionadoProps {
+  idProduto: number
+  nomeProduto: string
+  quantidade: number
+  valorUnidade: string
+  valorTotal: string
+}
+
+export interface ProdutoSelecionadoProps {
   idLinhaTabela: number,
   produto: Produto
 }
@@ -48,7 +57,8 @@ export default function CadastroVenda() {
   const { salvarPedido, deletarPedido } = PedidoService()
 
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
-  const [produtosSelecionados, setProdutosSelecionados] = useState<produtoSelecionadoProps[]>([])
+  const [registrosProdutosVenda, setRegistrosProdutosVenda] = useState<RegistroProdutoSelecionadoProps[]>([])
+  const [produtosSelecionados, setProdutosSelecionados] = useState<ProdutoSelecionadoProps[]>([])
   const [erros, setErros] = useState<Erros[]>([])
   const [produtos, setProdutos] = useState<Produto[]>([])
   const [todosProdutos, setTodosProdutos] = useState<Produto[]>([])
@@ -59,9 +69,7 @@ export default function CadastroVenda() {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
   const [formasDePagamento, setFormasDePagamento] = useState<OpcoesSelecoes[]>([])
   const [valoresTotais, setValoresTotais] = useState<ValoresTotaisProps[]>([])
-
   const [ocorrenciasErros, setOcorrenciasErros] = useState<string[]>([])
-
   const [idProdutoIdLinhaSelecionado, setIdProdutoIdLinhaSelecionado] = useState<IdProdutoEIdLinha[]>([])
 
   const [opcaoSelecionadaCliente,
@@ -168,6 +176,10 @@ export default function CadastroVenda() {
     }
   }
 
+  const handlerRealizarVenda = () => {
+    confirmarDecisao("Confirmação de Venda", "Tem certeza de que deseja realizar esta venda?", submit)
+  }
+
   const gerarMensagemAlertaProdutosAtivos = (produtosAtivos: Produto[]) => {
     let mensagem = ''
     if (todosProdutos.length > 1 && produtosAtivos.length > 1) {
@@ -199,7 +211,10 @@ export default function CadastroVenda() {
       novasLinhas.pop()
       if (qtdLinha.length === idProdutoIdLinhaSelecionado.length) {
         valoresTotais.pop()
-        idProdutoIdLinhaSelecionado.pop()
+        const idProdutoExcluido = idProdutoIdLinhaSelecionado.pop()?.idProduto
+        const produtoExcluido = produtosSelecionados.filter(produto => produto.produto.id === idProdutoExcluido)[0].produto
+        removerProdutoOrcamento(registrosProdutosVenda, produtoExcluido)
+        setProdutos([...produtos, produtoExcluido])
       }
     }
     setQtdLinha(novasLinhas)
@@ -223,6 +238,18 @@ export default function CadastroVenda() {
     } else {
       setIdProdutoIdLinhaSelecionado([...idProdutoIdLinhaSelecionado, { idProduto: idProduto, idLinha: idLinhaAtual }])
     }
+  }
+
+  const valorTotalVenda = valoresTotais.reduce((acumulador, valor) => acumulador + valor.valorTotal, 0)
+
+  const obterNomeClienteSelecionado = () => {
+    let nomeClienteSelecionado = ''
+    clientes.forEach(cliente => {
+      if (cliente.cpf === opcaoSelecionadaCliente.value) {
+        nomeClienteSelecionado = cliente.nome
+      }
+    })
+    return nomeClienteSelecionado
   }
 
   if (!foiCarregado) {
@@ -267,6 +294,7 @@ export default function CadastroVenda() {
         </FormGroup>
         <FormGroup label="Observação:" htmlFor="observacao">
           <input
+            maxLength={100}
             value={pedido.observacao}
             onChange={(e) => { setErros([]); setPedido({ ...pedido, observacao: e.target.value }) }}
             id="observacao"
@@ -291,6 +319,8 @@ export default function CadastroVenda() {
               setProdutos={setProdutos}
               produtosSelecionados={produtosSelecionados}
               setProdutosSelecionados={setProdutosSelecionados}
+              registrosProdutosVenda={registrosProdutosVenda}
+              setRegistrosProdutosVenda={setRegistrosProdutosVenda}
             />
           )
         })
@@ -299,9 +329,7 @@ export default function CadastroVenda() {
       <div id="valor-total-pedido">
         <span>Total do Pedido</span>
         <span>
-          {formatarParaReal(
-            valoresTotais.reduce((acumulador, valor) => acumulador + valor.valorTotal, 0)
-          )}
+          {formatarParaReal(valorTotalVenda)}
         </span>
       </div>
       <div className="div-botoes-line">
@@ -314,10 +342,19 @@ export default function CadastroVenda() {
       </div>
       <div className="divBotaoCadastrar">
         <button
-          onClick={submit}
+          onClick={handlerRealizarVenda}
           type="submit">
           Realizar Venda
         </button>
+        <GeradorPDF
+          nomeCliente={obterNomeClienteSelecionado()}
+          cpfCliente={opcaoSelecionadaCliente.value}
+          formaPagamento={opcaoSelecionadaFormaDePagamento.value}
+          nomeFuncionario={opcaoSelecionadaFuncionario.label}
+          observacao={pedido.observacao}
+          produtosVenda={registrosProdutosVenda}
+          valorTotalVenda={formatarParaReal(valorTotalVenda)}
+        />
       </div>
     </div>
   )
