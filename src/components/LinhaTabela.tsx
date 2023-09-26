@@ -1,5 +1,5 @@
 
-import { ValoresTotaisProps, produtoSelecionadoProps } from "@/app/venda/cadastro/page"
+import { ProdutoSelecionadoProps, RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/venda/cadastro/page"
 import { ProdutoPedido, estadoInicialProdutoPedido } from "@/models/ProdutoPedido"
 import { Estoque, estadoInicialEstoque } from "@/models/estoque"
 import { formatarParaReal } from "@/models/formatadorReal"
@@ -11,6 +11,7 @@ import { EstoqueService } from "@/services/estoqueService"
 import '@/styles/tabelaVenda.css'
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react"
 import Select from 'react-select'
+import { removerProdutoOrcamento } from "./GeradorPDF"
 
 interface LinhaTabelaProps {
   idLinha: number
@@ -23,8 +24,10 @@ interface LinhaTabelaProps {
   setValoresTotais: Dispatch<SetStateAction<ValoresTotaisProps[]>>
   atualizarIdProdutoIdLinhaSelecionado: (idProduto: number, idLinhaAtual: number) => void
   setProdutos: Dispatch<SetStateAction<Produto[]>>
-  produtosSelecionados: produtoSelecionadoProps[]
-  setProdutosSelecionados: Dispatch<SetStateAction<produtoSelecionadoProps[]>>
+  produtosSelecionados: ProdutoSelecionadoProps[]
+  setProdutosSelecionados: Dispatch<SetStateAction<ProdutoSelecionadoProps[]>>
+  registrosProdutosVenda: RegistroProdutoSelecionadoProps[]
+  setRegistrosProdutosVenda: Dispatch<SetStateAction<RegistroProdutoSelecionadoProps[]>>
 }
 
 interface OpcaoSelecionadaProps {
@@ -41,7 +44,7 @@ export function LinhaTabela(props: LinhaTabelaProps) {
   const { salvarProdutoPedido } = ProdutoPedidoService()
   const { buscarEstoquePorId } = EstoqueService()
 
-  const [produtoAnterior, setProdutoAnterior] = useState<produtoSelecionadoProps>({
+  const [produtoAnterior, setProdutoAnterior] = useState<ProdutoSelecionadoProps>({
     idLinhaTabela: 0,
     produto: estadoInicialProduto
   })
@@ -66,19 +69,20 @@ export function LinhaTabela(props: LinhaTabelaProps) {
         props.produtosSelecionados.map(produtoSelecionado => {
           if (produtoSelecionado.idLinhaTabela === props.idLinha) {
             if (produtoAnterior.produto.id !== opcaoSelecionada.produto.id) {
-              let indice = props.produtosSelecionados.findIndex(objeto => objeto.idLinhaTabela === produtoSelecionado.idLinhaTabela)
+              let indice = props.produtosSelecionados.findIndex(produto => produto.idLinhaTabela === produtoSelecionado.idLinhaTabela)
               const produtoParaDevolver = props.produtosSelecionados[indice].produto
               if (!props.produtos.includes(produtoParaDevolver)) {
                 props.setProdutos([...props.produtos, produtoParaDevolver])
               }
-              props.produtosSelecionados.splice(indice, 1)
+              const produtoExcluido = props.produtosSelecionados.splice(indice, 1)[0].produto
+              removerProdutoOrcamento(props.registrosProdutosVenda, produtoExcluido)
             }
           }
         })
       }
 
       if (produtoAnterior.produto === estadoInicialProduto || produtoAnterior.produto !== opcaoSelecionada.produto) {
-        const produtoSelecionado: produtoSelecionadoProps = {
+        const produtoSelecionado: ProdutoSelecionadoProps = {
           idLinhaTabela: props.idLinha,
           produto: opcaoSelecionada.produto
         }
@@ -235,6 +239,28 @@ export function LinhaTabela(props: LinhaTabelaProps) {
   const definirEstadoInicialOpcoesProdutos = () => {
     setOpcaoSelecionada(estadoInicialOpcaoSelecionada)
   }
+
+  useEffect(() => {
+    props.registrosProdutosVenda.forEach(produtoVenda => {
+      if (opcaoSelecionada.produto.id === produtoVenda.idProduto) {
+        const indice = props.registrosProdutosVenda.findIndex(objeto => objeto.idProduto === produtoVenda.idProduto)
+        props.registrosProdutosVenda.splice(indice, 1)
+      }
+    })
+
+    if (opcaoSelecionada.produto.id !== 0) {
+      props.setRegistrosProdutosVenda([
+        ...props.registrosProdutosVenda,
+        {
+          idProduto: opcaoSelecionada.produto.id,
+          nomeProduto: opcaoSelecionada.label,
+          quantidade: produtoPedido.quantidade,
+          valorUnidade: formatarParaReal(opcaoSelecionada.produto.precoVenda),
+          valorTotal: formatarParaReal(valorTotal)
+        }
+      ])
+    }
+  }, [valorTotal])
 
   return (
     <tr>
