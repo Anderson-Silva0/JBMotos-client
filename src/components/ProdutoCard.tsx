@@ -2,14 +2,15 @@ import { Estoque, estadoInicialEstoque } from '@/models/estoque'
 import { formatarParaReal } from '@/models/formatadorReal'
 import { Fornecedor, estadoInicialFornecedor } from '@/models/fornecedor'
 import { Produto } from '@/models/produto'
-import { confirmarDecisao, mensagemErro, mensagemSucesso } from '@/models/toast'
+import { mensagemErro, mensagemSucesso } from '@/models/toast'
 import { EstoqueService } from '@/services/estoqueService'
 import { FornecedorService } from '@/services/fornecedorService'
 import { ProdutoService } from '@/services/produtoService'
-import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
+import { Check, Edit, UserCheck, X, XSquare } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import '../styles/cardListagem.css'
+import { ConfirmarDecisao } from './ConfirmarDecisao'
 
 interface ProdutoCardProps {
   produto: Produto
@@ -43,7 +44,7 @@ export default function ProdutoCard({ produto, setProdutos }: ProdutoCardProps) 
 
   const handlerAlternar = () => {
     if (produto.statusProduto === 'ATIVO') {
-      confirmarDecisao(
+      ConfirmarDecisao(
         'Desativar Produto',
         'Ao confirmar, o Produto será marcado como inativo e não poderá ser vendido ou utilizado em serviços. Deseja realmente desativar o Produto?',
         () => {
@@ -51,7 +52,7 @@ export default function ProdutoCard({ produto, setProdutos }: ProdutoCardProps) 
         }
       )
     } else if (produto.statusProduto === 'INATIVO') {
-      confirmarDecisao(
+      ConfirmarDecisao(
         'Ativar Produto',
         'Ao confirmar, o Produto será marcado como ativo e poderá ser vendido e utilizado em serviços normalmente. Deseja realmente ativar o Produto?',
         () => {
@@ -155,7 +156,7 @@ export default function ProdutoCard({ produto, setProdutos }: ProdutoCardProps) 
         {
           produto.statusProduto === 'ATIVO' ? (
             <div onClick={handlerAlternar} title='Desativar'>
-              <UserX className='icones-atualizacao-e-delecao' />
+              <XSquare className='icones-atualizacao-e-delecao' />
             </div>
           ) : produto.statusProduto === 'INATIVO' && (
             <div onClick={handlerAlternar} title='Ativar'>
