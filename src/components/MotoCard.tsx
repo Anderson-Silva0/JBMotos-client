@@ -1,12 +1,13 @@
 import { Cliente, estadoInicialCliente } from "@/models/cliente"
 import { Moto } from "@/models/moto"
-import { confirmarDecisao, mensagemErro, mensagemSucesso } from "@/models/toast"
+import { mensagemErro, mensagemSucesso } from "@/models/toast"
 import { ClienteService } from "@/services/clienteService"
 import { MotoService } from "@/services/motoService"
-import { Check, Edit, UserCheck, UserX, X } from "lucide-react"
+import { Check, CheckSquare, Edit, X, XSquare } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import '../styles/cardListagem.css'
+import { ConfirmarDecisao } from "./ConfirmarDecisao"
 
 interface MotoCardProps {
   moto: Moto
@@ -35,7 +36,7 @@ export default function MotoCard({ moto, setMotos }: MotoCardProps) {
 
   const handlerAlternar = () => {
     if (moto.statusMoto === 'ATIVO') {
-      confirmarDecisao(
+      ConfirmarDecisao(
         'Desativar Moto',
         'Ao confirmar, a Moto será marcada como inativa e não poderá ser alvo de serviços. Deseja realmente desativar a Moto?',
         () => {
@@ -43,7 +44,7 @@ export default function MotoCard({ moto, setMotos }: MotoCardProps) {
         }
       )
     } else if (moto.statusMoto === 'INATIVO') {
-      confirmarDecisao(
+      ConfirmarDecisao(
         'Ativar Moto',
         'Ao confirmar, a Moto será marcada como ativa e poderá ser alvo de serviços normalmente. Deseja realmente ativar a Moto?',
         () => {
@@ -127,11 +128,11 @@ export default function MotoCard({ moto, setMotos }: MotoCardProps) {
         {
           moto.statusMoto === 'ATIVO' ? (
             <div onClick={handlerAlternar} title='Desativar'>
-              <UserX className='icones-atualizacao-e-delecao' />
+              <XSquare className='icones-atualizacao-e-delecao' />
             </div>
           ) : moto.statusMoto === 'INATIVO' && (
             <div onClick={handlerAlternar} title='Ativar'>
-              <UserCheck className='icones-atualizacao-e-delecao' />
+              <CheckSquare className='icones-atualizacao-e-delecao' />
             </div>
           )
         }
