@@ -1,5 +1,5 @@
 import { Cliente } from '@/models/cliente'
-import { confirmarDecisao, mensagemErro, mensagemSucesso } from '@/models/toast'
+import { mensagemErro, mensagemSucesso } from '@/models/toast'
 import { ClienteService } from '@/services/clienteService'
 import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -7,6 +7,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Endereco, estadoInicialEndereco } from '../models/endereco'
 import { EnderecoService } from '../services/enderecoService'
 import '../styles/cardListagem.css'
+import { ConfirmarDecisao } from './ConfirmarDecisao'
 
 interface ClienteCardProps {
   cliente: Cliente
@@ -35,7 +36,7 @@ export default function ClienteCard({ cliente, setClientes }: ClienteCardProps) 
 
   const handlerAlternar = () => {
     if (cliente.statusCliente === 'ATIVO') {
-      confirmarDecisao(
+      ConfirmarDecisao(
         'Desativar Cliente',
         'Ao confirmar, o Cliente será marcado como inativo e suas informações ainda serão mantidas no sistema, mas ele não poderá realizar compras ou serviços e suas motos não poderão ser alvo de serviços. Deseja realmente desativar o Cliente?',
         () => {
@@ -43,7 +44,7 @@ export default function ClienteCard({ cliente, setClientes }: ClienteCardProps) 
         }
       )
     } else if (cliente.statusCliente === 'INATIVO') {
-      confirmarDecisao(
+      ConfirmarDecisao(
         'Ativar Cliente',
         'Ao confirmar, o Cliente será marcado como ativo e poderá realizar compras e serviços e suas motos poderão ser alvo de serviços normalmente. Deseja realmente ativar o Cliente?',
         () => {

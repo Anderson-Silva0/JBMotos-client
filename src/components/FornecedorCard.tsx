@@ -1,12 +1,13 @@
 import { Fornecedor } from '@/models/fornecedor'
-import { Endereco, estadoInicialEndereco } from '../models/endereco'
-import { EnderecoService } from '../services/enderecoService'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { confirmarDecisao, mensagemErro, mensagemSucesso } from '@/models/toast'
+import { mensagemErro, mensagemSucesso } from '@/models/toast'
+import { FornecedorService } from '@/services/fornecedorService'
 import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Endereco, estadoInicialEndereco } from '../models/endereco'
+import { EnderecoService } from '../services/enderecoService'
 import '../styles/cardListagem.css'
-import { FornecedorService } from '@/services/fornecedorService'
+import { ConfirmarDecisao } from './ConfirmarDecisao'
 
 interface FornecedorCardProps {
   fornecedor: Fornecedor
@@ -35,7 +36,7 @@ export default function FornecedorCard({ fornecedor, setFornecedores }: Forneced
 
   const handlerAlternar = () => {
     if (fornecedor.statusFornecedor === 'ATIVO') {
-      confirmarDecisao(
+      ConfirmarDecisao(
         'Desativar Fornecedor',
         'Ao confirmar, o Fornecedor será marcado como inativo e seus produtos e informações ainda serão mantidos no sistema, mas ele não poderá fornecer produtos até que seja reativado. Deseja realmente desativar o Fornecedor?',
         () => {
@@ -43,7 +44,7 @@ export default function FornecedorCard({ fornecedor, setFornecedores }: Forneced
         }
       )
     } else if (fornecedor.statusFornecedor === 'INATIVO') {
-      confirmarDecisao(
+      ConfirmarDecisao(
         'Ativar Fornecedor',
         'Ao confirmar, o Fornecedor será marcado como ativo e poderá fornecer produtos normalmente. Deseja realmente ativar o Fornecedor?',
         () => {

@@ -1,12 +1,13 @@
 import { Funcionario } from '@/models/funcionario'
-import { Endereco, estadoInicialEndereco } from '../models/endereco'
-import { EnderecoService } from '../services/enderecoService'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { confirmarDecisao, mensagemErro, mensagemSucesso } from '@/models/toast'
+import { mensagemErro, mensagemSucesso } from '@/models/toast'
+import { FuncionarioService } from '@/services/funcionarioService'
 import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { FuncionarioService } from '@/services/funcionarioService'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Endereco, estadoInicialEndereco } from '../models/endereco'
+import { EnderecoService } from '../services/enderecoService'
 import '../styles/cardListagem.css'
+import { ConfirmarDecisao } from './ConfirmarDecisao'
 
 interface FuncionarioCardProps {
   funcionario: Funcionario
@@ -35,13 +36,13 @@ export default function FuncionarioCard({ funcionario, setFuncionarios }: Funcio
 
   const handlerAlternar = () => {
     if (funcionario.statusFuncionario === 'ATIVO') {
-      confirmarDecisao('Desativar Funcionário',
+      ConfirmarDecisao('Desativar Funcionário',
         'Ao confirmar, o Funcionário será marcado como inativo e suas informações ainda serão mantidas no sistema, mas ele não poderá realizar serviços ou vendas até que seja reativado. Deseja realmente desativar o Funcionário?',
         () => {
           alternarStatus()
         })
     } else if (funcionario.statusFuncionario === 'INATIVO') {
-      confirmarDecisao('Ativar Funcionário',
+      ConfirmarDecisao('Ativar Funcionário',
         'Ao confirmar, o Funcionário será marcado como ativo e poderá realizar serviços e vendas normalmente. Deseja realmente ativar o Funcionário?',
         () => {
           alternarStatus()
