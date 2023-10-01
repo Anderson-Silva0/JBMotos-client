@@ -6,7 +6,7 @@ import { mensagemErro, mensagemSucesso } from '@/models/toast'
 import { EstoqueService } from '@/services/estoqueService'
 import { FornecedorService } from '@/services/fornecedorService'
 import { ProdutoService } from '@/services/produtoService'
-import { Check, Edit, UserCheck, X, XSquare } from 'lucide-react'
+import { Check, CheckSquare, Edit, X, XSquare } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import '../styles/cardListagem.css'
@@ -160,7 +160,7 @@ export default function ProdutoCard({ produto, setProdutos }: ProdutoCardProps) 
             </div>
           ) : produto.statusProduto === 'INATIVO' && (
             <div onClick={handlerAlternar} title='Ativar'>
-              <UserCheck className='icones-atualizacao-e-delecao' />
+              <CheckSquare className='icones-atualizacao-e-delecao' />
             </div>
           )
         }
