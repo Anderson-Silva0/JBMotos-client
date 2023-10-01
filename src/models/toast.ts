@@ -1,6 +1,4 @@
-import toastr from "toastr"
-import 'react-confirm-alert/src/react-confirm-alert.css'
-import { confirmAlert } from 'react-confirm-alert'
+import toastr from "toastr";
 
 toastr.options = {
   "closeButton": true,
@@ -34,21 +32,3 @@ export function mensagemSucesso(mensagem: string) {
 export function mensagemAlerta(mensagem: string) {
   mostrarMensagem('Alerta', mensagem, 'warning')
 }
-
-export function confirmarDecisao(titulo: string, mensagem: string, callback: () => void) {
-  confirmAlert({
-    title: titulo,
-    message: mensagem,
-    buttons: [
-      {
-        label: 'Sim',
-        onClick: callback
-      },
-      {
-        label: 'Não',
-        onClick: () => { }
-      }
-    ]
-  })
-}
-
