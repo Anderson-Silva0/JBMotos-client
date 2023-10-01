@@ -12,16 +12,12 @@ import Image from "next/image"
 import { useEffect, useState } from "react"
 
 export default function ListarVendas() {
-  const [pedidos, setPedidos] = useState<Pedido[]>([])
-
-  const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
-
-  const [valorInputBuscar, setValorInputBuscar] = useState<string>('')
-
-  const [campoSelecionado, setCampoSelecionado] = useState<string>('')
-
   const { filtrarPedido } = PedidoService()
 
+  const [pedidos, setPedidos] = useState<Pedido[]>([])
+  const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
+  const [valorInputBuscar, setValorInputBuscar] = useState<string>('')
+  const [campoSelecionado, setCampoSelecionado] = useState<string>('')
   const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
 
   const alternarSelecaoCheckbox = (value: string) => {
