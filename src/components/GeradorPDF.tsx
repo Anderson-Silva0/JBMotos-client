@@ -1,11 +1,12 @@
 import { RegistroProdutoSelecionadoProps } from '@/app/venda/cadastro/page'
 import { Produto } from '@/models/produto'
-import { confirmarDecisao } from '@/models/toast'
 import '@/styles/home.css'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { ConfirmarDecisao } from './ConfirmarDecisao'
 
 interface GeradorPDFProps {
+    tipoRecibo: TipoRecibo
     nomeCliente: string
     cpfCliente: string | number
     nomeFuncionario: string | number
@@ -13,11 +14,17 @@ interface GeradorPDFProps {
     observacao: string
     valorTotalVenda: string
     produtosVenda: RegistroProdutoSelecionadoProps[]
+    dataHoraVenda?: string
 }
 
 enum TipoUso {
     Titulo,
     Texto
+}
+
+export enum TipoRecibo {
+    Orcamento,
+    comprovante
 }
 
 export const removerProdutoOrcamento = (registrosProdutosVenda: RegistroProdutoSelecionadoProps[], produtoExcluido: Produto) => {
@@ -49,23 +56,37 @@ export function GeradorPDF(props: GeradorPDFProps) {
             }
         }
 
-        doc.text(String(obterDataHoraAgora(TipoUso.Texto)), 79, 292)
+        props.tipoRecibo === TipoRecibo.Orcamento ? (
+            autoTable(doc, {
+                startY: 10,
+                tableWidth: 110,
 
-        autoTable(doc, {
-            startY: 10,
-            tableWidth: 110,
+                head: [['Orçamento da JB Motos']],
+                theme: 'striped',
+                styles: { halign: 'center' },
+                margin: { horizontal: 50 },
+                headStyles: {
+                    halign: 'center',
+                    fontSize: 20,
+                }
+            })
+        ) : props.tipoRecibo === TipoRecibo.comprovante && (
+            autoTable(doc, {
+                startY: 10,
+                tableWidth: 110,
 
-            head: [['Orçamento da JB Motos']],
-            theme: 'striped',
-            styles: { halign: 'center' },
-            margin: { horizontal: 50 },
-            headStyles: {
-                halign: 'center',
-                fontSize: 20,
-            }
-        })
+                head: [['Comprovante de Venda da JB Motos']],
+                theme: 'striped',
+                styles: { halign: 'center' },
+                margin: { horizontal: 50 },
+                headStyles: {
+                    halign: 'center',
+                    fontSize: 17,
+                }
+            })
+        )
 
-        const alturaTabelaInfo = 43
+        const alturaTabelaInfo = 38
 
         autoTable(doc, {
             startY: alturaTabelaInfo,
@@ -84,7 +105,7 @@ export function GeradorPDF(props: GeradorPDFProps) {
             produto.valorTotal
         ])
 
-        const alturaTabelaOrcamento = props.observacao.length * 0.16 + 85
+        const alturaTabelaOrcamento = props.observacao.length * 0.14 + 75
 
         autoTable(doc, {
             startY: alturaTabelaOrcamento,
@@ -94,7 +115,7 @@ export function GeradorPDF(props: GeradorPDFProps) {
             styles: { halign: 'center' }
         })
 
-        const alturaTabelaValorTotal = alturaTabelaOrcamento + produtos.length * 8 + 30
+        const alturaTabelaValorTotal = alturaTabelaOrcamento + produtos.length * 7 + 30
 
         autoTable(doc, {
             startY: alturaTabelaValorTotal,
@@ -106,16 +127,51 @@ export function GeradorPDF(props: GeradorPDFProps) {
             margin: { horizontal: 75 }
         })
 
-        doc.save(`orcamento_oficina_${obterDataHoraAgora(TipoUso.Titulo)}.pdf`)
+        props.tipoRecibo === TipoRecibo.Orcamento ? (
+            doc.text(String(obterDataHoraAgora(TipoUso.Texto)), 79, 292)
+        ) : props.tipoRecibo === TipoRecibo.comprovante && (
+            props.dataHoraVenda && (
+                autoTable(doc, {
+                    startY: 264,
+                    tableWidth: 60,
+
+                    head: [['Data e Hora da Venda']],
+                    body: [[props.dataHoraVenda]],
+                    theme: 'grid',
+                    styles: { halign: 'center', fontSize: 12, fontStyle: 'bold' },
+                    margin: { horizontal: 75 },
+                    headStyles: {
+                        halign: 'center',
+                        fontSize: 14,
+                    }
+                })
+            )
+        )
+
+        props.tipoRecibo === TipoRecibo.Orcamento ? (
+            doc.save(`orcamento_JBMotos_${obterDataHoraAgora(TipoUso.Titulo)}.pdf`)
+        ) : props.tipoRecibo === TipoRecibo.comprovante && (
+            doc.save(`comprovante_venda_JBMotos_${obterDataHoraAgora(TipoUso.Titulo)}.pdf`)
+        )
     }
 
     const handlerDecisao = () => {
-        confirmarDecisao("Orçamento em PDF", "Tem certeza que deseja criar o orçamento em formato PDF?", gerarPDF)
+        props.tipoRecibo === TipoRecibo.Orcamento ? (
+            ConfirmarDecisao("Orçamento em PDF", "Tem certeza que deseja criar o orçamento em formato PDF?", gerarPDF)
+        ) : props.tipoRecibo === TipoRecibo.comprovante && (
+            ConfirmarDecisao("Comprovante de Venda em PDF", "Tem certeza que deseja criar o comprovante de venda em formato PDF?", gerarPDF)
+        )
     }
 
     return (
-        <button className='botao-gerar-pdf' onClick={handlerDecisao}>
-            Gerar PDF Orçamento
-        </button >
+        props.tipoRecibo === TipoRecibo.Orcamento ? (
+            <button className='botao-gerar-pdf' onClick={handlerDecisao}>
+                Gerar PDF Orçamento
+            </button >
+        ) : props.tipoRecibo === TipoRecibo.comprovante && (
+            <button className='botao-gerar-pdf' onClick={handlerDecisao}>
+                PDF Comprovante
+            </button >
+        )
     )
 }
