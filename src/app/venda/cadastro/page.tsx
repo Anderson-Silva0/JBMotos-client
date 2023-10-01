@@ -49,8 +49,6 @@ export interface ValoresTotaisProps {
   idLinha: number
 }
 
-let handleRepeticao: boolean = false
-
 export default function CadastroVenda() {
   const { buscarTodosClientes } = ClienteService()
   const { buscarTodosFuncionarios } = FuncionarioService()
@@ -314,7 +312,6 @@ export default function CadastroVenda() {
               qtdLinha={qtdLinha}
               setOcorrenciasErros={setOcorrenciasErros}
               atualizarIdProdutoIdLinhaSelecionado={atualizarIdProdutoIdLinhaSelecionado}
-              handleRepeticao={handleRepeticao}
               valoresTotais={valoresTotais}
               setValoresTotais={setValoresTotais}
               setProdutos={setProdutos}

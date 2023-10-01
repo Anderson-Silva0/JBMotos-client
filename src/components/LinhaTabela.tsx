@@ -19,7 +19,6 @@ interface LinhaTabelaProps {
   qtdLinha: number[]
   idPedido: number
   setOcorrenciasErros: Dispatch<SetStateAction<string[]>>
-  handleRepeticao: boolean
   valoresTotais: ValoresTotaisProps[]
   setValoresTotais: Dispatch<SetStateAction<ValoresTotaisProps[]>>
   atualizarIdProdutoIdLinhaSelecionado: (idProduto: number, idLinhaAtual: number) => void
@@ -171,11 +170,6 @@ export function LinhaTabela(props: LinhaTabelaProps) {
     }
     calculo()
   }, [produtoPedido.quantidade, opcaoSelecionada?.produto.precoVenda])
-
-  useEffect(() => {
-    setOpcaoSelecionada(estadoInicialOpcaoSelecionada)
-    produtoPedido.quantidade = 0
-  }, [props.handleRepeticao])
 
   useEffect(() => {
     const salvar = async () => {
