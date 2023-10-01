@@ -1,9 +1,10 @@
 'use client'
 
 import { Card } from "@/components/Card"
+import { ConfirmarDecisao } from "@/components/ConfirmarDecisao"
 import { ExibeErro } from "@/components/ExibeErro"
 import { FormGroup } from "@/components/Form-group"
-import { GeradorPDF, removerProdutoOrcamento } from "@/components/GeradorPDF"
+import { GeradorPDF, TipoRecibo, removerProdutoOrcamento } from "@/components/GeradorPDF"
 import { LinhaTabela } from "@/components/LinhaTabela"
 import TabelaVenda from "@/components/TabelaVenda"
 import imgRemoverLinha from '@/images/icons8-delete-row-100.png'
@@ -16,7 +17,7 @@ import { Funcionario } from "@/models/funcionario"
 import { Pedido, estadoInicialPedido } from "@/models/pedido"
 import { Produto } from "@/models/produto"
 import { selectStyles } from "@/models/selectStyles"
-import { confirmarDecisao, mensagemAlerta, mensagemErro, mensagemSucesso } from "@/models/toast"
+import { mensagemAlerta, mensagemErro, mensagemSucesso } from "@/models/toast"
 import { PedidoService } from "@/services/PedidoService"
 import { ClienteService } from "@/services/clienteService"
 import { FuncionarioService } from "@/services/funcionarioService"
@@ -177,7 +178,7 @@ export default function CadastroVenda() {
   }
 
   const handlerRealizarVenda = () => {
-    confirmarDecisao("Confirmação de Venda", "Tem certeza de que deseja realizar esta venda?", submit)
+    ConfirmarDecisao("Confirmação de Venda", "Tem certeza de que deseja realizar esta venda?", submit)
   }
 
   const gerarMensagemAlertaProdutosAtivos = (produtosAtivos: Produto[]) => {
@@ -347,6 +348,7 @@ export default function CadastroVenda() {
           Realizar Venda
         </button>
         <GeradorPDF
+          tipoRecibo={TipoRecibo.Orcamento}
           nomeCliente={obterNomeClienteSelecionado()}
           cpfCliente={opcaoSelecionadaCliente.value}
           formaPagamento={opcaoSelecionadaFormaDePagamento.value}
