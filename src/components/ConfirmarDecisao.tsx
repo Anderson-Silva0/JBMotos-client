@@ -7,6 +7,7 @@ export function ConfirmarDecisao(titulo: string, mensagem: string, callback: () 
         customUI: ({ onClose }) => (
             <div className='confirm-custom-ui'>
                 <h1>{titulo}</h1>
+                <hr className='hr-line'/>  
                 <p>{mensagem}</p>
                 <button
                     onClick={() => {
