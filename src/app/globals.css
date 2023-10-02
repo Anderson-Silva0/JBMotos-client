@@ -96,6 +96,7 @@ label {
 
 .carregando {
   font-weight: 800;
+  font-size: 3vw;
 }
 
 .form-group {
@@ -125,5 +126,10 @@ label {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 10px 0 20px rgba(255, 255, 255, 0.3);
     width: 110px;
     height: 100%;
+  }
+
+  .carregando {
+    font-weight: 800;
+    font-size: 6vw;
   }
 }
