@@ -164,14 +164,12 @@ export function GeradorPDF(props: GeradorPDFProps) {
     }
 
     return (
-        props.tipoRecibo === TipoRecibo.Orcamento ? (
-            <button className='botao-gerar-pdf' onClick={handlerDecisao}>
-                Gerar PDF Orçamento
-            </button >
-        ) : props.tipoRecibo === TipoRecibo.comprovante && (
-            <button className='botao-gerar-pdf' onClick={handlerDecisao}>
-                PDF Comprovante
-            </button >
-        )
+        <button className='botao-gerar-pdf' onClick={handlerDecisao}>
+            {props.tipoRecibo === TipoRecibo.Orcamento ? (
+                "PDF Orçamento"
+            ) : props.tipoRecibo === TipoRecibo.comprovante && (
+                "PDF Comprovante"
+            )}
+        </button >
     )
 }
