@@ -91,7 +91,7 @@ label {
   text-align: center;
   font-weight: 800;
   width: auto;
-  font-size: 4vw;
+  font-size: 3.5vw;
 }
 
 .carregando {
@@ -131,5 +131,12 @@ label {
   .carregando {
     font-weight: 800;
     font-size: 6vw;
+  }
+
+  .centered-text {
+    text-align: center;
+    font-weight: 800;
+    width: auto;
+    font-size: 7vw;
   }
 }
