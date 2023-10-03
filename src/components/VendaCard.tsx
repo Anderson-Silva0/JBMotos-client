@@ -12,6 +12,7 @@ import { ClienteService } from '@/services/clienteService'
 import { FuncionarioService } from '@/services/funcionarioService'
 import { ProdutoService } from '@/services/produtoService'
 import '@/styles/cardListagem.css'
+import { Edit } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { GeradorPDF, TipoRecibo } from './GeradorPDF'
@@ -48,16 +49,6 @@ export default function VendaCard(pedido: Pedido) {
     buscar()
   }, [])
 
-  const handleOnClick = () => {
-    if (botaoVerProduto.current && cardListagemContainer.current) {
-      cardListagemContainer.current.style.cursor = 'wait'
-      botaoVerProduto.current.style.cursor = 'wait'
-    }
-
-    const urlAtual = window.location.pathname
-    router.push(`${urlAtual}/produtos/${pedido.id}`)
-  }
-
   const obterNomeProduto = async (idProduto: number) => {
     const produtoResponse = await buscarProdutoPorId(idProduto)
     const produto = produtoResponse.data as Produto
@@ -91,9 +82,26 @@ export default function VendaCard(pedido: Pedido) {
     buscar()
   }, [])
 
+  const listarProdutosVenda = () => {
+    if (botaoVerProduto.current && cardListagemContainer.current) {
+      cardListagemContainer.current.style.cursor = 'wait'
+      botaoVerProduto.current.style.cursor = 'wait'
+    }
+
+    const urlAtual = window.location.pathname
+    router.push(`${urlAtual}/produtos/${pedido.id}`)
+  }
+
+  const atualizar = () => {
+    router.push(`/venda/atualizar/${pedido.id}`)
+  }
+
   return (
     <div ref={cardListagemContainer} className="cardListagem-container-venda">
       <span id="info-title-venda">Detalhes da Venda</span>
+      <div className='div-btn-edit' onClick={atualizar} title='Editar'>
+        <Edit className='icones-atualizacao-e-delecao' />
+      </div>
       <div className='container-items'>
         <div className='items'>
           <div className='div-dados'>Nome do Cliente</div>
@@ -115,7 +123,7 @@ export default function VendaCard(pedido: Pedido) {
         </div>
       </div>
       <div className='botoes-container'>
-        <button ref={botaoVerProduto} id='botao-ver-produtos' type="button" onClick={handleOnClick}>
+        <button ref={botaoVerProduto} id='botao-ver-produtos' type="button" onClick={listarProdutosVenda}>
           Ver Produtos
         </button>
         <GeradorPDF
