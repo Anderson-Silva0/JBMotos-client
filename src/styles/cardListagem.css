@@ -59,6 +59,10 @@
   margin: 0px auto 2% auto;
 }
 
+.div-btn-edit {
+  margin-top: -3.5%;
+}
+
 .div-dados {
   background-color: #DEE2E6;
   border-radius: 2vh;
