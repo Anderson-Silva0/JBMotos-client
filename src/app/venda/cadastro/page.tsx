@@ -12,6 +12,7 @@ import imgAdicionarLinha from '@/images/icons8-insert-row-48.png'
 import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from "@/models/Selecoes"
 import { Cliente } from "@/models/cliente"
 import { Erros, salvarErros } from "@/models/erros"
+import { formasPagamentos } from "@/models/formasPagamento"
 import { formatarParaReal } from "@/models/formatadorReal"
 import { Funcionario } from "@/models/funcionario"
 import { Pedido, estadoInicialPedido } from "@/models/pedido"
@@ -22,6 +23,7 @@ import { PedidoService } from "@/services/PedidoService"
 import { ClienteService } from "@/services/clienteService"
 import { FuncionarioService } from "@/services/funcionarioService"
 import { ProdutoService } from "@/services/produtoService"
+import { Save } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import Select from 'react-select'
@@ -66,7 +68,6 @@ export default function CadastroVenda() {
   const [qtdLinha, setQtdLinha] = useState<number[]>([1])
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
-  const [formasDePagamento, setFormasDePagamento] = useState<OpcoesSelecoes[]>([])
   const [valoresTotais, setValoresTotais] = useState<ValoresTotaisProps[]>([])
   const [ocorrenciasErros, setOcorrenciasErros] = useState<string[]>([])
   const [idProdutoIdLinhaSelecionado, setIdProdutoIdLinhaSelecionado] = useState<IdProdutoEIdLinha[]>([])
@@ -91,17 +92,6 @@ export default function CadastroVenda() {
     setOpcaoSelecionadaFormaDePagamento(estadoInicialOpcoesSelecoes)
     setPedido({ ...pedido, observacao: '' })
   }
-
-  useEffect(() => {
-    setFormasDePagamento([
-      { value: 'PIX', label: 'PIX' },
-      { value: 'Transferência Bancária', label: 'Transferência Bancária' },
-      { value: 'Dinheiro', label: 'Dinheiro' },
-      { value: 'Cartão de débito', label: 'Cartão de Débito' },
-      { value: 'Cartão de Crédito', label: 'Cartão de Crédito' },
-      { value: 'Boleto Bancário', label: 'Boleto Bancário' }
-    ])
-  }, [])
 
   const buscarTodos = async () => {
     try {
@@ -257,6 +247,9 @@ export default function CadastroVenda() {
 
   return (
     <div className="div-form-container">
+      <h1 className="centered-text">
+        <Save size='6vh' strokeWidth={3} /> Registro de Venda
+      </h1>
       <Card titulo="Detalhes da Venda">
         <FormGroup label="Selecione o Cliente: *" htmlFor="cpfCliente">
           <Select
@@ -286,7 +279,7 @@ export default function CadastroVenda() {
             placeholder="Selecione..."
             value={opcaoSelecionadaFormaDePagamento}
             onChange={(option: any) => setOpcaoSelecionadaFormaDePagamento(option)}
-            options={formasDePagamento}
+            options={formasPagamentos}
             instanceId="select-formaDePagamento"
           />
           {<ExibeErro erros={erros} nomeInput="formaDePagamento" />}
