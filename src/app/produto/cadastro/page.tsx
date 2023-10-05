@@ -9,7 +9,7 @@ import { Estoque, estadoInicialEstoque } from '@/models/estoque'
 import { formatarParaReal } from '@/models/formatadorReal'
 import { Fornecedor } from '@/models/fornecedor'
 import { Produto, estadoInicialProduto } from '@/models/produto'
-import { selectStyles } from '@/models/selectStyles'
+import { selectStyles } from "@/models/selectStyles"
 import { mensagemErro, mensagemSucesso } from '@/models/toast'
 import { EstoqueService } from '@/services/estoqueService'
 import { FornecedorService } from '@/services/fornecedorService'
@@ -87,37 +87,27 @@ export default function CadastroProduto() {
   }
 
   const submit = async () => {
-    await exibirErrosProduto()
     try {
       const responseEstoque = await salvarEstoque(estoque)
-      setEstoque({ ...estoque, id: responseEstoque.data.id })
-      setProduto({ ...produto, idEstoque: responseEstoque.data.id })
-    } catch (error: any) {
-      salvarErros(error, erros, setErros)
-      mensagemErro('Erro no preenchimento dos campos.')
-    }
-  }
-
-  useEffect(() => {
-    const salvarProdutoAtualizado = async () => {
       try {
-        await salvarProduto(produto)
-        mensagemSucesso("Produto cadastrado no estoque com sucesso!")
+        await salvarProduto({ ...produto, idEstoque: responseEstoque.data.id })
+        mensagemSucesso("Produto cadastrado com sucesso!")
         setProduto(estadoInicialProduto)
         setOpcaoSelecionadaFornecedor(estadoInicialOpcoesSelecoes)
         setEstoque(estadoInicialEstoque)
+        setErros([])
       } catch (erro: any) {
-        mensagemErro('Erro no preenchimento dos campos.')
         erros.map(e => e.nomeInput === 'error' && mensagemErro(e.mensagemErro))
-        await deletarEstoque(estoque.id)
-        setEstoque({ ...estoque, id: 0 })
-        setProduto({ ...produto, idEstoque: 0 })
+        await deletarEstoque(responseEstoque.data.id)
+        mensagemErro('Erro no preenchimento dos campos')
+        salvarErros(erro, erros, setErros)
       }
+    } catch (erro: any) {
+      await exibirErrosProduto()
+      mensagemErro('Erro no preenchimento dos campos.')
+      salvarErros(erro, erros, setErros)
     }
-    if (estoque.id !== 0) {
-      salvarProdutoAtualizado()
-    }
-  }, [estoque.id])
+  }
 
   return (
     <div className='div-form-container'>
