@@ -35,7 +35,9 @@ export default function CadastroFornecedor() {
 
   const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setEndereco({ ...endereco, [key]: e.target.value })
-    setErros([])
+    if (endereco.cep.length < 9 || key) {
+      setErros([])
+    }
   }
 
   useEffect(() => {
@@ -46,7 +48,6 @@ export default function CadastroFornecedor() {
     if (erros.length > 0) {
       setErros([])
     }
-
     try {
       await salvarFornecedor(fornecedor)
     } catch (error) {
@@ -56,35 +57,25 @@ export default function CadastroFornecedor() {
 
   const submit = async () => {
     try {
-      await exibirErrosFornecedor()
       const responseEndereco = await salvarEndereco(endereco)
-      setEndereco({ ...endereco, id: responseEndereco.data.id })
-      setFornecedor({ ...fornecedor, endereco: responseEndereco.data.id })
-    } catch (error: any) {
-      mensagemErro('Erro no preenchimento dos campos.')
-      salvarErros(error, erros, setErros)
-    }
-  }
-
-  useEffect(() => {
-    const salvarFornecedorAtualizado = async () => {
       try {
-        await salvarFornecedor(fornecedor)
+        await salvarFornecedor({ ...fornecedor, endereco: responseEndereco.data.id })
         mensagemSucesso("Fornecedor cadastrado com sucesso!")
         setFornecedor(estadoInicialFornecedor)
         setEndereco(estadoInicialEndereco)
+        setErros([])
       } catch (erro: any) {
         erros.map(e => e.nomeInput === 'error' && mensagemErro(e.mensagemErro))
-        await deletarEndereco(endereco.id)
-        setEndereco({ ...endereco, id: 0 })
-        setFornecedor({ ...fornecedor, endereco: 0 })
-        mensagemErro('Erro no preenchimento dos campos.')
+        await deletarEndereco(responseEndereco.data.id)
+        mensagemErro('Erro no preenchimento dos campos')
+        salvarErros(erro, erros, setErros)
       }
+    } catch (erro: any) {
+      await exibirErrosFornecedor()
+      mensagemErro('Erro no preenchimento dos campos.')
+      salvarErros(erro, erros, setErros)
     }
-    if (endereco.id !== 0) {
-      salvarFornecedorAtualizado()
-    }
-  }, [fornecedor.endereco])
+  }
 
   return (
     <div className='div-form-container'>
