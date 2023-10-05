@@ -36,7 +36,7 @@ export default function CadastroCliente() {
 
     const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
         setEndereco({ ...endereco, [key]: e.target.value })
-        if (endereco.cep.length < 9) {
+        if (endereco.cep.length < 9 || key) {
             setErros([])
         }
     }
@@ -51,42 +51,32 @@ export default function CadastroCliente() {
         }
         try {
             await salvarCliente(cliente)
-        } catch (error) {
-            salvarErros(error, erros, setErros)
+        } catch (erro: any) {
+            salvarErros(erro, erros, setErros)
         }
     }
 
     const submit = async () => {
         try {
-            await exibirErrosCliente()
             const responseEndereco = await salvarEndereco(endereco)
-            setEndereco({ ...endereco, id: responseEndereco.data.id })
-            setCliente({ ...cliente, endereco: responseEndereco.data.id })
-        } catch (error: any) {
-            mensagemErro('Erro no preenchimento dos campos.')
-            salvarErros(error, erros, setErros)
-        }
-    }
-
-    useEffect(() => {
-        const salvarClienteAtualizado = async () => {
             try {
-                await salvarCliente(cliente)
+                await salvarCliente({ ...cliente, endereco: responseEndereco.data.id })
                 mensagemSucesso("Cliente cadastrado com sucesso!")
                 setCliente(estadoInicialCliente)
                 setEndereco(estadoInicialEndereco)
+                setErros([])
             } catch (erro: any) {
                 erros.map(e => e.nomeInput === 'error' && mensagemErro(e.mensagemErro))
-                await deletarEndereco(endereco.id)
-                setEndereco({ ...endereco, id: 0 })
-                setCliente({ ...cliente, endereco: 0 })
+                await deletarEndereco(responseEndereco.data.id)
                 mensagemErro('Erro no preenchimento dos campos')
+                salvarErros(erro, erros, setErros)
             }
+        } catch (erro: any) {
+            await exibirErrosCliente()
+            mensagemErro('Erro no preenchimento dos campos.')
+            salvarErros(erro, erros, setErros)
         }
-        if (endereco.id !== 0) {
-            salvarClienteAtualizado()
-        }
-    }, [cliente.endereco])
+    }
 
     return (
         <div className='div-form-container'>
