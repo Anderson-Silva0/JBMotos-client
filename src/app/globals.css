@@ -53,20 +53,23 @@ label {
   display: block;
 }
 
+.divBotaoCadastrar {
+  width: 100%;
+}
+
 .divBotaoCadastrar button {
+  border-radius: 2vw;
+  max-width: 30%;
+  font-size: 2.4vw;
+  padding: 1.5%;
+  margin: 3vh;
   border: none;
-  border-radius: 30px;
-  padding: 15px 30px;
-  width: 250px;
   background-image: linear-gradient(to top, #002855 40%, #0353A4);
   color: #979DAC;
-  font-size: 24px;
   font-weight: 900;
-  letter-spacing: 1px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: background-color 0.2s, transform 0.2s;
-  margin: 4vh;
 }
 
 .divBotaoCadastrar button:hover {
@@ -138,5 +141,13 @@ label {
     font-weight: 800;
     width: auto;
     font-size: 7vw;
+  }
+
+  .divBotaoCadastrar button {
+    border-radius: 2vw;
+    max-width: 30%;
+    font-size: 3.5vw;
+    padding: 4.2%;
+    margin: 3vh;
   }
 }
