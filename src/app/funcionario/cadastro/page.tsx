@@ -37,7 +37,7 @@ export default function CadastroFuncionario() {
 
   const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setEndereco({ ...endereco, [key]: e.target.value })
-    if (endereco.cep.length < 9) {
+    if (endereco.cep.length < 9 || key) {
       setErros([])
     }
   }
@@ -59,35 +59,25 @@ export default function CadastroFuncionario() {
 
   const submit = async () => {
     try {
-      await exibirErrosFuncionario()
       const responseEndereco = await salvarEndereco(endereco)
-      setEndereco({ ...endereco, id: responseEndereco.data.id })
-      setFuncionario({ ...funcionario, endereco: responseEndereco.data.id })
-    } catch (error: any) {
-      mensagemErro('Erro no preenchimento dos campos.')
-      salvarErros(error, erros, setErros)
-    }
-  }
-
-  useEffect(() => {
-    const salvarFuncionarioAtualizado = async () => {
       try {
-        await salvarFuncionario(funcionario)
+        await salvarFuncionario({ ...funcionario, endereco: responseEndereco.data.id })
         mensagemSucesso("Funcionário cadastrado com sucesso!")
         setFuncionario(estadoInicialFuncionario)
         setEndereco(estadoInicialEndereco)
+        setErros([])
       } catch (erro: any) {
         erros.map(e => e.nomeInput === 'error' && mensagemErro(e.mensagemErro))
-        await deletarEndereco(endereco.id)
-        setEndereco({ ...endereco, id: 0 })
-        setFuncionario({ ...funcionario, endereco: 0 })
+        await deletarEndereco(responseEndereco.data.id)
         mensagemErro('Erro no preenchimento dos campos')
+        salvarErros(erro, erros, setErros)
       }
+    } catch (erro: any) {
+      await exibirErrosFuncionario()
+      mensagemErro('Erro no preenchimento dos campos.')
+      salvarErros(erro, erros, setErros)
     }
-    if (endereco.id !== 0) {
-      salvarFuncionarioAtualizado()
-    }
-  }, [funcionario.endereco])
+  }
 
   return (
     <div className='div-form-container'>
