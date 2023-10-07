@@ -1,13 +1,13 @@
 import { RegistroProdutoSelecionadoProps } from '@/app/venda/cadastro/page'
-import { ProdutoPedido } from '@/models/ProdutoPedido'
+import { ProdutoVenda } from '@/models/ProdutoVenda'
 import { Cliente, estadoInicialCliente } from '@/models/cliente'
 import { formatarParaReal } from '@/models/formatadorReal'
 import { Funcionario, estadoInicialFuncionario } from '@/models/funcionario'
-import { Pedido } from '@/models/pedido'
 import { Produto } from '@/models/produto'
 import { mensagemErro } from '@/models/toast'
-import { PedidoService } from '@/services/PedidoService'
-import { ProdutoPedidoService } from '@/services/ProdutoPedidoService'
+import { Venda } from '@/models/venda'
+import { ProdutoVendaService } from '@/services/ProdutoVendaService'
+import { VendaService } from '@/services/VendaService'
 import { ClienteService } from '@/services/clienteService'
 import { FuncionarioService } from '@/services/funcionarioService'
 import { ProdutoService } from '@/services/produtoService'
@@ -17,13 +17,13 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { GeradorPDF, TipoRecibo } from './GeradorPDF'
 
-export default function VendaCard(pedido: Pedido) {
+export default function VendaCard(venda: Venda) {
   const router = useRouter()
 
   const { buscarClientePorCpf } = ClienteService()
   const { buscarFuncionarioPorCpf } = FuncionarioService()
-  const { valorTotalDoPedido } = PedidoService()
-  const { buscarTodosPorIdPedido } = ProdutoPedidoService()
+  const { valorTotalDaVenda } = VendaService()
+  const { buscarTodosPorIdVenda } = ProdutoVendaService()
   const { buscarProdutoPorId } = ProdutoService()
 
   const [clienteState, setClienteState] = useState<Cliente>(estadoInicialCliente)
@@ -37,10 +37,10 @@ export default function VendaCard(pedido: Pedido) {
   useEffect(() => {
     const buscar = async () => {
       try {
-        const clienteResponse = await buscarClientePorCpf(pedido.cpfCliente)
+        const clienteResponse = await buscarClientePorCpf(venda.cpfCliente)
         setClienteState(clienteResponse.data)
 
-        const funcionarioResponse = await buscarFuncionarioPorCpf(pedido.cpfFuncionario)
+        const funcionarioResponse = await buscarFuncionarioPorCpf(venda.cpfFuncionario)
         setFuncionarioState(funcionarioResponse.data)
       } catch (error: any) {
         mensagemErro(error.response.data)
@@ -57,11 +57,11 @@ export default function VendaCard(pedido: Pedido) {
 
   useEffect(() => {
     const buscar = async () => {
-      const valorTotalVendaResponse = await valorTotalDoPedido(pedido.id)
+      const valorTotalVendaResponse = await valorTotalDaVenda(venda.id)
       setValorTotal(formatarParaReal(valorTotalVendaResponse.data))
 
-      const produtosVendaResponse = await buscarTodosPorIdPedido(pedido.id)
-      const produtosVenda = produtosVendaResponse.data as ProdutoPedido[]
+      const produtosVendaResponse = await buscarTodosPorIdVenda(venda.id)
+      const produtosVenda = produtosVendaResponse.data as ProdutoVenda[]
 
       const registrosProdutosVenda = await Promise.all(
         produtosVenda.map(async (produtoVenda) => {
@@ -89,11 +89,11 @@ export default function VendaCard(pedido: Pedido) {
     }
 
     const urlAtual = window.location.pathname
-    router.push(`${urlAtual}/produtos/${pedido.id}`)
+    router.push(`${urlAtual}/produtos/${venda.id}`)
   }
 
   const atualizar = () => {
-    router.push(`/venda/atualizar/${pedido.id}`)
+    router.push(`/venda/atualizar/${venda.id}`)
   }
 
   return (
@@ -107,19 +107,19 @@ export default function VendaCard(pedido: Pedido) {
           <div className='div-dados'>Nome do Cliente</div>
           <div className='div-resultado'>{clienteState.nome}</div>
           <div className='div-dados'>CPF do Cliente</div>
-          <div className='div-resultado'>{pedido.cpfCliente}</div>
+          <div className='div-resultado'>{venda.cpfCliente}</div>
           <div className='div-dados'>Nome do Funcionário</div>
           <div className='div-resultado'>{funcionarioState.nome}</div>
           <div className='div-dados'>CPF do Funcionário</div>
-          <div className='div-resultado'>{pedido.cpfFuncionario}</div>
+          <div className='div-resultado'>{venda.cpfFuncionario}</div>
         </div>
         <div className='items'>
           <div className='div-dados'>Data e Hora de Cadastro da Venda</div>
-          <div className='div-resultado'>{pedido.dataHoraCadastro}</div>
+          <div className='div-resultado'>{venda.dataHoraCadastro}</div>
           <div className='div-dados'>Observação</div>
-          <div className='div-resultado'>{pedido.observacao}</div>
+          <div className='div-resultado'>{venda.observacao}</div>
           <div className='div-dados'>Forma de Pagamento</div>
-          <div className='div-resultado'>{pedido.formaDePagamento}</div>
+          <div className='div-resultado'>{venda.formaDePagamento}</div>
         </div>
       </div>
       <div className='botoes-container'>
@@ -129,13 +129,13 @@ export default function VendaCard(pedido: Pedido) {
         <GeradorPDF
           tipoRecibo={TipoRecibo.comprovante}
           nomeCliente={clienteState.nome}
-          cpfCliente={pedido.cpfCliente}
-          formaPagamento={pedido.formaDePagamento}
+          cpfCliente={venda.cpfCliente}
+          formaPagamento={venda.formaDePagamento}
           nomeFuncionario={funcionarioState.nome}
-          observacao={pedido.observacao}
+          observacao={venda.observacao}
           produtosVenda={produtosVendaState}
           valorTotalVenda={valorTotal}
-          dataHoraVenda={pedido.dataHoraCadastro}
+          dataHoraVenda={venda.dataHoraCadastro}
         />
       </div>
     </div>

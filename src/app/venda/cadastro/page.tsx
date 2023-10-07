@@ -15,11 +15,11 @@ import { Erros, salvarErros } from "@/models/erros"
 import { formasPagamentos } from "@/models/formasPagamento"
 import { formatarParaReal } from "@/models/formatadorReal"
 import { Funcionario } from "@/models/funcionario"
-import { Pedido, estadoInicialPedido } from "@/models/pedido"
 import { Produto } from "@/models/produto"
 import { selectStyles } from "@/models/selectStyles"
 import { mensagemAlerta, mensagemErro, mensagemSucesso } from "@/models/toast"
-import { PedidoService } from "@/services/PedidoService"
+import { Venda, estadoInicialVenda } from "@/models/venda"
+import { VendaService } from "@/services/VendaService"
 import { ClienteService } from "@/services/clienteService"
 import { FuncionarioService } from "@/services/funcionarioService"
 import { ProdutoService } from "@/services/produtoService"
@@ -55,7 +55,7 @@ export default function CadastroVenda() {
   const { buscarTodosClientes } = ClienteService()
   const { buscarTodosFuncionarios } = FuncionarioService()
   const { buscarTodosProdutos } = ProdutoService()
-  const { salvarPedido, deletarPedido } = PedidoService()
+  const { salvarVenda, deletarVenda } = VendaService()
 
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
   const [registrosProdutosVenda, setRegistrosProdutosVenda] = useState<RegistroProdutoSelecionadoProps[]>([])
@@ -63,8 +63,8 @@ export default function CadastroVenda() {
   const [erros, setErros] = useState<Erros[]>([])
   const [produtos, setProdutos] = useState<Produto[]>([])
   const [todosProdutos, setTodosProdutos] = useState<Produto[]>([])
-  const [pedido, setPedido] = useState<Pedido>(estadoInicialPedido)
-  const [idPedido, setIdPedido] = useState<number>(0)
+  const [venda, setVenda] = useState<Venda>(estadoInicialVenda)
+  const [idVenda, setIdVenda] = useState<number>(0)
   const [qtdLinha, setQtdLinha] = useState<number[]>([1])
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
@@ -86,11 +86,11 @@ export default function CadastroVenda() {
     setOpcaoSelecionadaFormaDePagamento
   ] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
 
-  const definirEstadoInicialSelecaoPedido = () => {
+  const definirEstadoInicialSelecaoVenda = () => {
     setOpcaoSelecionadaCliente(estadoInicialOpcoesSelecoes)
     setOpcaoSelecionadaFuncionario(estadoInicialOpcoesSelecoes)
     setOpcaoSelecionadaFormaDePagamento(estadoInicialOpcoesSelecoes)
-    setPedido({ ...pedido, observacao: '' })
+    setVenda({ ...venda, observacao: '' })
   }
 
   const buscarTodos = async () => {
@@ -120,9 +120,9 @@ export default function CadastroVenda() {
   }, [])
 
   useEffect(() => {
-    setPedido(
+    setVenda(
       {
-        ...pedido,
+        ...venda,
         cpfCliente: String(opcaoSelecionadaCliente?.value),
         cpfFuncionario: String(opcaoSelecionadaFuncionario?.value),
         formaDePagamento: String(opcaoSelecionadaFormaDePagamento?.value)
@@ -135,15 +135,15 @@ export default function CadastroVenda() {
     if (ocorrenciasErros.includes('sucesso') && !ocorrenciasErros.includes('erro')) {
       mensagemSucesso("Venda realizada com sucesso!")
     } else if (ocorrenciasErros.includes('erro')) {
-      await deletarPedido(idPedido)
-      mensagemAlerta('Ocorreram erros. Por favor, refaça o Pedido.')
+      await deletarVenda(idVenda)
+      mensagemAlerta('Ocorreram erros. Por favor, refaça a Venda.')
     }
     setQtdLinha([1])
     setOcorrenciasErros([])
     setValoresTotais([])
-    definirEstadoInicialSelecaoPedido()
-    setPedido(estadoInicialPedido)
-    setIdPedido(0)
+    definirEstadoInicialSelecaoVenda()
+    setVenda(estadoInicialVenda)
+    setIdVenda(0)
     buscarTodos()
   }
 
@@ -155,8 +155,8 @@ export default function CadastroVenda() {
 
   const submit = async () => {
     try {
-      const response = await salvarPedido(pedido)
-      setIdPedido(response.data.id)
+      const response = await salvarVenda(venda)
+      setIdVenda(response.data.id)
       setErros([])
       setIdProdutoIdLinhaSelecionado([])
     } catch (error: any) {
@@ -241,6 +241,30 @@ export default function CadastroVenda() {
     return nomeClienteSelecionado
   }
 
+  //Teste ****************************************************************
+
+  const [divisoesState, setDivisoesState] = useState<OpcoesSelecoes[]>([])
+  const [opcaoSelecionadaDivisao, setOpcaoSelecionadaDivisao] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
+
+  useEffect(() => {
+    const divisoes: OpcoesSelecoes[] = []
+
+    for (let i = 1; i <= 24; i++) {
+      const label = `${i}x`
+      const value = label
+      divisoes.push({ label, value })
+    }
+    setDivisoesState(divisoes)
+  }, [])
+
+  useEffect(() => {
+    if (opcaoSelecionadaDivisao.value !== "") {
+      console.log("Divisão Selecionada: ", opcaoSelecionadaDivisao)
+    }
+  }, [opcaoSelecionadaDivisao])
+
+  //************************************************************************
+
   if (!foiCarregado) {
     return <h1 className="carregando">Carregando...</h1>
   }
@@ -283,12 +307,30 @@ export default function CadastroVenda() {
             instanceId="select-formaDePagamento"
           />
           {<ExibeErro erros={erros} nomeInput="formaDePagamento" />}
+
+
+
+          {
+            opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito" && (
+              <>
+                <label htmlFor="teste">Divisão em Parcelas</label>
+                <Select
+                  styles={selectStyles}
+                  placeholder="Selecione..."
+                  value={opcaoSelecionadaDivisao}
+                  onChange={(option: any) => setOpcaoSelecionadaDivisao(option)}
+                  options={divisoesState}
+                  instanceId="select-divisoes"
+                />
+              </>
+            )
+          }
         </FormGroup>
         <FormGroup label="Observação:" htmlFor="observacao">
           <input
             maxLength={100}
-            value={pedido.observacao}
-            onChange={(e) => { setErros([]); setPedido({ ...pedido, observacao: e.target.value }) }}
+            value={venda.observacao}
+            onChange={(e) => { setErros([]); setVenda({ ...venda, observacao: e.target.value }) }}
             id="observacao"
             type="text"
           />
@@ -301,7 +343,7 @@ export default function CadastroVenda() {
             <LinhaTabela key={idLinha}
               idLinha={idLinha}
               produtos={produtos}
-              idPedido={idPedido}
+              idVenda={idVenda}
               qtdLinha={qtdLinha}
               setOcorrenciasErros={setOcorrenciasErros}
               atualizarIdProdutoIdLinhaSelecionado={atualizarIdProdutoIdLinhaSelecionado}
@@ -317,8 +359,8 @@ export default function CadastroVenda() {
         })
         }
       </TabelaVenda>
-      <div id="valor-total-pedido">
-        <span>Total do Pedido</span>
+      <div id="valor-total-venda">
+        <span>Total da Venda</span>
         <span>
           {formatarParaReal(valorTotalVenda)}
         </span>
@@ -343,7 +385,7 @@ export default function CadastroVenda() {
           cpfCliente={opcaoSelecionadaCliente.value}
           formaPagamento={opcaoSelecionadaFormaDePagamento.value}
           nomeFuncionario={opcaoSelecionadaFuncionario.label}
-          observacao={pedido.observacao}
+          observacao={venda.observacao}
           produtosVenda={registrosProdutosVenda}
           valorTotalVenda={formatarParaReal(valorTotalVenda)}
         />

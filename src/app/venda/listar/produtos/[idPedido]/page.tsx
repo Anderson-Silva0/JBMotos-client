@@ -3,32 +3,32 @@ import { Olho } from "@/components/Olho"
 import TabelaVenda from "@/components/TabelaVenda"
 import imgProduto from '@/images/checklist.png'
 import imgVenda from '@/images/vendas.png'
-import { ProdutoPedido } from "@/models/ProdutoPedido"
+import { ProdutoVenda } from "@/models/ProdutoVenda"
 import { formatarParaReal } from "@/models/formatadorReal"
 import { Produto } from "@/models/produto"
-import { PedidoService } from "@/services/PedidoService"
-import { ProdutoPedidoService } from "@/services/ProdutoPedidoService"
+import { ProdutoVendaService } from "@/services/ProdutoVendaService"
+import { VendaService } from "@/services/VendaService"
 import { ProdutoService } from "@/services/produtoService"
 import '@/styles/cardListagem.css'
 import Image from "next/image"
 
-interface ProdutosDoPedidoProps {
+interface ProdutosDoVendaProps {
   params: {
-    idPedido: number
+    idVenda: number
   }
 }
 
-export default async function ProdutosDoPedido({ params }: ProdutosDoPedidoProps) {
+export default async function ProdutosDoVenda({ params }: ProdutosDoVendaProps) {
   const { buscarProdutoPorId } = ProdutoService()
 
-  const { buscarTodosPorIdPedido } = ProdutoPedidoService()
+  const { buscarTodosPorIdVenda } = ProdutoVendaService()
 
-  const { valorTotalDoPedido, lucroDoPedido } = PedidoService()
+  const { valorTotalDaVenda, lucroDaVenda } = VendaService()
 
-  const produtosDoPedidoResponse: ProdutoPedido[] = (await buscarTodosPorIdPedido(params.idPedido)).data
+  const produtosDoVendaResponse: ProdutoVenda[] = (await buscarTodosPorIdVenda(params.idVenda)).data
 
-  const valorTotalVenda = (await valorTotalDoPedido(params.idPedido)).data
-  const lucroVenda: number = (await lucroDoPedido(params.idPedido)).data
+  const valorTotalVenda = (await valorTotalDaVenda(params.idVenda)).data
+  const lucroVenda: number = (await lucroDaVenda(params.idVenda)).data
 
   const obterNomeProduto = async (idProduto: number) => {
     const produtoResponse = (await buscarProdutoPorId(idProduto)).data as Produto
@@ -36,19 +36,19 @@ export default async function ProdutosDoPedido({ params }: ProdutosDoPedidoProps
   }
 
   return (
-    <div className="div-container-produtoPedido">
+    <div className="div-container-produtoVenda">
       <h1 className="centered-text">
         {
-          produtosDoPedidoResponse.length > 1 ? (
+          produtosDoVendaResponse.length > 1 ? (
             <>
               A <Image src={imgVenda} width={60} height={60} alt="" /> Venda
-              contém {produtosDoPedidoResponse.length} Produtos { }
+              contém {produtosDoVendaResponse.length} Produtos { }
               <Image src={imgProduto} width={60} height={60} alt="" />
             </>
-          ) : produtosDoPedidoResponse.length === 1 && (
+          ) : produtosDoVendaResponse.length === 1 && (
             <>
               A <Image src={imgVenda} width={60} height={60} alt="" /> Venda
-              contém {produtosDoPedidoResponse.length} Produto { }
+              contém {produtosDoVendaResponse.length} Produto { }
               <Image src={imgProduto} width={60} height={60} alt="" />
             </>
           )
@@ -57,7 +57,7 @@ export default async function ProdutosDoPedido({ params }: ProdutosDoPedidoProps
       <div className="cardListagem-container">
         <span id="info-title-venda">
           {
-            produtosDoPedidoResponse.length === 1 ? (
+            produtosDoVendaResponse.length === 1 ? (
               <div className="div-dados-title">
                 Detalhes do Produto
               </div>
@@ -71,13 +71,13 @@ export default async function ProdutosDoPedido({ params }: ProdutosDoPedidoProps
         <TabelaVenda>
           {
             await Promise.all(
-              produtosDoPedidoResponse.map(async (produtoPedido) => {
-                const nomeProduto = await obterNomeProduto(produtoPedido.idProduto)
+              produtosDoVendaResponse.map(async (produtoVenda) => {
+                const nomeProduto = await obterNomeProduto(produtoVenda.idProduto)
                 return (
                   <LinhaProduto
-                    key={produtoPedido.id}
+                    key={produtoVenda.id}
                     nome={nomeProduto}
-                    produtoPedido={produtoPedido}
+                    produtoVenda={produtoVenda}
                   />
                 )
               })

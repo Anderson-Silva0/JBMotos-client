@@ -8,10 +8,10 @@ import { Cliente } from '@/models/cliente'
 import { Erros, salvarErros } from '@/models/erros'
 import { formasPagamentos } from '@/models/formasPagamento'
 import { Funcionario } from '@/models/funcionario'
-import { Pedido, estadoInicialPedido } from '@/models/pedido'
 import { selectStyles } from '@/models/selectStyles'
 import { mensagemErro, mensagemSucesso } from '@/models/toast'
-import { PedidoService } from '@/services/PedidoService'
+import { Venda, estadoInicialVenda } from '@/models/venda'
+import { VendaService } from '@/services/VendaService'
 import { ClienteService } from '@/services/clienteService'
 import { FuncionarioService } from '@/services/funcionarioService'
 import { Edit3 } from 'lucide-react'
@@ -21,7 +21,7 @@ import Select from 'react-select'
 
 interface AtualizarVendaProps {
     params: {
-        idPedido: number
+        idVenda: number
     }
 }
 
@@ -31,7 +31,7 @@ export default function AtualizarVenda({ params }: AtualizarVendaProps) {
     const { buscarTodosClientes } = ClienteService()
     const { buscarFuncionarioPorCpf, buscarTodosFuncionarios } = FuncionarioService()
 
-    const [pedido, setPedido] = useState<Pedido>(estadoInicialPedido)
+    const [venda, setVenda] = useState<Venda>(estadoInicialVenda)
     const [clientes, setClientes] = useState<Cliente[]>([])
     const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
     const [erros, setErros] = useState<Erros[]>([])
@@ -50,7 +50,7 @@ export default function AtualizarVenda({ params }: AtualizarVendaProps) {
         setOpcaoSelecionadaFormaDePagamento
     ] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
 
-    const { buscarPedidoPorId, atualizarPedido } = PedidoService()
+    const { buscarVendaPorId, atualizarVenda } = VendaService()
 
     useEffect(() => {
         const buscarFuncionariosEClientes = async () => {
@@ -69,33 +69,33 @@ export default function AtualizarVenda({ params }: AtualizarVendaProps) {
             }
         }
 
-        const buscarInformacoesPedido = async () => {
+        const buscarInformacoesVenda = async () => {
             try {
-                const pedidoResponse = (await buscarPedidoPorId(params.idPedido)).data as Pedido
-                setPedido(pedidoResponse)
+                const vendaResponse = (await buscarVendaPorId(params.idVenda)).data as Venda
+                setVenda(vendaResponse)
 
-                const funcionarioDoPedido = (await buscarFuncionarioPorCpf(pedidoResponse.cpfFuncionario)).data as Funcionario
+                const funcionarioDoVenda = (await buscarFuncionarioPorCpf(vendaResponse.cpfFuncionario)).data as Funcionario
 
-                setOpcaoSelecionadaCliente({ label: pedidoResponse.cpfCliente, value: pedidoResponse.cpfCliente })
+                setOpcaoSelecionadaCliente({ label: vendaResponse.cpfCliente, value: vendaResponse.cpfCliente })
                 setOpcaoSelecionadaFuncionario({
-                    label: funcionarioDoPedido.nome,
-                    value: pedidoResponse.cpfFuncionario,
+                    label: funcionarioDoVenda.nome,
+                    value: vendaResponse.cpfFuncionario,
                 })
 
-                setOpcaoSelecionadaFormaDePagamento({ label: pedidoResponse.formaDePagamento, value: pedidoResponse.formaDePagamento })
+                setOpcaoSelecionadaFormaDePagamento({ label: vendaResponse.formaDePagamento, value: vendaResponse.formaDePagamento })
             } catch (erro: any) {
                 mensagemErro(erro.response.data)
             }
         }
 
         buscarFuncionariosEClientes()
-        buscarInformacoesPedido()
+        buscarInformacoesVenda()
     }, [])
 
     useEffect(() => {
-        setPedido(
+        setVenda(
             {
-                ...pedido,
+                ...venda,
                 cpfCliente: String(opcaoSelecionadaCliente?.value),
                 cpfFuncionario: String(opcaoSelecionadaFuncionario?.value),
                 formaDePagamento: String(opcaoSelecionadaFormaDePagamento?.value)
@@ -106,7 +106,7 @@ export default function AtualizarVenda({ params }: AtualizarVendaProps) {
 
     const atualizar = async () => {
         try {
-            await atualizarPedido(pedido.id, pedido)
+            await atualizarVenda(venda.id, venda)
             mensagemSucesso('Venda atualizada com sucesso.')
             router.push('/venda/listar')
         } catch (error: any) {
@@ -157,8 +157,8 @@ export default function AtualizarVenda({ params }: AtualizarVendaProps) {
                 <FormGroup label="Observação:" htmlFor="observacao">
                     <input
                         maxLength={100}
-                        value={pedido.observacao}
-                        onChange={(e) => { setErros([]); setPedido({ ...pedido, observacao: e.target.value }) }}
+                        value={venda.observacao}
+                        onChange={(e) => { setErros([]); setVenda({ ...venda, observacao: e.target.value }) }}
                         id="observacao"
                         type="text"
                     />

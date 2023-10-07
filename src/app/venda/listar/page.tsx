@@ -4,17 +4,17 @@ import { InputCpf } from "@/components/Input"
 import VendaCard from "@/components/VendaCard"
 import imgVenda from "@/images/vendas.png"
 import { parseDate } from "@/models/StringParaDate"
-import { Pedido } from "@/models/pedido"
 import { mensagemErro } from "@/models/toast"
-import { PedidoService } from "@/services/PedidoService"
+import { Venda } from "@/models/venda"
+import { VendaService } from "@/services/VendaService"
 import { Search } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 
 export default function ListarVendas() {
-  const { filtrarPedido } = PedidoService()
+  const { filtrarVenda } = VendaService()
 
-  const [pedidos, setPedidos] = useState<Pedido[]>([])
+  const [vendas, setVendas] = useState<Venda[]>([])
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
   const [valorInputBuscar, setValorInputBuscar] = useState<string>('')
   const [campoSelecionado, setCampoSelecionado] = useState<string>('')
@@ -26,25 +26,25 @@ export default function ListarVendas() {
 
   useEffect(() => {
     if (valorSelecionado === 'antiga') {
-      const sortedPedidosRecentes = [...pedidos].sort((a: Pedido, b: Pedido) =>
+      const sortedVendasRecentes = [...vendas].sort((a: Venda, b: Venda) =>
         parseDate(a.dataHoraCadastro).getTime() - parseDate(b.dataHoraCadastro).getTime()
       )
-      setPedidos(sortedPedidosRecentes)
+      setVendas(sortedVendasRecentes)
     } else if (valorSelecionado === 'recente') {
-      const sortedPedidosRecentes = [...pedidos].sort((a: Pedido, b: Pedido) =>
+      const sortedVendasRecentes = [...vendas].sort((a: Venda, b: Venda) =>
         parseDate(b.dataHoraCadastro).getTime() - parseDate(a.dataHoraCadastro).getTime()
       )
-      setPedidos(sortedPedidosRecentes)
+      setVendas(sortedVendasRecentes)
     }
   }, [valorSelecionado])
 
   useEffect(() => {
     const buscarPorId = async () => {
       try {
-        const pedidoResponse = await filtrarPedido(campoSelecionado, valorInputBuscar)
-        setPedidos(pedidoResponse.data)
+        const vendaResponse = await filtrarVenda(campoSelecionado, valorInputBuscar)
+        setVendas(vendaResponse.data)
       } catch (error: any) {
-        mensagemErro('Erro ao tentar buscar Pedido.')
+        mensagemErro('Erro ao tentar buscar Venda.')
       } finally {
         setFoiCarregado(true)
       }
@@ -71,13 +71,13 @@ export default function ListarVendas() {
       <h1 className="centered-text">
         {
           campoSelecionado === '' ? (
-            pedidos.length > 1 ? (
+            vendas.length > 1 ? (
               <>
-                <Image src={imgVenda} width={60} height={60} alt="" /> {pedidos.length} Vendas Realizadas
+                <Image src={imgVenda} width={60} height={60} alt="" /> {vendas.length} Vendas Realizadas
               </>
-            ) : pedidos.length === 1 ? (
+            ) : vendas.length === 1 ? (
               <>
-                <Image src={imgVenda} width={60} height={60} alt="" /> {pedidos.length} Venda Realizada
+                <Image src={imgVenda} width={60} height={60} alt="" /> {vendas.length} Venda Realizada
               </>
             ) : (
               'Nenhuma Venda realizada no sistema'
@@ -85,10 +85,10 @@ export default function ListarVendas() {
           ) : campoSelecionado !== '' && valorInputBuscar !== '' && (
             <>
               {
-                pedidos.length === 1 ? (
-                  <strong>{pedidos.length} Venda encontrada</strong>
-                ) : pedidos.length > 1 ? (
-                  <strong>{pedidos.length} Vendas encontradas</strong>
+                vendas.length === 1 ? (
+                  <strong>{vendas.length} venda encontrada</strong>
+                ) : vendas.length > 1 ? (
+                  <strong>{vendas.length} Vendas encontradas</strong>
                 ) : (
                   'Nenhuma Venda encontrada'
                 )
@@ -180,16 +180,16 @@ export default function ListarVendas() {
         </div>
       </div>
 
-      {pedidos.map((pedido) => {
+      {vendas.map((venda) => {
         return (
           <VendaCard
-            key={pedido.id}
-            id={pedido.id}
-            cpfCliente={pedido.cpfCliente}
-            cpfFuncionario={pedido.cpfFuncionario}
-            dataHoraCadastro={pedido.dataHoraCadastro}
-            observacao={pedido.observacao}
-            formaDePagamento={pedido.formaDePagamento}
+            key={venda.id}
+            id={venda.id}
+            cpfCliente={venda.cpfCliente}
+            cpfFuncionario={venda.cpfFuncionario}
+            dataHoraCadastro={venda.dataHoraCadastro}
+            observacao={venda.observacao}
+            formaDePagamento={venda.formaDePagamento}
           />
         )
       })}

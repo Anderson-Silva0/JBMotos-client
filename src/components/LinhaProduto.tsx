@@ -1,9 +1,9 @@
-import { ProdutoPedido } from "@/models/ProdutoPedido"
+import { ProdutoVenda } from "@/models/ProdutoVenda"
 import { formatarParaReal } from "@/models/formatadorReal"
 import '@/styles/tabelaVenda.css'
 
 interface LinhaProdutoProps {
-    produtoPedido: ProdutoPedido
+    produtoVenda: ProdutoVenda
     nome: string
 }
 
@@ -17,11 +17,11 @@ export function LinhaProduto(props: LinhaProdutoProps) {
             </td>
             <td>
                 {
-                    props.produtoPedido.quantidade
+                    props.produtoVenda.quantidade
                 }
             </td>
-            <td>{formatarParaReal(props.produtoPedido.valorUnidade)}</td>
-            <td>{formatarParaReal(props.produtoPedido.valorTotal)}</td>
+            <td>{formatarParaReal(props.produtoVenda.valorUnidade)}</td>
+            <td>{formatarParaReal(props.produtoVenda.valorTotal)}</td>
         </tr>
     )
 }

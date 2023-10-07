@@ -1,4 +1,4 @@
-export interface Pedido {
+export interface Venda {
   id: number
   cpfCliente: string
   cpfFuncionario: string
@@ -7,7 +7,7 @@ export interface Pedido {
   formaDePagamento: string
 }
 
-export const estadoInicialPedido: Pedido = {
+export const estadoInicialVenda: Venda = {
   id: 0,
   cpfCliente: '',
   cpfFuncionario: '',

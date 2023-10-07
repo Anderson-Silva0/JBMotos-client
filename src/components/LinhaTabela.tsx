@@ -1,12 +1,12 @@
 
 import { ProdutoSelecionadoProps, RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/venda/cadastro/page"
-import { ProdutoPedido, estadoInicialProdutoPedido } from "@/models/ProdutoPedido"
+import { ProdutoVenda, estadoInicialProdutoVenda } from "@/models/ProdutoVenda"
 import { Estoque, estadoInicialEstoque } from "@/models/estoque"
 import { formatarParaReal } from "@/models/formatadorReal"
 import { Produto, estadoInicialProduto } from '@/models/produto'
 import { selectStylesVenda } from '@/models/selectStyles'
 import { mensagemAlerta, mensagemErro } from "@/models/toast"
-import { ProdutoPedidoService } from '@/services/ProdutoPedidoService'
+import { ProdutoVendaService } from '@/services/ProdutoVendaService'
 import { EstoqueService } from "@/services/estoqueService"
 import '@/styles/tabelaVenda.css'
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react"
@@ -17,7 +17,7 @@ interface LinhaTabelaProps {
   idLinha: number
   produtos: Produto[]
   qtdLinha: number[]
-  idPedido: number
+  idVenda: number
   setOcorrenciasErros: Dispatch<SetStateAction<string[]>>
   valoresTotais: ValoresTotaisProps[]
   setValoresTotais: Dispatch<SetStateAction<ValoresTotaisProps[]>>
@@ -40,7 +40,7 @@ const estadoInicialOpcaoSelecionada: OpcaoSelecionadaProps = {
 }
 
 export function LinhaTabela(props: LinhaTabelaProps) {
-  const { salvarProdutoPedido } = ProdutoPedidoService()
+  const { salvarProdutoVenda } = ProdutoVendaService()
   const { buscarEstoquePorId } = EstoqueService()
 
   const [produtoAnterior, setProdutoAnterior] = useState<ProdutoSelecionadoProps>({
@@ -48,7 +48,7 @@ export function LinhaTabela(props: LinhaTabelaProps) {
     produto: estadoInicialProduto
   })
   const [valorTotal, setValorTotal] = useState<number>(0)
-  const [produtoPedido, setProdutoPedido] = useState<ProdutoPedido>(estadoInicialProdutoPedido)
+  const [produtoVenda, setProdutoVenda] = useState<ProdutoVenda>(estadoInicialProdutoVenda)
   const [opcaoSelecionada, setOpcaoSelecionada] = useState<OpcaoSelecionadaProps>(estadoInicialOpcaoSelecionada)
   const [estoqueProdutoSelecionado, setEstoqueProdutoSelecionado] = useState<Estoque>(estadoInicialEstoque)
   const [produtosAtivos, setProdutosAtivos] = useState<Produto[]>([])
@@ -125,12 +125,12 @@ export function LinhaTabela(props: LinhaTabelaProps) {
   useEffect(() => {
     const setQuantidadeInicial = () => {
       if (opcaoSelecionada.produto.id !== 0 && estoqueProdutoSelecionado.status !== 'INDISPONIVEL') {
-        setProdutoPedido((prevState) => ({
+        setProdutoVenda((prevState) => ({
           ...prevState,
           quantidade: 1
         }))
       } else {
-        setProdutoPedido((prevState) => ({
+        setProdutoVenda((prevState) => ({
           ...prevState,
           quantidade: 0
         }))
@@ -157,7 +157,7 @@ export function LinhaTabela(props: LinhaTabelaProps) {
 
   useEffect(() => {
     const calculo = () => {
-      const total = Number(opcaoSelecionada?.produto.precoVenda) * produtoPedido.quantidade
+      const total = Number(opcaoSelecionada?.produto.precoVenda) * produtoVenda.quantidade
       setValorTotal(total)
       if (total !== 0) {
         if (props.valoresTotais.some(item => item.idLinha === props.idLinha)) {
@@ -169,17 +169,17 @@ export function LinhaTabela(props: LinhaTabelaProps) {
       }
     }
     calculo()
-  }, [produtoPedido.quantidade, opcaoSelecionada?.produto.precoVenda])
+  }, [produtoVenda.quantidade, opcaoSelecionada?.produto.precoVenda])
 
   useEffect(() => {
     const salvar = async () => {
       try {
-        const produtoPedidoAtualizado = {
-          ...produtoPedido,
-          idPedido: props.idPedido,
+        const produtoVendaAtualizado = {
+          ...produtoVenda,
+          idVenda: props.idVenda,
           idProduto: opcaoSelecionada.produto.id
         }
-        await salvarProdutoPedido(produtoPedidoAtualizado)
+        await salvarProdutoVenda(produtoVendaAtualizado)
         props.setOcorrenciasErros(prevState => [...prevState, 'sucesso'])
       } catch (error: any) {
         props.setOcorrenciasErros(prevState => [...prevState, 'erro'])
@@ -187,12 +187,12 @@ export function LinhaTabela(props: LinhaTabelaProps) {
       }
       definirEstadoInicialOpcoesProdutos()
       setOpcaoSelecionada(estadoInicialOpcaoSelecionada)
-      setProdutoPedido(estadoInicialProdutoPedido)
+      setProdutoVenda(estadoInicialProdutoVenda)
     }
-    if (props.idPedido !== 0) {
+    if (props.idVenda !== 0) {
       salvar()
     }
-  }, [props.idPedido])
+  }, [props.idVenda])
 
 
   const mostrarErrosProdutos = (erro: any) => {
@@ -221,12 +221,12 @@ export function LinhaTabela(props: LinhaTabelaProps) {
     }
     if (opcaoSelecionada.produto.id) {
       if (estoqueProdutoSelecionado.status !== 'INDISPONIVEL') {
-        setProdutoPedido({ ...produtoPedido, quantidade: novoValor < 1 ? 1 : novoValor })
+        setProdutoVenda({ ...produtoVenda, quantidade: novoValor < 1 ? 1 : novoValor })
       } else {
-        setProdutoPedido({ ...produtoPedido, quantidade: 0 })
+        setProdutoVenda({ ...produtoVenda, quantidade: 0 })
       }
     } else {
-      setProdutoPedido({ ...produtoPedido, quantidade: novoValor < 0 ? 0 : novoValor })
+      setProdutoVenda({ ...produtoVenda, quantidade: novoValor < 0 ? 0 : novoValor })
     }
   }
 
@@ -248,7 +248,7 @@ export function LinhaTabela(props: LinhaTabelaProps) {
         {
           idProduto: opcaoSelecionada.produto.id,
           nomeProduto: opcaoSelecionada.label,
-          quantidade: produtoPedido.quantidade,
+          quantidade: produtoVenda.quantidade,
           valorUnidade: formatarParaReal(opcaoSelecionada.produto.precoVenda),
           valorTotal: formatarParaReal(valorTotal)
         }
@@ -275,7 +275,7 @@ export function LinhaTabela(props: LinhaTabelaProps) {
       </td>
       <td>
         <input
-          value={produtoPedido.quantidade}
+          value={produtoVenda.quantidade}
           onChange={(e) => setPropQuantidade(e)}
           type="number"
           name="quantidade"
