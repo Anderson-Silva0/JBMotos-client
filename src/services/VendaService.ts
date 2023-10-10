@@ -17,7 +17,7 @@ export const VendaService = () => {
   }
 
   const filtrarVenda = (nomeCampo: string, valor: string) => {
-    return ApiService.get(`${url}/filtrar/?${nomeCampo}=${valor}`)
+    return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
   }
 
   const atualizarVenda = (id: number, dados: object) => {

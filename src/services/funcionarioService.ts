@@ -17,7 +17,7 @@ export const FuncionarioService = () => {
     }
 
     const filtrarFuncionario = (nomeCampo: string, valor: string) => {
-        return ApiService.get(`${url}/filtrar/?${nomeCampo}=${valor}`)
+        return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
     }
 
     const alternarStatusFuncionario = (cpf: string) => {

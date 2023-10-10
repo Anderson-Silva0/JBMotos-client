@@ -25,7 +25,7 @@ export const MotoService = () => {
   }
 
   const filtrarMoto = (nomeCampo: string, valor: string) => {
-    return ApiService.get(`${url}/filtrar/?${nomeCampo}=${valor}`)
+    return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
   }
 
   const alternarStatusMoto = (id: number | string) => {

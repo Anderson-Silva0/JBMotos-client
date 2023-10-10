@@ -1,4 +1,3 @@
-import { Fornecedor } from "@/models/fornecedor"
 import { ApiService } from "./apiService"
 
 export const FornecedorService = () => {
@@ -14,11 +13,11 @@ export const FornecedorService = () => {
     }
 
     const buscarFornecedorPorCnpj = (cnpj: string) => {
-        return ApiService.get(`${url}/buscar/?cnpj=${cnpj}`)
+        return ApiService.get(`${url}/buscar?cnpj=${cnpj}`)
     }
 
     const filtrarFornecedor = (nomeCampo: string, valor: string) => {
-        return ApiService.get(`${url}/filtrar/?${nomeCampo}=${valor}`)
+        return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
     }
 
     const alternarStatusFornecedor = (cnpj: string) => {

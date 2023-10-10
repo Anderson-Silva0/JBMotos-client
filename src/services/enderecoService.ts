@@ -1,9 +1,9 @@
-import axios from "axios"
-import { ApiService } from "./apiService"
 import { Endereco } from "@/models/endereco"
-import { Dispatch, SetStateAction } from "react"
 import { Erros } from "@/models/erros"
 import { mensagemErro } from "@/models/toast"
+import axios from "axios"
+import { Dispatch, SetStateAction } from "react"
+import { ApiService } from "./apiService"
 
 export const EnderecoService = () => {
 
