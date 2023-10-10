@@ -181,6 +181,7 @@
   justify-content: space-between;
   gap: 3vh;
   align-items: center;
+  width: 90%;
 }
 
 .div-buscar {
@@ -216,24 +217,26 @@
   flex-direction: column;
 }
 
-.input-radio {
-  height: 2.5vw;
-  width: 2.5vw;
-  margin: 8px auto 0 auto;
-}
-
 .input-check {
   height: 2.5vw;
   width: 2.5vw;
 }
 
 .label-radio {
+  font-size: 100%;
   font-weight: 700;
   margin: auto 1vw 0.5vw auto;
   border-radius: 10px;
   background-color: white;
-  padding: 6px;
+  height: 32%;
+  padding: 2%;
   white-space: nowrap;
+}
+
+.input-radio {
+  height: 2.5vw;
+  width: 2.5vw;
+  margin: 8px auto 0 auto;
 }
 
 .input-buscar {
@@ -247,7 +250,7 @@
 .div-radios {
   display: flex;
   justify-content: space-around;
-  width: 50%;
+  width: 80%;
 }
 
 @media (max-width: 999px) {
@@ -259,16 +262,6 @@
     padding: 2vh;
     box-shadow: 0px 4px 5px #495057;
     font-size: 12pt;
-  }
-
-  .div-container-buscar {
-    display: flex;
-    flex-direction: column;
-    padding: 2vh;
-    justify-content: space-between;
-    gap: 3vh;
-    align-items: center;
-    width: 100vw;
   }
 
   #info-title {
@@ -291,16 +284,19 @@
   }
 
   .label-radio {
-    display: inline-flex;
-    align-items: center;
-    vertical-align: middle;
+    font-size: 3.5vw;
     font-weight: 700;
-    font-size: 4vw;
+    margin: auto 1vw 0.5vw auto;
+    border-radius: 10px;
+    background-color: white;
+    height: 32%;
+    padding: 2%;
+    white-space: nowrap;
   }
 
   .input-radio {
     height: 6vw;
-    width: 6vw;
+    width: 5vw;
     margin: 8px auto 0 auto;
   }
 
