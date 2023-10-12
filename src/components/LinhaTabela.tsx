@@ -17,7 +17,7 @@ interface LinhaTabelaProps {
   idLinha: number
   produtos: Produto[]
   qtdLinha: number[]
-  idVenda: number
+  idVendaState: number
   setOcorrenciasErros: Dispatch<SetStateAction<string[]>>
   valoresTotais: ValoresTotaisProps[]
   setValoresTotais: Dispatch<SetStateAction<ValoresTotaisProps[]>>
@@ -176,7 +176,7 @@ export function LinhaTabela(props: LinhaTabelaProps) {
       try {
         const produtoVendaAtualizado = {
           ...produtoVenda,
-          idVenda: props.idVenda,
+          idVenda: props.idVendaState,
           idProduto: opcaoSelecionada.produto.id
         }
         await salvarProdutoVenda(produtoVendaAtualizado)
@@ -189,10 +189,10 @@ export function LinhaTabela(props: LinhaTabelaProps) {
       setOpcaoSelecionada(estadoInicialOpcaoSelecionada)
       setProdutoVenda(estadoInicialProdutoVenda)
     }
-    if (props.idVenda !== 0) {
+    if (props.idVendaState !== 0) {
       salvar()
     }
-  }, [props.idVenda])
+  }, [props.idVendaState])
 
 
   const mostrarErrosProdutos = (erro: any) => {
