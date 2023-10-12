@@ -12,9 +12,10 @@ import imgAdicionarLinha from '@/images/icons8-insert-row-48.png'
 import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from "@/models/Selecoes"
 import { Cliente } from "@/models/cliente"
 import { Erros, salvarErros } from "@/models/erros"
-import { formasPagamentos } from "@/models/formasPagamento"
+import { bandeiras, formasPagamentos, obterParcelas } from "@/models/formasPagamento"
 import { formatarParaReal } from "@/models/formatadorReal"
 import { Funcionario } from "@/models/funcionario"
+import { PagamentoCartao, estadoInicialPagamentoCartao } from "@/models/pagamentoCartao"
 import { Produto } from "@/models/produto"
 import { selectStyles } from "@/models/selectStyles"
 import { mensagemAlerta, mensagemErro, mensagemSucesso } from "@/models/toast"
@@ -22,10 +23,11 @@ import { Venda, estadoInicialVenda } from "@/models/venda"
 import { VendaService } from "@/services/VendaService"
 import { ClienteService } from "@/services/clienteService"
 import { FuncionarioService } from "@/services/funcionarioService"
+import { PagamentoCartaoService } from "@/services/pagamentoCartaoService"
 import { ProdutoService } from "@/services/produtoService"
 import { Save } from "lucide-react"
 import Image from "next/image"
-import { useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
 import Select from 'react-select'
 
 export interface RegistroProdutoSelecionadoProps {
@@ -56,6 +58,7 @@ export default function CadastroVenda() {
   const { buscarTodosFuncionarios } = FuncionarioService()
   const { buscarTodosProdutos } = ProdutoService()
   const { salvarVenda, deletarVenda } = VendaService()
+  const { salvarPagamentoCartao } = PagamentoCartaoService()
 
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
   const [registrosProdutosVenda, setRegistrosProdutosVenda] = useState<RegistroProdutoSelecionadoProps[]>([])
@@ -64,13 +67,17 @@ export default function CadastroVenda() {
   const [produtos, setProdutos] = useState<Produto[]>([])
   const [todosProdutos, setTodosProdutos] = useState<Produto[]>([])
   const [venda, setVenda] = useState<Venda>(estadoInicialVenda)
-  const [idVenda, setIdVenda] = useState<number>(0)
+  const [idVendaState, setIdVendaState] = useState<number>(0)
   const [qtdLinha, setQtdLinha] = useState<number[]>([1])
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
   const [valoresTotais, setValoresTotais] = useState<ValoresTotaisProps[]>([])
   const [ocorrenciasErros, setOcorrenciasErros] = useState<string[]>([])
   const [idProdutoIdLinhaSelecionado, setIdProdutoIdLinhaSelecionado] = useState<IdProdutoEIdLinha[]>([])
+  const [pagamentoCartao, setPagamentoCartao] = useState<PagamentoCartao>(estadoInicialPagamentoCartao)
+  const [opcaoSelecionadaParcela, setOpcaoSelecionadaParcela] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
+  const [opcaoSelecionadaBandeira, setOpcaoSelecionadaBandeira] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
+  const [totalTaxasState, setTotalTaxaState] = useState<number | string>(0)
 
   const [opcaoSelecionadaCliente,
     setOpcaoSelecionadaCliente
@@ -131,20 +138,41 @@ export default function CadastroVenda() {
     setErros([])
   }, [opcaoSelecionadaCliente, opcaoSelecionadaFuncionario, opcaoSelecionadaFormaDePagamento])
 
+  const setPropsProdutoMoney = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value.replace(/\D/g, '')) / 100
+    const limitedValue = Math.min(value, 100000)
+    setTotalTaxaState(limitedValue)
+  }
+
+  const definirEstadoInicialPagamentoCartao = () => {
+    setPagamentoCartao(estadoInicialPagamentoCartao)
+    setOpcaoSelecionadaParcela(estadoInicialOpcoesSelecoes)
+    setOpcaoSelecionadaBandeira(estadoInicialOpcoesSelecoes)
+    setTotalTaxaState(0)
+  }
+
   const exibirResultados = async () => {
     if (ocorrenciasErros.includes('sucesso') && !ocorrenciasErros.includes('erro')) {
       mensagemSucesso("Venda realizada com sucesso!")
+
+      definirEstadoInicialPagamentoCartao()
+      setIdProdutoIdLinhaSelecionado([])
+      definirEstadoInicialSelecaoVenda()
+      setVenda(estadoInicialVenda)
+      setProdutosSelecionados([])
+      setValoresTotais([])
+      setQtdLinha([1])
+      buscarTodos()
+      setErros([])
     } else if (ocorrenciasErros.includes('erro')) {
-      await deletarVenda(idVenda)
-      mensagemAlerta('Ocorreram erros. Por favor, refaça a Venda.')
+      if (idVendaState !== 0) {
+        await deletarVenda(idVendaState)
+      }
+      mensagemAlerta('Ocorreram erros. Por favor, tente novamente.')
     }
-    setQtdLinha([1])
+
+    setIdVendaState(0)
     setOcorrenciasErros([])
-    setValoresTotais([])
-    definirEstadoInicialSelecaoVenda()
-    setVenda(estadoInicialVenda)
-    setIdVenda(0)
-    buscarTodos()
   }
 
   useEffect(() => {
@@ -154,16 +182,55 @@ export default function CadastroVenda() {
   }, [ocorrenciasErros])
 
   const submit = async () => {
-    try {
-      const response = await salvarVenda(venda)
-      setIdVenda(response.data.id)
-      setErros([])
-      setIdProdutoIdLinhaSelecionado([])
-    } catch (error: any) {
-      salvarErros(error, erros, setErros)
-      mensagemErro('Erro no preenchimento dos campos.')
+    if (produtosSelecionados.length) {
+      try {
+        const vendaResponse = await salvarVenda(venda)
+        if (opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito") {
+          try {
+            await salvarPagamentoCartao({ ...pagamentoCartao, idVenda: vendaResponse.data.id })
+            setIdVendaState(vendaResponse.data.id)
+          } catch (error: any) {
+            await deletarVenda(vendaResponse.data.id)
+            salvarErros(error, erros, setErros)
+            mensagemErro('Erro no preenchimento dos campos.')
+          }
+        } else {
+          setIdVendaState(vendaResponse.data.id)
+        }
+      } catch (error: any) {
+        salvarErros(error, erros, setErros)
+        mensagemErro('Erro no preenchimento dos campos.')
+      }
+    } else {
+      mensagemAlerta("Selecione algum produto.")
     }
   }
+
+  useEffect(() => {
+    const definirPagamentoCartao = () => {
+      if (opcaoSelecionadaFormaDePagamento.label === "Cartão de Crédito") {
+        if (opcaoSelecionadaParcela.value || opcaoSelecionadaBandeira.value || totalTaxasState) {
+          setPagamentoCartao(
+            {
+              parcela: opcaoSelecionadaParcela.value,
+              bandeira: opcaoSelecionadaBandeira.value,
+              totalTaxas: totalTaxasState,
+              idVenda: 0
+            }
+          )
+        }
+      } else {
+        setPagamentoCartao(estadoInicialPagamentoCartao)
+        setOpcaoSelecionadaParcela(estadoInicialOpcoesSelecoes)
+        setOpcaoSelecionadaBandeira(estadoInicialOpcoesSelecoes)
+        setTotalTaxaState(0)
+      }
+
+      setErros([])
+    }
+
+    definirPagamentoCartao()
+  }, [opcaoSelecionadaParcela, opcaoSelecionadaBandeira, totalTaxasState, opcaoSelecionadaFormaDePagamento])
 
   const handlerRealizarVenda = () => {
     ConfirmarDecisao("Confirmação de Venda", "Tem certeza de que deseja realizar esta venda?", submit)
@@ -241,30 +308,6 @@ export default function CadastroVenda() {
     return nomeClienteSelecionado
   }
 
-  //Teste ****************************************************************
-
-  const [divisoesState, setDivisoesState] = useState<OpcoesSelecoes[]>([])
-  const [opcaoSelecionadaDivisao, setOpcaoSelecionadaDivisao] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
-
-  useEffect(() => {
-    const divisoes: OpcoesSelecoes[] = []
-
-    for (let i = 1; i <= 24; i++) {
-      const label = `${i}x`
-      const value = label
-      divisoes.push({ label, value })
-    }
-    setDivisoesState(divisoes)
-  }, [])
-
-  useEffect(() => {
-    if (opcaoSelecionadaDivisao.value !== "") {
-      console.log("Divisão Selecionada: ", opcaoSelecionadaDivisao)
-    }
-  }, [opcaoSelecionadaDivisao])
-
-  //************************************************************************
-
   if (!foiCarregado) {
     return <h1 className="carregando">Carregando...</h1>
   }
@@ -307,22 +350,41 @@ export default function CadastroVenda() {
             instanceId="select-formaDePagamento"
           />
           {<ExibeErro erros={erros} nomeInput="formaDePagamento" />}
-
-
-
           {
             opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito" && (
-              <>
-                <label htmlFor="teste">Divisão em Parcelas</label>
+              <div className="config-pagamentos">
+                <label htmlFor="select-divisoes">Parcelas</label>
                 <Select
                   styles={selectStyles}
                   placeholder="Selecione..."
-                  value={opcaoSelecionadaDivisao}
-                  onChange={(option: any) => setOpcaoSelecionadaDivisao(option)}
-                  options={divisoesState}
+                  value={opcaoSelecionadaParcela}
+                  onChange={(option: any) => setOpcaoSelecionadaParcela(option)}
+                  options={obterParcelas()}
+                  instanceId="select-divisoes"
+                  id="select-divisoes"
+                />
+                {<ExibeErro erros={erros} nomeInput="parcela" />}
+
+                <label htmlFor="teste">Bandeira</label>
+                <Select
+                  styles={selectStyles}
+                  placeholder="Selecione..."
+                  value={opcaoSelecionadaBandeira}
+                  onChange={(option: any) => setOpcaoSelecionadaBandeira(option)}
+                  options={bandeiras}
                   instanceId="select-divisoes"
                 />
-              </>
+                {<ExibeErro erros={erros} nomeInput="bandeira" />}
+
+                <label htmlFor="precoCusto">Total de Taxas</label>
+                <input
+                  value={formatarParaReal(totalTaxasState)}
+                  onChange={(e) => setPropsProdutoMoney(e)}
+                  id="precoCusto"
+                  type="text"
+                />
+                {<ExibeErro erros={erros} nomeInput="totalTaxas" />}
+              </div>
             )
           }
         </FormGroup>
@@ -338,25 +400,26 @@ export default function CadastroVenda() {
         </FormGroup>
       </Card>
       <TabelaVenda>
-        {qtdLinha.map(idLinha => {
-          return (
-            <LinhaTabela key={idLinha}
-              idLinha={idLinha}
-              produtos={produtos}
-              idVenda={idVenda}
-              qtdLinha={qtdLinha}
-              setOcorrenciasErros={setOcorrenciasErros}
-              atualizarIdProdutoIdLinhaSelecionado={atualizarIdProdutoIdLinhaSelecionado}
-              valoresTotais={valoresTotais}
-              setValoresTotais={setValoresTotais}
-              setProdutos={setProdutos}
-              produtosSelecionados={produtosSelecionados}
-              setProdutosSelecionados={setProdutosSelecionados}
-              registrosProdutosVenda={registrosProdutosVenda}
-              setRegistrosProdutosVenda={setRegistrosProdutosVenda}
-            />
-          )
-        })
+        {
+          qtdLinha.map(idLinha => {
+            return (
+              <LinhaTabela key={idLinha}
+                idLinha={idLinha}
+                produtos={produtos}
+                idVendaState={idVendaState}
+                qtdLinha={qtdLinha}
+                setOcorrenciasErros={setOcorrenciasErros}
+                atualizarIdProdutoIdLinhaSelecionado={atualizarIdProdutoIdLinhaSelecionado}
+                valoresTotais={valoresTotais}
+                setValoresTotais={setValoresTotais}
+                setProdutos={setProdutos}
+                produtosSelecionados={produtosSelecionados}
+                setProdutosSelecionados={setProdutosSelecionados}
+                registrosProdutosVenda={registrosProdutosVenda}
+                setRegistrosProdutosVenda={setRegistrosProdutosVenda}
+              />
+            )
+          })
         }
       </TabelaVenda>
       <div id="valor-total-venda">
