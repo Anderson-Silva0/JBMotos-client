@@ -76,10 +76,10 @@
   font-weight: bold;
   margin-left: 2%;
   margin-bottom: 1%;
-  word-wrap: break-word;
-  text-align: justify;
   display: flex;
   justify-content: space-between;
+  
+  flex-direction: column;
 }
 
 .div-container-produtoVenda {
@@ -134,6 +134,13 @@
   justify-content: space-between;
   width: 20%;
   margin: auto;
+}
+
+.icone-info {
+  cursor: pointer;
+  position: relative;
+  width: 10%;
+  height: 10%;
 }
 
 .botoes-container {
@@ -312,20 +319,24 @@
     font-weight: 900;
     width: 85%;
     margin-bottom: 1%;
-    font-size: 3.3vw;
+    font-size: 2.8vw;
   }
 
   .div-resultado {
-    word-break: break-all;
     font-weight: bold;
     margin-left: 2%;
     margin-bottom: 1%;
-    word-wrap: break-word;
-    text-align: justify;
     width: 85%;
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    font-size: 3.3vw;
+    font-size: 2.8vw;
+  }
+
+  .icone-info {
+    margin: auto;
+    width: 35%;
+    height: 35%;
   }
 
   .container-items {
