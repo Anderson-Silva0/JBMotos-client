@@ -16,6 +16,10 @@ export const PagamentoCartaoService = () => {
         return ApiService.get(`${url}/buscar/${id}`)
     }
 
+    const buscarPagamentoCartaoPorIdVenda = (idVenda: number) => {
+        return ApiService.get(`${url}/buscar-por-idVenda/${idVenda}`)
+    }
+
     const atualizarPagamentoCartao = (id: number, dados: object) => {
         return ApiService.put(`${url}/atualizar/${id}`, dados)
     }
@@ -28,6 +32,7 @@ export const PagamentoCartaoService = () => {
         salvarPagamentoCartao,
         buscarTodosPagamentosCartoes,
         buscarPagamentoCartaoPorId,
+        buscarPagamentoCartaoPorIdVenda,
         atualizarPagamentoCartao,
         deletarPagamentoCartao
     }
