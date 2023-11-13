@@ -3,6 +3,7 @@ import { ProdutoVenda } from '@/models/ProdutoVenda'
 import { Cliente, estadoInicialCliente } from '@/models/cliente'
 import { formatarParaReal } from '@/models/formatadorReal'
 import { Funcionario, estadoInicialFuncionario } from '@/models/funcionario'
+import { PagamentoCartao, estadoInicialPagamentoCartao } from '@/models/pagamentoCartao'
 import { Produto } from '@/models/produto'
 import { mensagemErro } from '@/models/toast'
 import { Venda } from '@/models/venda'
@@ -10,12 +11,14 @@ import { ProdutoVendaService } from '@/services/ProdutoVendaService'
 import { VendaService } from '@/services/VendaService'
 import { ClienteService } from '@/services/clienteService'
 import { FuncionarioService } from '@/services/funcionarioService'
+import { PagamentoCartaoService } from '@/services/pagamentoCartaoService'
 import { ProdutoService } from '@/services/produtoService'
 import '@/styles/cardListagem.css'
-import { Edit } from 'lucide-react'
+import { Edit, Info } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { GeradorPDF, TipoRecibo } from './GeradorPDF'
+import InfoCard from './InfoCard'
 
 export default function VendaCard(venda: Venda) {
   const router = useRouter()
@@ -25,11 +28,13 @@ export default function VendaCard(venda: Venda) {
   const { valorTotalDaVenda } = VendaService()
   const { buscarTodosPorIdVenda } = ProdutoVendaService()
   const { buscarProdutoPorId } = ProdutoService()
+  const { buscarPagamentoCartaoPorIdVenda } = PagamentoCartaoService()
 
   const [clienteState, setClienteState] = useState<Cliente>(estadoInicialCliente)
   const [funcionarioState, setFuncionarioState] = useState<Funcionario>(estadoInicialFuncionario)
   const [valorTotal, setValorTotal] = useState<string>('')
   const [produtosVendaState, setProdutosVendaState] = useState<RegistroProdutoSelecionadoProps[]>([])
+  const [pagamentoCartao, setPagamentoCartao] = useState<PagamentoCartao>(estadoInicialPagamentoCartao)
 
   const botaoVerProduto = useRef<HTMLButtonElement>(null)
   const cardListagemContainer = useRef<HTMLDivElement>(null)
@@ -42,6 +47,11 @@ export default function VendaCard(venda: Venda) {
 
         const funcionarioResponse = await buscarFuncionarioPorCpf(venda.cpfFuncionario)
         setFuncionarioState(funcionarioResponse.data)
+
+        if (venda.formaDePagamento === "Cartão de Crédito") {
+          const pagamentoCartaoResponse = await buscarPagamentoCartaoPorIdVenda(venda.id)
+          setPagamentoCartao(pagamentoCartaoResponse.data)
+        }
       } catch (error: any) {
         mensagemErro(error.response.data)
       }
@@ -92,6 +102,15 @@ export default function VendaCard(venda: Venda) {
     router.push(`${urlAtual}/produtos/${venda.id}`)
   }
 
+  const [mostrarInfo, setMostrarInfo] = useState(false)
+
+  const HandleOnMouseLeave = () => {
+    setMostrarInfo(false)
+  }
+  const HandleOnMouseMove = () => {
+    setMostrarInfo(true)
+  }
+
   const atualizar = () => {
     router.push(`/venda/atualizar/${venda.id}`)
   }
@@ -116,10 +135,31 @@ export default function VendaCard(venda: Venda) {
         <div className='items'>
           <div className='div-dados'>Data e Hora de Cadastro da Venda</div>
           <div className='div-resultado'>{venda.dataHoraCadastro}</div>
-          <div className='div-dados'>Observação</div>
+          <div className='div-dados' style={!venda.observacao ? { display: 'none' } : undefined}>Observação</div>
           <div className='div-resultado'>{venda.observacao}</div>
+
           <div className='div-dados'>Forma de Pagamento</div>
-          <div className='div-resultado'>{venda.formaDePagamento}</div>
+          <div className='div-resultado'>
+            {venda.formaDePagamento}
+            {
+              venda.formaDePagamento === "Cartão de Crédito" && (
+                <div id='div-infocard'>
+                  {
+
+                    <Info
+                      className='icone-info'
+                      strokeWidth={3}
+                      onMouseMove={HandleOnMouseMove}
+                      onMouseLeave={HandleOnMouseLeave}
+                    />
+                  }
+                  {
+                    mostrarInfo && <InfoCard pagamentoCartao={pagamentoCartao} />
+                  }
+                </div>
+              )
+            }
+          </div>
         </div>
       </div>
       <div className='botoes-container'>
