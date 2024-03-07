@@ -59,9 +59,9 @@ label {
 
 .divBotaoCadastrar button {
   border-radius: 2vw;
-  max-width: 30%;
+  max-width: 25%;
   font-size: 2.4vw;
-  padding: 1.5%;
+  padding: 1.2%;
   margin: 3vh;
   border: none;
   background-image: linear-gradient(to top, #002855 40%, #0353A4);
