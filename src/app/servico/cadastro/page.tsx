@@ -1,20 +1,31 @@
 'use client'
 
+import { IdProdutoEIdLinha, ProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/venda/cadastro/page";
 import { Card } from "@/components/Card";
 import { ExibeErro } from "@/components/ExibeErro";
 import { FormGroup } from "@/components/Form-group";
+import { PagamentoCredito } from "@/components/PagamentoCredito";
+import ProdutoServico from "@/components/ProdutoServico";
 import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from "@/models/Selecoes";
 import { Cliente } from "@/models/cliente";
-import { Erros } from "@/models/erros";
+import { Erros, salvarErros } from "@/models/erros";
+import { formasPagamentos } from "@/models/formasPagamento";
 import { formatarParaReal } from "@/models/formatadorReal";
 import { Funcionario } from "@/models/funcionario";
 import { Moto } from "@/models/moto";
+import { PagamentoCartao, estadoInicialPagamentoCartao } from "@/models/pagamentoCartao";
+import { Produto } from "@/models/produto";
 import { selectStyles } from "@/models/selectStyles";
 import { Servico, estadoInicialServico } from "@/models/servico";
-import { mensagemErro } from "@/models/toast";
+import { mensagemAlerta, mensagemErro, mensagemSucesso } from "@/models/toast";
+import { Venda, estadoInicialVenda } from "@/models/venda";
+import { VendaService } from "@/services/VendaService";
 import { ClienteService } from "@/services/clienteService";
 import { FuncionarioService } from "@/services/funcionarioService";
 import { MotoService } from "@/services/motoService";
+import { PagamentoCartaoService } from "@/services/pagamentoCartaoService";
+import { ProdutoService } from "@/services/produtoService";
+import { ServicoService } from "@/services/servicoService";
 import { Save } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import Select from "react-select";
@@ -23,12 +34,31 @@ export default function CadastroServico() {
     const { buscarTodosFuncionarios } = FuncionarioService()
     const { buscarTodosClientes } = ClienteService()
     const { buscarMotosPorCpfCliente } = MotoService()
+    const { salvarServico } = ServicoService()
+    const { buscarTodosProdutos } = ProdutoService()
+    const { salvarPagamentoCartao } = PagamentoCartaoService()
+    const { salvarVenda, deletarVenda } = VendaService()
 
+    const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
     const [servico, setServico] = useState<Servico>(estadoInicialServico)
     const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
     const [motosCliente, setMotosCliente] = useState<Moto[]>([])
     const [clientes, setClientes] = useState<Cliente[]>([])
     const [erros, setErros] = useState<Erros[]>([])
+    const [adicaoProduto, setAdicaoProduto] = useState<boolean>(false)
+    const [produtos, setProdutos] = useState<Produto[]>([])
+    const [todosProdutos, setTodosProdutos] = useState<Produto[]>([])
+    const [venda, setVenda] = useState<Venda>(estadoInicialVenda)
+    const [ocorrenciasErros, setOcorrenciasErros] = useState<string[]>([])
+    const [idVendaState, setIdVendaState] = useState<number>(0)
+    const [produtosSelecionados, setProdutosSelecionados] = useState<ProdutoSelecionadoProps[]>([])
+    const [pagamentoCartao, setPagamentoCartao] = useState<PagamentoCartao>(estadoInicialPagamentoCartao)
+    const [opcaoSelecionadaParcela, setOpcaoSelecionadaParcela] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
+    const [opcaoSelecionadaBandeira, setOpcaoSelecionadaBandeira] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
+    const [idProdutoIdLinhaSelecionado, setIdProdutoIdLinhaSelecionado] = useState<IdProdutoEIdLinha[]>([])
+    const [valoresTotais, setValoresTotais] = useState<ValoresTotaisProps[]>([])
+    const [qtdLinha, setQtdLinha] = useState<number[]>([1])
+    const [totalTaxasState, setTotalTaxaState] = useState<number | string>(0)
 
     const [
         opcaoSelecionadaFuncionario,
@@ -45,10 +75,17 @@ export default function CadastroServico() {
         setOpcaoSelecionadaMoto
     ] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
 
+    const [
+        opcaoSelecionadaFormaDePagamento,
+        setOpcaoSelecionadaFormaDePagamento
+    ] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
+
     const setPropsProdutoMoney = (key: string, e: ChangeEvent<HTMLInputElement>) => {
         const value = parseFloat(e.target.value.replace(/\D/g, '')) / 100
         const limitedValue = Math.min(value, 100000)
         setServico({ ...servico, [key]: limitedValue })
+        const filteredValoresTotais = valoresTotais.filter(vt => vt.idLinha !== 300);
+        setValoresTotais([...filteredValoresTotais, { idLinha: 300, valorTotal: limitedValue }]);
         setErros([])
     }
 
@@ -63,10 +100,14 @@ export default function CadastroServico() {
             const todosClientes = todosClientesResponse.data
             const clientesAtivos = todosClientes.filter((c: Cliente) => c.statusCliente === 'ATIVO')
             setClientes(clientesAtivos)
+
+            const todosProdutosResponse = await buscarTodosProdutos()
+            setProdutos(todosProdutosResponse.data)
+            setTodosProdutos(todosProdutosResponse.data)
         } catch (erro: any) {
             mensagemErro(erro.response.data)
         } finally {
-            //   setFoiCarregado(true)
+            setFoiCarregado(true)
         }
     }
 
@@ -104,11 +145,171 @@ export default function CadastroServico() {
                 idMoto: Number(opcaoSelecionadaMoto.value)
             }
         )
+        setVenda(
+            {
+                ...venda,
+                cpfFuncionario: String(opcaoSelecionadaFuncionario?.value),
+                cpfCliente: String(opcaoSelecionadaCliente?.value),
+                formaDePagamento: String(opcaoSelecionadaFormaDePagamento?.value)
+            }
+        )
         setErros([])
-    }, [opcaoSelecionadaFuncionario, opcaoSelecionadaCliente, opcaoSelecionadaMoto])
+    }, [opcaoSelecionadaFuncionario, opcaoSelecionadaCliente, opcaoSelecionadaFormaDePagamento])
 
-    const submit = () => {
-        console.log(servico)
+    useEffect(() => {
+        const definirPagamentoCartao = () => {
+            if (opcaoSelecionadaFormaDePagamento.label === "Cartão de Crédito") {
+                if (opcaoSelecionadaParcela.value || opcaoSelecionadaBandeira.value || totalTaxasState) {
+                    setPagamentoCartao(
+                        {
+                            parcela: opcaoSelecionadaParcela.value,
+                            bandeira: opcaoSelecionadaBandeira.value,
+                            totalTaxas: totalTaxasState,
+                            idVenda: 0
+                        }
+                    )
+                }
+            } else {
+                setPagamentoCartao(estadoInicialPagamentoCartao)
+                setOpcaoSelecionadaParcela(estadoInicialOpcoesSelecoes)
+                setOpcaoSelecionadaBandeira(estadoInicialOpcoesSelecoes)
+                setTotalTaxaState(0)
+            }
+
+            setErros([])
+        }
+
+        definirPagamentoCartao()
+    }, [opcaoSelecionadaParcela, opcaoSelecionadaBandeira, totalTaxasState, opcaoSelecionadaFormaDePagamento])
+
+    const definirEstadoInicialPagamentoCartao = () => {
+        setPagamentoCartao(estadoInicialPagamentoCartao)
+        setOpcaoSelecionadaParcela(estadoInicialOpcoesSelecoes)
+        setOpcaoSelecionadaBandeira(estadoInicialOpcoesSelecoes)
+        setTotalTaxaState(0)
+    }
+
+    const definirEstadoInicialSelecaoVenda = () => {
+        setOpcaoSelecionadaCliente(estadoInicialOpcoesSelecoes)
+        setOpcaoSelecionadaFuncionario(estadoInicialOpcoesSelecoes)
+        setOpcaoSelecionadaFormaDePagamento(estadoInicialOpcoesSelecoes)
+        setVenda({ ...venda, observacao: '' })
+    }
+
+    const exibirResultados = async () => {
+        if (ocorrenciasErros.includes('sucesso') && !ocorrenciasErros.includes('erro')) {
+            mensagemSucesso("Venda realizada com sucesso!")
+            resetarVenda()
+        } else if (ocorrenciasErros.includes('erro')) {
+            if (idVendaState !== 0) {
+                await deletarVenda(idVendaState)
+            }
+            mensagemAlerta('Ocorreram erros. Por favor, tente novamente.')
+        }
+
+        setIdVendaState(0)
+        setOcorrenciasErros([])
+    }
+
+    useEffect(() => {
+        if (ocorrenciasErros.length === qtdLinha.length) {
+            exibirResultados()
+        }
+    }, [ocorrenciasErros])
+
+    const validarCamposMotoECliente = () => {
+        if (!opcaoSelecionadaCliente.value) {
+            erros.push({ nomeInput: 'cpfCliente', mensagemErro: 'O campo CPF do Cliente é obrigatório.' })
+        }
+        if (!opcaoSelecionadaMoto.value) {
+            erros.push({ nomeInput: 'moto', mensagemErro: 'A seleção da Moto é obrigatória.' })
+        }
+    }
+
+    const resetarVenda = () => {
+        setAdicaoProduto(false)
+        definirEstadoInicialPagamentoCartao()
+        setIdProdutoIdLinhaSelecionado([])
+        definirEstadoInicialSelecaoVenda()
+        setVenda(estadoInicialVenda)
+        setProdutosSelecionados([])
+        setValoresTotais([])
+        setQtdLinha([1])
+        buscarTodos()
+        setErros([])
+    }
+
+    const resetarServico = () => {
+        setServico(estadoInicialServico)
+        setErros([])
+        setOpcaoSelecionadaFuncionario(estadoInicialOpcoesSelecoes)
+        setOpcaoSelecionadaCliente(estadoInicialOpcoesSelecoes)
+        setOpcaoSelecionadaMoto(estadoInicialOpcoesSelecoes)
+    }
+
+    const cadastrarVenda = async () => {
+        let result = null
+        if (produtosSelecionados.length) {
+            try {
+                const vendaResponse = await salvarVenda(venda)
+                result = vendaResponse.data.id
+                if (opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito") {
+                    try {
+                        await salvarPagamentoCartao({ ...pagamentoCartao, idVenda: vendaResponse.data.id })
+                        setIdVendaState(vendaResponse.data.id)
+                    } catch (error: any) {
+                        await deletarVenda(vendaResponse.data.id)
+                        salvarErros(error, erros, setErros)
+                        mensagemErro('Erro no preenchimento dos campos.')
+                    }
+                } else {
+                    setIdVendaState(vendaResponse.data.id)
+                }
+            } catch (error: any) {
+                salvarErros(error, erros, setErros)
+                mensagemErro('Erro no preenchimento dos campos.')
+            }
+        } else {
+            mensagemAlerta("Selecione algum produto.")
+        }
+
+        return result
+    }
+
+    // A VENDA ESTÁ SENDO REALIZADA MESMO SEM DADOS DE SERVIÇO, TENHO QUE CORRIGIR...
+
+    const submit = async () => {
+        let idVenda = null
+        try {
+            if (adicaoProduto) {
+                try {
+                    const responseIdVenda = await cadastrarVenda()
+                    idVenda = responseIdVenda
+                } catch (error) {
+                }
+            }
+            await salvarServico({ ...servico, idVenda })
+            resetarServico()
+            mensagemSucesso('Serviço cadastrado com sucesso!')
+        } catch (error) {
+            validarCamposMotoECliente()
+            salvarErros(error, erros, setErros)
+            mensagemErro('Erro no preenchimento dos campos.')
+        }
+    }
+
+    const alternarEstadoAdicaoProduto = () => {
+        if (adicaoProduto) {
+            setAdicaoProduto(false)
+            resetarVenda()
+            setServico({...servico, precoMaoDeObra: 0})
+        } else {
+            setAdicaoProduto(true)
+        }
+    }
+
+    if (!foiCarregado) {
+        return <h1 className="carregando">Carregando...</h1>
     }
 
     return (
@@ -157,7 +358,7 @@ export default function CadastroServico() {
                 <FormGroup label="Serviços Realizados: *" htmlFor="servicosRealizados">
                     <input
                         value={servico.servicosRealizados}
-                        onChange={e => setServico({ ...servico, servicosRealizados: e.target.value })}
+                        onChange={e => { setErros([]); setServico({ ...servico, servicosRealizados: e.target.value }) }}
                         id="servicosRealizados"
                         type="text"
                     />
@@ -167,7 +368,7 @@ export default function CadastroServico() {
                 <FormGroup label="Observação: *" htmlFor="observacao">
                     <input
                         value={servico.observacao}
-                        onChange={e => setServico({ ...servico, observacao: e.target.value })}
+                        onChange={e => { setErros([]); setServico({ ...servico, observacao: e.target.value }) }}
                         id="observacao"
                         type="text"
                     />
@@ -183,8 +384,68 @@ export default function CadastroServico() {
                     />
                     {<ExibeErro erros={erros} nomeInput='precoMaoDeObra' />}
                 </FormGroup>
+                {adicaoProduto &&
+                    <FormGroup label="Selecione a forma de pagamento*" htmlFor="formaDePagamento">
+                        <Select
+                            styles={selectStyles}
+                            placeholder="Selecione..."
+                            value={opcaoSelecionadaFormaDePagamento}
+                            onChange={(option: any) => setOpcaoSelecionadaFormaDePagamento(option)}
+                            options={formasPagamentos}
+                            instanceId="select-formaDePagamento"
+                        />
+                        {<ExibeErro erros={erros} nomeInput="formaDePagamento" />}
+                        {
+                            opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito" && (
 
+                                <PagamentoCredito
+                                    erros={erros}
+                                    totalTaxasState={totalTaxasState}
+                                    setTotalTaxaState={setTotalTaxaState}
+                                    opcaoSelecionadaBandeira={opcaoSelecionadaBandeira}
+                                    setOpcaoSelecionadaBandeira={setOpcaoSelecionadaBandeira}
+                                    opcaoSelecionadaParcela={opcaoSelecionadaParcela}
+                                    setOpcaoSelecionadaParcela={setOpcaoSelecionadaParcela}
+                                />
+
+                            )
+                        }
+                    </FormGroup>
+                }
             </Card>
+
+            {adicaoProduto ? (
+                <button
+                    onClick={alternarEstadoAdicaoProduto}>
+                    Remover Produtos
+                </button>
+            ) : (
+                <button
+                    onClick={alternarEstadoAdicaoProduto}>
+                    Adicionar Produtos
+                </button>
+            )
+            }
+
+            {
+                adicaoProduto && (
+                    <ProdutoServico
+                        produtos={produtos}
+                        setProdutos={setProdutos}
+                        todosProdutos={todosProdutos}
+                        setOcorrenciasErros={setOcorrenciasErros}
+                        idVendaState={idVendaState}
+                        qtdLinha={qtdLinha}
+                        setQtdLinha={setQtdLinha}
+                        valoresTotais={valoresTotais}
+                        setValoresTotais={setValoresTotais}
+                        produtosSelecionados={produtosSelecionados}
+                        setProdutosSelecionados={setProdutosSelecionados}
+                        idProdutoIdLinhaSelecionado={idProdutoIdLinhaSelecionado}
+                        setIdProdutoIdLinhaSelecionado={setIdProdutoIdLinhaSelecionado}
+                    />
+                )
+            }
 
             <div className="divBotaoCadastrar">
                 <button

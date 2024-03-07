@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 
-export default function TabelaTeste({ children }: { children: ReactNode }) {
+export default function TabelaVenda({ children }: { children: ReactNode }) {
   return (
     <div className="tabela-container">
       <table>

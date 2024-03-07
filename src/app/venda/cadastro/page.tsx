@@ -6,13 +6,14 @@ import { ExibeErro } from "@/components/ExibeErro"
 import { FormGroup } from "@/components/Form-group"
 import { GeradorPDF, TipoRecibo, removerProdutoOrcamento } from "@/components/GeradorPDF"
 import { LinhaTabela } from "@/components/LinhaTabela"
+import { PagamentoCredito } from "@/components/PagamentoCredito"
 import TabelaVenda from "@/components/TabelaVenda"
 import imgRemoverLinha from '@/images/icons8-delete-row-100.png'
 import imgAdicionarLinha from '@/images/icons8-insert-row-48.png'
 import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from "@/models/Selecoes"
 import { Cliente } from "@/models/cliente"
 import { Erros, salvarErros } from "@/models/erros"
-import { bandeiras, formasPagamentos, obterParcelas } from "@/models/formasPagamento"
+import { formasPagamentos } from "@/models/formasPagamento"
 import { formatarParaReal } from "@/models/formatadorReal"
 import { Funcionario } from "@/models/funcionario"
 import { PagamentoCartao, estadoInicialPagamentoCartao } from "@/models/pagamentoCartao"
@@ -43,7 +44,7 @@ export interface ProdutoSelecionadoProps {
   produto: Produto
 }
 
-interface IdProdutoEIdLinha {
+export interface IdProdutoEIdLinha {
   idProduto: number
   idLinha: number
 }
@@ -137,12 +138,6 @@ export default function CadastroVenda() {
     )
     setErros([])
   }, [opcaoSelecionadaCliente, opcaoSelecionadaFuncionario, opcaoSelecionadaFormaDePagamento])
-
-  const setPropsProdutoMoney = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value.replace(/\D/g, '')) / 100
-    const limitedValue = Math.min(value, 100000)
-    setTotalTaxaState(limitedValue)
-  }
 
   const definirEstadoInicialPagamentoCartao = () => {
     setPagamentoCartao(estadoInicialPagamentoCartao)
@@ -352,39 +347,17 @@ export default function CadastroVenda() {
           {<ExibeErro erros={erros} nomeInput="formaDePagamento" />}
           {
             opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito" && (
-              <div className="config-pagamentos">
-                <label htmlFor="select-divisoes">Parcelas</label>
-                <Select
-                  styles={selectStyles}
-                  placeholder="Selecione..."
-                  value={opcaoSelecionadaParcela}
-                  onChange={(option: any) => setOpcaoSelecionadaParcela(option)}
-                  options={obterParcelas()}
-                  instanceId="select-divisoes"
-                  id="select-divisoes"
-                />
-                {<ExibeErro erros={erros} nomeInput="parcela" />}
 
-                <label htmlFor="teste">Bandeira</label>
-                <Select
-                  styles={selectStyles}
-                  placeholder="Selecione..."
-                  value={opcaoSelecionadaBandeira}
-                  onChange={(option: any) => setOpcaoSelecionadaBandeira(option)}
-                  options={bandeiras}
-                  instanceId="select-divisoes"
-                />
-                {<ExibeErro erros={erros} nomeInput="bandeira" />}
+              <PagamentoCredito
+                erros={erros}
+                totalTaxasState={totalTaxasState}
+                setTotalTaxaState={setTotalTaxaState}
+                opcaoSelecionadaBandeira={opcaoSelecionadaBandeira}
+                setOpcaoSelecionadaBandeira={setOpcaoSelecionadaBandeira}
+                opcaoSelecionadaParcela={opcaoSelecionadaParcela}
+                setOpcaoSelecionadaParcela={setOpcaoSelecionadaParcela}
+              />
 
-                <label htmlFor="precoCusto">Total de Taxas</label>
-                <input
-                  value={formatarParaReal(totalTaxasState)}
-                  onChange={(e) => setPropsProdutoMoney(e)}
-                  id="precoCusto"
-                  type="text"
-                />
-                {<ExibeErro erros={erros} nomeInput="totalTaxas" />}
-              </div>
             )
           }
         </FormGroup>
