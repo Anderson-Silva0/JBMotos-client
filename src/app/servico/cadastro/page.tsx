@@ -28,6 +28,9 @@ import { ProdutoService } from "@/services/produtoService";
 import { ServicoService } from "@/services/servicoService";
 import { Save } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
+import Image from "next/image";
+import imgAddProduto from "@/images/icons8-add-product-66.png";
+import imgARemoveProduto from "@/images/icons8-remove-product-64.png";
 import Select from "react-select";
 
 export default function CadastroServico() {
@@ -138,23 +141,27 @@ export default function CadastroServico() {
     }, [opcaoSelecionadaCliente])
 
     useEffect(() => {
-        setServico(
-            {
-                ...servico,
-                cpfFuncionario: String(opcaoSelecionadaFuncionario?.value),
-                idMoto: Number(opcaoSelecionadaMoto.value)
-            }
-        )
-        setVenda(
-            {
-                ...venda,
-                cpfFuncionario: String(opcaoSelecionadaFuncionario?.value),
-                cpfCliente: String(opcaoSelecionadaCliente?.value),
-                formaDePagamento: String(opcaoSelecionadaFormaDePagamento?.value)
-            }
-        )
+        if (opcaoSelecionadaFuncionario.value && opcaoSelecionadaMoto.value) {
+            setServico(
+                {
+                    ...servico,
+                    cpfFuncionario: String(opcaoSelecionadaFuncionario.value),
+                    idMoto: Number(opcaoSelecionadaMoto.value)
+                }
+            )
+        }
+        if (opcaoSelecionadaFuncionario.value && opcaoSelecionadaCliente.value && opcaoSelecionadaMoto.value) {
+            setVenda(
+                {
+                    ...venda,
+                    cpfFuncionario: String(opcaoSelecionadaFuncionario.value),
+                    cpfCliente: String(opcaoSelecionadaCliente.value),
+                    formaDePagamento: String(opcaoSelecionadaFormaDePagamento.value)
+                }
+            )
+        }
         setErros([])
-    }, [opcaoSelecionadaFuncionario, opcaoSelecionadaCliente, opcaoSelecionadaFormaDePagamento])
+    }, [opcaoSelecionadaFuncionario, opcaoSelecionadaCliente, opcaoSelecionadaFormaDePagamento, opcaoSelecionadaMoto])
 
     useEffect(() => {
         const definirPagamentoCartao = () => {
@@ -190,18 +197,19 @@ export default function CadastroServico() {
     }
 
     const definirEstadoInicialSelecaoVenda = () => {
-        setOpcaoSelecionadaCliente(estadoInicialOpcoesSelecoes)
-        setOpcaoSelecionadaFuncionario(estadoInicialOpcoesSelecoes)
         setOpcaoSelecionadaFormaDePagamento(estadoInicialOpcoesSelecoes)
         setVenda({ ...venda, observacao: '' })
     }
 
     const exibirResultados = async () => {
         if (ocorrenciasErros.includes('sucesso') && !ocorrenciasErros.includes('erro')) {
-            mensagemSucesso("Venda realizada com sucesso!")
             resetarVenda()
         } else if (ocorrenciasErros.includes('erro')) {
-            if (idVendaState !== 0) {
+            if (idVendaState) {
+                console.log('ocorrenciasErros: ', ocorrenciasErros)
+                console.log('idVendaState: ', idVendaState)
+                // Está sendo executado quando eu tento salvar o serviço completo e venda completa apenas sem a informaçáo de 
+                // Total Taxas do pagamento cartão de crédito.
                 await deletarVenda(idVendaState)
             }
             mensagemAlerta('Ocorreram erros. Por favor, tente novamente.')
@@ -245,29 +253,30 @@ export default function CadastroServico() {
         setOpcaoSelecionadaFuncionario(estadoInicialOpcoesSelecoes)
         setOpcaoSelecionadaCliente(estadoInicialOpcoesSelecoes)
         setOpcaoSelecionadaMoto(estadoInicialOpcoesSelecoes)
+        setAdicaoProduto(false)
+    }
+
+    const cadastrarPagamentoCartao = () => {
+        
     }
 
     const cadastrarVenda = async () => {
-        let result = null
+        let result = []
         if (produtosSelecionados.length) {
             try {
                 const vendaResponse = await salvarVenda(venda)
-                result = vendaResponse.data.id
+                result.push(vendaResponse.data.id)
                 if (opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito") {
                     try {
                         await salvarPagamentoCartao({ ...pagamentoCartao, idVenda: vendaResponse.data.id })
-                        setIdVendaState(vendaResponse.data.id)
+                        result.push(0)
                     } catch (error: any) {
                         await deletarVenda(vendaResponse.data.id)
                         salvarErros(error, erros, setErros)
-                        mensagemErro('Erro no preenchimento dos campos.')
                     }
-                } else {
-                    setIdVendaState(vendaResponse.data.id)
                 }
             } catch (error: any) {
                 salvarErros(error, erros, setErros)
-                mensagemErro('Erro no preenchimento dos campos.')
             }
         } else {
             mensagemAlerta("Selecione algum produto.")
@@ -276,24 +285,40 @@ export default function CadastroServico() {
         return result
     }
 
-    // A VENDA ESTÁ SENDO REALIZADA MESMO SEM DADOS DE SERVIÇO, TENHO QUE CORRIGIR...
-
     const submit = async () => {
+        let resultSize = []
         let idVenda = null
         try {
             if (adicaoProduto) {
-                try {
-                    const responseIdVenda = await cadastrarVenda()
-                    idVenda = responseIdVenda
-                } catch (error) {
+                const responseIdVenda = await cadastrarVenda()
+                resultSize = responseIdVenda
+                idVenda = resultSize.filter(res => res !== 0)[0]
+                if (opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito" && resultSize.length === 1) {
+                    mensagemErro('Erro no preenchimento dos campos.')
+                } else if (opcaoSelecionadaFormaDePagamento.value !== "Cartão de Crédito" && resultSize.length === 1) {
+                    setIdVendaState(idVenda)
+                } else {
+                    setIdVendaState(idVenda)
                 }
             }
-            await salvarServico({ ...servico, idVenda })
-            resetarServico()
-            mensagemSucesso('Serviço cadastrado com sucesso!')
+            if (resultSize.length === 2 || resultSize.length === 0) {
+                await salvarServico({ ...servico, idVenda })
+                resetarServico()
+                resetarVenda()
+                mensagemSucesso('Serviço cadastrado com sucesso!')
+                definirEstadoInicialPagamentoCartao()
+            }
         } catch (error) {
-            validarCamposMotoECliente()
+            if (idVenda) {
+                try {
+                    await deletarVenda(idVenda)
+                } catch (error) {
+                }
+
+                idVenda = null
+            }
             salvarErros(error, erros, setErros)
+            validarCamposMotoECliente()
             mensagemErro('Erro no preenchimento dos campos.')
         }
     }
@@ -302,9 +327,10 @@ export default function CadastroServico() {
         if (adicaoProduto) {
             setAdicaoProduto(false)
             resetarVenda()
-            setServico({...servico, precoMaoDeObra: 0})
+            setValoresTotais(valoresTotais)
         } else {
             setAdicaoProduto(true)
+            setValoresTotais([{ idLinha: 300, valorTotal: servico.precoMaoDeObra }])
         }
     }
 
@@ -356,11 +382,10 @@ export default function CadastroServico() {
                 </FormGroup>
 
                 <FormGroup label="Serviços Realizados: *" htmlFor="servicosRealizados">
-                    <input
+                    <textarea
                         value={servico.servicosRealizados}
                         onChange={e => { setErros([]); setServico({ ...servico, servicosRealizados: e.target.value }) }}
                         id="servicosRealizados"
-                        type="text"
                     />
                     {<ExibeErro erros={erros} nomeInput='servicosRealizados' />}
                 </FormGroup>
@@ -415,14 +440,14 @@ export default function CadastroServico() {
             </Card>
 
             {adicaoProduto ? (
-                <button
-                    onClick={alternarEstadoAdicaoProduto}>
-                    Remover Produtos
+                <button onClick={alternarEstadoAdicaoProduto} title="Remover Produto"
+                    style={{ cursor: "pointer", border: "none", margin: "2vw" }}>
+                    <Image src={imgARemoveProduto} width={70} height={65} alt="" />
                 </button>
             ) : (
-                <button
-                    onClick={alternarEstadoAdicaoProduto}>
-                    Adicionar Produtos
+                <button onClick={alternarEstadoAdicaoProduto} title="Adicionar Produto"
+                    style={{ cursor: "pointer", border: "none", margin: "2vw 0 1vw 0" }}>
+                    <Image src={imgAddProduto} width={70} height={60} alt="" />
                 </button>
             )
             }
