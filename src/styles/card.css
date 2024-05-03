@@ -56,6 +56,20 @@
   font-size: 20px;
 }
 
+.card textarea {
+  max-width: 96%;
+  min-width: 96%;
+  min-height: 15vh;
+  padding: 2%;
+  font-size: 15pt;
+  font-weight: 700;
+  border: none;
+  border-radius: 15px;
+  background-color: #DEE2E6;
+  color: #495057;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
 .card input {
   font-size: 15pt;
   background-color: #DEE2E6;
@@ -67,6 +81,11 @@
   color: #495057;
   font-weight: 700;
   border: none;
+}
+
+.card textarea:hover {
+  background-color: #CED4DA;
+  box-shadow: 1px 2px 3px 1px #495057;
 }
 
 .card input:hover {

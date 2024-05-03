@@ -256,25 +256,39 @@ export default function CadastroServico() {
         setAdicaoProduto(false)
     }
 
-    const cadastrarPagamentoCartao = () => {
-        
+    const cadastrarPagamentoCartao = async (idVenda: number) => {
+        if (opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito") {
+            try {
+                await salvarPagamentoCartao({ ...pagamentoCartao, idVenda: idVenda })
+                definirEstadoInicialPagamentoCartao()
+            } catch (error: any) {
+                await deletarVenda(idVenda)
+                salvarErros(error, erros, setErros)
+            }
+        }
+    }
+
+    const cadastrarServico = async (idVenda: number | null) => {
+        try {
+            await salvarServico({ ...servico, idVenda })
+            resetarServico()
+            mensagemSucesso('Serviço cadastrado com sucesso!')
+        } catch (error) {
+            salvarErros(error, erros, setErros)
+            validarCamposMotoECliente()
+        }
     }
 
     const cadastrarVenda = async () => {
-        let result = []
+        let result = null
         if (produtosSelecionados.length) {
             try {
                 const vendaResponse = await salvarVenda(venda)
-                result.push(vendaResponse.data.id)
-                if (opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito") {
-                    try {
-                        await salvarPagamentoCartao({ ...pagamentoCartao, idVenda: vendaResponse.data.id })
-                        result.push(0)
-                    } catch (error: any) {
-                        await deletarVenda(vendaResponse.data.id)
-                        salvarErros(error, erros, setErros)
-                    }
-                }
+                resetarVenda()
+                const idVenda = vendaResponse.data.id
+                result = idVenda
+                console.log('idVenda: ', idVenda)
+                setIdVendaState(idVenda)
             } catch (error: any) {
                 salvarErros(error, erros, setErros)
             }
@@ -286,39 +300,18 @@ export default function CadastroServico() {
     }
 
     const submit = async () => {
-        let resultSize = []
         let idVenda = null
+
         try {
             if (adicaoProduto) {
-                const responseIdVenda = await cadastrarVenda()
-                resultSize = responseIdVenda
-                idVenda = resultSize.filter(res => res !== 0)[0]
-                if (opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito" && resultSize.length === 1) {
-                    mensagemErro('Erro no preenchimento dos campos.')
-                } else if (opcaoSelecionadaFormaDePagamento.value !== "Cartão de Crédito" && resultSize.length === 1) {
-                    setIdVendaState(idVenda)
-                } else {
-                    setIdVendaState(idVenda)
-                }
-            }
-            if (resultSize.length === 2 || resultSize.length === 0) {
-                await salvarServico({ ...servico, idVenda })
-                resetarServico()
-                resetarVenda()
-                mensagemSucesso('Serviço cadastrado com sucesso!')
-                definirEstadoInicialPagamentoCartao()
-            }
-        } catch (error) {
-            if (idVenda) {
-                try {
-                    await deletarVenda(idVenda)
-                } catch (error) {
-                }
+                idVenda = await cadastrarVenda()
 
-                idVenda = null
+                if (idVenda != null) {
+                    await cadastrarPagamentoCartao(idVenda)
+                }
             }
-            salvarErros(error, erros, setErros)
-            validarCamposMotoECliente()
+            await cadastrarServico(idVenda)
+        } catch (error) {
             mensagemErro('Erro no preenchimento dos campos.')
         }
     }
