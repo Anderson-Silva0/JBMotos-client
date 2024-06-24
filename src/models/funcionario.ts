@@ -1,9 +1,11 @@
+import { Endereco } from "./endereco"
+
 export interface Funcionario {
   cpf: string
   nome: string
   telefone: string
   statusFuncionario: string
-  endereco: number
+  endereco: Endereco | null
   dataHoraCadastro: string
 }
 
@@ -12,6 +14,6 @@ export const estadoInicialFuncionario: Funcionario = {
   nome: '',
   telefone: '',
   statusFuncionario: '',
-  endereco: 0,
+  endereco: null,
   dataHoraCadastro: ''
 };

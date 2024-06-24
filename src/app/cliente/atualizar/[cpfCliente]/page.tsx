@@ -28,7 +28,6 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
     buscarClientePorCpf
   } = ClienteService()
   const {
-    atualizarEndereco,
     buscarEnderecoPorId,
     obterEnderecoPorCep
   } = EnderecoService()
@@ -46,7 +45,7 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
 
   const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setEndereco({ ...endereco, [key]: e.target.value })
-    if (endereco.cep.length < 9) {
+    if (endereco.cep.length < 9 || erros) {
       setErros([])
     }
   }
@@ -60,16 +59,17 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
       const clienteResponse = (await buscarClientePorCpf(params.cpfCliente)).data as Cliente
       setCliente(clienteResponse)
 
-      const enderecoResponse = (await buscarEnderecoPorId(clienteResponse.endereco)).data as Endereco
-      setEndereco(enderecoResponse)
+      if (clienteResponse.endereco) {
+        const enderecoResponse = (await buscarEnderecoPorId(clienteResponse.endereco.id)).data as Endereco
+        setEndereco(enderecoResponse)
+      }
     }
     buscar()
   }, [])
 
   const submit = async () => {
     try {
-      await atualizarCliente(cliente.cpf, cliente)
-      await atualizarEndereco(endereco.id, endereco)
+      await atualizarCliente(cliente.cpf, { ...cliente, endereco })
       mensagemSucesso('Cliente atualizado com sucesso.')
       router.push('/cliente/listar')
     } catch (error: any) {

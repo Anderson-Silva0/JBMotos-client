@@ -25,8 +25,10 @@ export default function FornecedorCard({ fornecedor, setFornecedores }: Forneced
   useEffect(() => {
     async function buscar() {
       try {
-        const response = await buscarEnderecoPorId(fornecedor.endereco)
-        setEnderecoState(response.data)
+        if (fornecedor.endereco) {
+          const response = await buscarEnderecoPorId(fornecedor.endereco.id)
+          setEnderecoState(response.data)
+        }
       } catch (error: any) {
         mensagemErro(error.response.data)
       }

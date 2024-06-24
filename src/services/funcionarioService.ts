@@ -1,11 +1,12 @@
+import { Funcionario } from "@/models/funcionario"
 import { ApiService } from "./apiService"
 
 export const FuncionarioService = () => {
 
     const url = "/funcionario"
 
-    const salvarFuncionario = (dados: object) => {
-        return ApiService.post(`${url}`, dados)
+    const salvarFuncionario = (funcionario: Funcionario) => {
+        return ApiService.post(`${url}`, funcionario)
     }
 
     const buscarTodosFuncionarios = () => {
@@ -24,8 +25,8 @@ export const FuncionarioService = () => {
         return ApiService.patch(`${url}/alternar-status/${cpf}`)
     }
 
-    const atualizarFuncionario = (cpf: string, dados: object) => {
-        return ApiService.put(`${url}/atualizar/${cpf}`, dados)
+    const atualizarFuncionario = (cpf: string, funcionario: Funcionario) => {
+        return ApiService.put(`${url}/atualizar/${cpf}`, funcionario)
     }
 
     const deletarFuncionario = (cpf: string) => {

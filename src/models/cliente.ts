@@ -1,10 +1,12 @@
+import { Endereco } from "./endereco"
+
 export interface Cliente {
     cpf: string
     nome: string
     email: string
     telefone: string
     statusCliente: string
-    endereco: number
+    endereco: Endereco | null
     dataHoraCadastro: string
 }
 
@@ -14,6 +16,6 @@ export const estadoInicialCliente: Cliente = {
     email: '',
     telefone: '',
     statusCliente: '',
-    endereco: 0,
+    endereco: null,
     dataHoraCadastro: ''
 }

@@ -25,8 +25,10 @@ export default function ClienteCard({ cliente, setClientes }: ClienteCardProps) 
   useEffect(() => {
     async function buscar() {
       try {
-        const response = await buscarEnderecoPorId(cliente.endereco)
-        setEnderecoState(response.data)
+        if (cliente.endereco) {
+          const response = await buscarEnderecoPorId(cliente.endereco.id)
+          setEnderecoState(response.data)
+        }
       } catch (error: any) {
         mensagemErro(error.response.data)
       }

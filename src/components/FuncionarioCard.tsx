@@ -25,8 +25,10 @@ export default function FuncionarioCard({ funcionario, setFuncionarios }: Funcio
   useEffect(() => {
     async function buscar() {
       try {
-        const response = await buscarEnderecoPorId(funcionario.endereco)
-        setEnderecoState(response.data)
+        if (funcionario.endereco) {
+          const response = await buscarEnderecoPorId(funcionario.endereco.id)
+          setEnderecoState(response.data)
+        }
       } catch (error: any) {
         mensagemErro(error.response.data)
       }

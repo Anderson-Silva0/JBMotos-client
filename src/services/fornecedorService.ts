@@ -1,11 +1,12 @@
+import { Fornecedor } from "@/models/fornecedor"
 import { ApiService } from "./apiService"
 
 export const FornecedorService = () => {
 
     const url = "/fornecedor"
 
-    const salvarFornecedor = (dados: object) => {
-        return ApiService.post(`${url}`, dados)
+    const salvarFornecedor = (fornecedor: Fornecedor) => {
+        return ApiService.post(`${url}`, fornecedor)
     }
 
     const buscarTodosFornecedores = () => {
@@ -24,8 +25,8 @@ export const FornecedorService = () => {
         return ApiService.patch(`${url}/alternar-status?cnpj=${cnpj}`)
     }
 
-    const atualizarFornecedor = (cnpj: string, dados: object) => {
-        return ApiService.put(`${url}/atualizar?cnpj=${cnpj}`, dados)
+    const atualizarFornecedor = (cnpj: string, fornecedor: Fornecedor) => {
+        return ApiService.put(`${url}/atualizar?cnpj=${cnpj}`, fornecedor)
     }
 
     const deletarFornecedor = (cnpj: string) => {

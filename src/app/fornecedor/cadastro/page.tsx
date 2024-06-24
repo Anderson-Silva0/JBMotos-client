@@ -17,8 +17,6 @@ export default function CadastroFornecedor() {
   const { salvarFornecedor } = FornecedorService()
 
   const {
-    salvarEndereco,
-    deletarEndereco,
     obterEnderecoPorCep
   } = EnderecoService()
 
@@ -44,34 +42,14 @@ export default function CadastroFornecedor() {
     obterEnderecoPorCep(endereco, setEndereco, erros, setErros)
   }, [endereco.cep])
 
-  const exibirErrosFornecedor = async () => {
-    if (erros.length > 0) {
-      setErros([])
-    }
-    try {
-      await salvarFornecedor(fornecedor)
-    } catch (error) {
-      salvarErros(error, erros, setErros)
-    }
-  }
-
   const submit = async () => {
     try {
-      const responseEndereco = await salvarEndereco(endereco)
-      try {
-        await salvarFornecedor({ ...fornecedor, endereco: responseEndereco.data.id })
-        mensagemSucesso("Fornecedor cadastrado com sucesso!")
-        setFornecedor(estadoInicialFornecedor)
-        setEndereco(estadoInicialEndereco)
-        setErros([])
-      } catch (erro: any) {
-        erros.map(e => e.nomeInput === 'error' && mensagemErro(e.mensagemErro))
-        await deletarEndereco(responseEndereco.data.id)
-        mensagemErro('Erro no preenchimento dos campos')
-        salvarErros(erro, erros, setErros)
-      }
+      await salvarFornecedor({ ...fornecedor, endereco })
+      mensagemSucesso("Fornecedor cadastrado com sucesso!")
+      setFornecedor(estadoInicialFornecedor)
+      setEndereco(estadoInicialEndereco)
+      setErros([])
     } catch (erro: any) {
-      await exibirErrosFornecedor()
       mensagemErro('Erro no preenchimento dos campos.')
       salvarErros(erro, erros, setErros)
     }

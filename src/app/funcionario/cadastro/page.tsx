@@ -19,8 +19,6 @@ export default function CadastroFuncionario() {
     salvarFuncionario
   } = FuncionarioService()
   const {
-    salvarEndereco,
-    deletarEndereco,
     obterEnderecoPorCep
   } = EnderecoService()
 
@@ -46,34 +44,14 @@ export default function CadastroFuncionario() {
     obterEnderecoPorCep(endereco, setEndereco, erros, setErros)
   }, [endereco.cep])
 
-  const exibirErrosFuncionario = async () => {
-    if (erros.length > 0) {
-      setErros([])
-    }
-    try {
-      await salvarFuncionario(funcionario)
-    } catch (error) {
-      salvarErros(error, erros, setErros)
-    }
-  }
-
   const submit = async () => {
     try {
-      const responseEndereco = await salvarEndereco(endereco)
-      try {
-        await salvarFuncionario({ ...funcionario, endereco: responseEndereco.data.id })
-        mensagemSucesso("Funcionário cadastrado com sucesso!")
-        setFuncionario(estadoInicialFuncionario)
-        setEndereco(estadoInicialEndereco)
-        setErros([])
-      } catch (erro: any) {
-        erros.map(e => e.nomeInput === 'error' && mensagemErro(e.mensagemErro))
-        await deletarEndereco(responseEndereco.data.id)
-        mensagemErro('Erro no preenchimento dos campos')
-        salvarErros(erro, erros, setErros)
-      }
+      await salvarFuncionario({ ...funcionario, endereco })
+      mensagemSucesso("Funcionário cadastrado com sucesso!")
+      setFuncionario(estadoInicialFuncionario)
+      setEndereco(estadoInicialEndereco)
+      setErros([])
     } catch (erro: any) {
-      await exibirErrosFuncionario()
       mensagemErro('Erro no preenchimento dos campos.')
       salvarErros(erro, erros, setErros)
     }

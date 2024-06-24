@@ -1,11 +1,12 @@
+import { Cliente } from "@/models/cliente"
 import { ApiService } from "./apiService"
 
 export const ClienteService = () => {
 
     const url = "/cliente"
 
-    const salvarCliente = (dados: object) => {
-        return ApiService.post(`${url}`, dados)
+    const salvarCliente = (cliente: Cliente) => {
+        return ApiService.post(`${url}`, cliente)
     }
 
     const buscarTodosClientes = () => {
@@ -24,8 +25,8 @@ export const ClienteService = () => {
         return ApiService.patch(`${url}/alternar-status/${cpf}`)
     }
 
-    const atualizarCliente = (cpf: string, dados: object) => {
-        return ApiService.put(`${url}/atualizar/${cpf}`, dados)
+    const atualizarCliente = (cpf: string, cliente: Cliente) => {
+        return ApiService.put(`${url}/atualizar/${cpf}`, cliente)
     }
 
     const deletarCliente = (cpf: string) => {

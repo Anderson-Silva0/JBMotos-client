@@ -1,9 +1,11 @@
+import { Endereco } from "./endereco"
+
 export interface Fornecedor {
   cnpj: string
   nome: string
   telefone: string
   statusFornecedor: string
-  endereco: number
+  endereco: Endereco | null
   dataHoraCadastro: string
 }
 
@@ -12,6 +14,6 @@ export const estadoInicialFornecedor: Fornecedor = {
   nome: '',
   telefone: '',
   statusFornecedor: '',
-  endereco: 0,
+  endereco: null,
   dataHoraCadastro: ''
 };

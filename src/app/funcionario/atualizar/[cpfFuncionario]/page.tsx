@@ -28,7 +28,6 @@ export default function AtualizarFuncionario({ params }: AtualizarFuncionarioPro
     buscarFuncionarioPorCpf
   } = FuncionarioService()
   const {
-    atualizarEndereco,
     buscarEnderecoPorId,
     obterEnderecoPorCep
   } = EnderecoService()
@@ -46,7 +45,7 @@ export default function AtualizarFuncionario({ params }: AtualizarFuncionarioPro
 
   const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setEndereco({ ...endereco, [key]: e.target.value })
-    if (endereco.cep.length < 9) {
+    if (endereco.cep.length < 9 || erros) {
       setErros([])
     }
   }
@@ -60,16 +59,17 @@ export default function AtualizarFuncionario({ params }: AtualizarFuncionarioPro
       const funcionarioResponse = (await buscarFuncionarioPorCpf(params.cpfFuncionario)).data as Funcionario
       setFuncionario(funcionarioResponse)
 
-      const enderecoResponse = (await buscarEnderecoPorId(funcionarioResponse.endereco)).data as Endereco
-      setEndereco(enderecoResponse)
+      if (funcionarioResponse.endereco) {
+        const enderecoResponse = (await buscarEnderecoPorId(funcionarioResponse.endereco.id)).data as Endereco
+        setEndereco(enderecoResponse)
+      }
     }
     buscar()
   }, [])
 
   const submit = async () => {
     try {
-      await atualizarFuncionario(funcionario.cpf, funcionario)
-      await atualizarEndereco(endereco.id, endereco)
+      await atualizarFuncionario(funcionario.cpf, { ...funcionario, endereco })
       mensagemSucesso('Funcionário atualizado com sucesso.')
       router.push('/funcionario/listar')
     } catch (error: any) {

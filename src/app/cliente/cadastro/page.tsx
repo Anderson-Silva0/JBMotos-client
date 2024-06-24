@@ -18,8 +18,6 @@ export default function CadastroCliente() {
         salvarCliente,
     } = ClienteService()
     const {
-        salvarEndereco,
-        deletarEndereco,
         obterEnderecoPorCep
     } = EnderecoService()
 
@@ -45,34 +43,14 @@ export default function CadastroCliente() {
         obterEnderecoPorCep(endereco, setEndereco, erros, setErros)
     }, [endereco.cep])
 
-    const exibirErrosCliente = async () => {
-        if (erros.length > 0) {
-            setErros([])
-        }
-        try {
-            await salvarCliente(cliente)
-        } catch (erro: any) {
-            salvarErros(erro, erros, setErros)
-        }
-    }
-
     const submit = async () => {
         try {
-            const responseEndereco = await salvarEndereco(endereco)
-            try {
-                await salvarCliente({ ...cliente, endereco: responseEndereco.data.id })
-                mensagemSucesso("Cliente cadastrado com sucesso!")
-                setCliente(estadoInicialCliente)
-                setEndereco(estadoInicialEndereco)
-                setErros([])
-            } catch (erro: any) {
-                erros.map(e => e.nomeInput === 'error' && mensagemErro(e.mensagemErro))
-                await deletarEndereco(responseEndereco.data.id)
-                mensagemErro('Erro no preenchimento dos campos')
-                salvarErros(erro, erros, setErros)
-            }
+            await salvarCliente({ ...cliente, endereco })
+            mensagemSucesso("Cliente cadastrado com sucesso!")
+            setCliente(estadoInicialCliente)
+            setEndereco(estadoInicialEndereco)
+            setErros([])
         } catch (erro: any) {
-            await exibirErrosCliente()
             mensagemErro('Erro no preenchimento dos campos.')
             salvarErros(erro, erros, setErros)
         }

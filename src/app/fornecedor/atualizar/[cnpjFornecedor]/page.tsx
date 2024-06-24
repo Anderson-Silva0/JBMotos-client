@@ -28,7 +28,6 @@ export default function AtualizarFornecedor({ params }: AtualizarFornecedorProps
     buscarFornecedorPorCnpj
   } = FornecedorService()
   const {
-    atualizarEndereco,
     buscarEnderecoPorId,
     obterEnderecoPorCep
   } = EnderecoService()
@@ -46,7 +45,7 @@ export default function AtualizarFornecedor({ params }: AtualizarFornecedorProps
 
   const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setEndereco({ ...endereco, [key]: e.target.value })
-    if (endereco.cep.length < 9) {
+    if (endereco.cep.length < 9 || erros) {
       setErros([])
     }
   }
@@ -60,16 +59,17 @@ export default function AtualizarFornecedor({ params }: AtualizarFornecedorProps
       const fornecedorResponse = (await buscarFornecedorPorCnpj(params.cnpjFornecedor)).data as Fornecedor
       setFornecedor(fornecedorResponse)
 
-      const enderecoResponse = (await buscarEnderecoPorId(fornecedorResponse.endereco)).data as Endereco
-      setEndereco(enderecoResponse)
+      if (fornecedorResponse.endereco) {
+        const enderecoResponse = (await buscarEnderecoPorId(fornecedorResponse.endereco.id)).data as Endereco
+        setEndereco(enderecoResponse)
+      }
     }
     buscar()
   }, [])
 
   const submit = async () => {
     try {
-      await atualizarFornecedor(fornecedor.cnpj, fornecedor)
-      await atualizarEndereco(endereco.id, endereco)
+      await atualizarFornecedor(fornecedor.cnpj, { ...fornecedor, endereco })
       mensagemSucesso('Fornecedor atualizado com sucesso.')
       router.push('/fornecedor/listar')
     } catch (error: any) {
