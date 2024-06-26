@@ -10,6 +10,7 @@ import { PagamentoCredito } from "@/components/PagamentoCredito"
 import TabelaVenda from "@/components/TabelaVenda"
 import imgRemoverLinha from '@/images/icons8-delete-row-100.png'
 import imgAdicionarLinha from '@/images/icons8-insert-row-48.png'
+import { ProdutoVenda } from "@/models/ProdutoVenda"
 import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from "@/models/Selecoes"
 import { Cliente } from "@/models/cliente"
 import { Erros, salvarErros } from "@/models/erros"
@@ -24,11 +25,10 @@ import { Venda, estadoInicialVenda } from "@/models/venda"
 import { VendaService } from "@/services/VendaService"
 import { ClienteService } from "@/services/clienteService"
 import { FuncionarioService } from "@/services/funcionarioService"
-import { PagamentoCartaoService } from "@/services/pagamentoCartaoService"
 import { ProdutoService } from "@/services/produtoService"
 import { Save } from "lucide-react"
 import Image from "next/image"
-import { ChangeEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import Select from 'react-select'
 
 export interface RegistroProdutoSelecionadoProps {
@@ -54,12 +54,16 @@ export interface ValoresTotaisProps {
   idLinha: number
 }
 
+export interface ProdutoVendaIdLinhaProps {
+  produtoVenda: ProdutoVenda,
+  idLinha: number
+}
+
 export default function CadastroVenda() {
   const { buscarTodosClientes } = ClienteService()
   const { buscarTodosFuncionarios } = FuncionarioService()
   const { buscarTodosProdutos } = ProdutoService()
-  const { salvarVenda, deletarVenda } = VendaService()
-  const { salvarPagamentoCartao } = PagamentoCartaoService()
+  const { salvarVenda } = VendaService()
 
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
   const [registrosProdutosVenda, setRegistrosProdutosVenda] = useState<RegistroProdutoSelecionadoProps[]>([])
@@ -68,17 +72,16 @@ export default function CadastroVenda() {
   const [produtos, setProdutos] = useState<Produto[]>([])
   const [todosProdutos, setTodosProdutos] = useState<Produto[]>([])
   const [venda, setVenda] = useState<Venda>(estadoInicialVenda)
-  const [idVendaState, setIdVendaState] = useState<number>(0)
   const [qtdLinha, setQtdLinha] = useState<number[]>([1])
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
   const [valoresTotais, setValoresTotais] = useState<ValoresTotaisProps[]>([])
-  const [ocorrenciasErros, setOcorrenciasErros] = useState<string[]>([])
   const [idProdutoIdLinhaSelecionado, setIdProdutoIdLinhaSelecionado] = useState<IdProdutoEIdLinha[]>([])
   const [pagamentoCartao, setPagamentoCartao] = useState<PagamentoCartao>(estadoInicialPagamentoCartao)
   const [opcaoSelecionadaParcela, setOpcaoSelecionadaParcela] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
   const [opcaoSelecionadaBandeira, setOpcaoSelecionadaBandeira] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
   const [totalTaxasState, setTotalTaxaState] = useState<number | string>(0)
+  const [produtosVendaIdLinha, setProdutoVendaIdLinha] = useState<ProdutoVendaIdLinhaProps[]>([])
 
   const [opcaoSelecionadaCliente,
     setOpcaoSelecionadaCliente
@@ -146,52 +149,32 @@ export default function CadastroVenda() {
     setTotalTaxaState(0)
   }
 
-  const exibirResultados = async () => {
-    if (ocorrenciasErros.includes('sucesso') && !ocorrenciasErros.includes('erro')) {
-      mensagemSucesso("Venda realizada com sucesso!")
-
-      definirEstadoInicialPagamentoCartao()
-      setIdProdutoIdLinhaSelecionado([])
-      definirEstadoInicialSelecaoVenda()
-      setVenda(estadoInicialVenda)
-      setProdutosSelecionados([])
-      setValoresTotais([])
-      setQtdLinha([1])
-      buscarTodos()
-      setErros([])
-    } else if (ocorrenciasErros.includes('erro')) {
-      if (idVendaState !== 0) {
-        await deletarVenda(idVendaState)
-      }
-      mensagemAlerta('Ocorreram erros. Por favor, tente novamente.')
-    }
-
-    setIdVendaState(0)
-    setOcorrenciasErros([])
+  const limparTudoAposVenda = () => {
+    definirEstadoInicialPagamentoCartao()
+    setIdProdutoIdLinhaSelecionado([])
+    definirEstadoInicialSelecaoVenda()
+    setVenda(estadoInicialVenda)
+    setProdutosSelecionados([])
+    setValoresTotais([])
+    setQtdLinha([1])
+    setProdutoVendaIdLinha([])
+    buscarTodos()
+    setErros([])
   }
-
-  useEffect(() => {
-    if (ocorrenciasErros.length === qtdLinha.length) {
-      exibirResultados()
-    }
-  }, [ocorrenciasErros])
 
   const submit = async () => {
     if (produtosSelecionados.length) {
       try {
-        const vendaResponse = await salvarVenda(venda)
+        const produtosVenda = produtosVendaIdLinha.map(item => item.produtoVenda)
+
         if (opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito") {
-          try {
-            await salvarPagamentoCartao({ ...pagamentoCartao, idVenda: vendaResponse.data.id })
-            setIdVendaState(vendaResponse.data.id)
-          } catch (error: any) {
-            await deletarVenda(vendaResponse.data.id)
-            salvarErros(error, erros, setErros)
-            mensagemErro('Erro no preenchimento dos campos.')
-          }
+          await salvarVenda({ ...venda, produtosVenda, pagamentoCartao })
         } else {
-          setIdVendaState(vendaResponse.data.id)
+          await salvarVenda({ ...venda, produtosVenda: produtosVenda })
         }
+
+        mensagemSucesso("Venda realizada com sucesso!")
+        limparTudoAposVenda()
       } catch (error: any) {
         salvarErros(error, erros, setErros)
         mensagemErro('Erro no preenchimento dos campos.')
@@ -265,6 +248,10 @@ export default function CadastroVenda() {
         const idProdutoExcluido = idProdutoIdLinhaSelecionado.pop()?.idProduto
         const produtoExcluido = produtosSelecionados.filter(produto => produto.produto.id === idProdutoExcluido)[0].produto
         removerProdutoOrcamento(registrosProdutosVenda, produtoExcluido)
+
+        const indiceParaRemover = produtosVendaIdLinha.findIndex((item) => item.produtoVenda.idProduto === idProdutoExcluido)
+        produtosVendaIdLinha.splice(indiceParaRemover, 1)
+
         setProdutos([...produtos, produtoExcluido])
       }
     }
@@ -379,9 +366,7 @@ export default function CadastroVenda() {
               <LinhaTabela key={idLinha}
                 idLinha={idLinha}
                 produtos={produtos}
-                idVendaState={idVendaState}
                 qtdLinha={qtdLinha}
-                setOcorrenciasErros={setOcorrenciasErros}
                 atualizarIdProdutoIdLinhaSelecionado={atualizarIdProdutoIdLinhaSelecionado}
                 valoresTotais={valoresTotais}
                 setValoresTotais={setValoresTotais}
@@ -390,6 +375,8 @@ export default function CadastroVenda() {
                 setProdutosSelecionados={setProdutosSelecionados}
                 registrosProdutosVenda={registrosProdutosVenda}
                 setRegistrosProdutosVenda={setRegistrosProdutosVenda}
+                setProdutoVendaIdLinha={setProdutoVendaIdLinha}
+                produtoVendaIdLinha={produtosVendaIdLinha}
               />
             )
           })

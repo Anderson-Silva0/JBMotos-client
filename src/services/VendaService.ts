@@ -1,11 +1,12 @@
+import { Venda } from "@/models/venda"
 import { ApiService } from "./apiService"
 
 export const VendaService = () => {
 
   const url = "/venda"
 
-  const salvarVenda = (dados: object) => {
-    return ApiService.post(`${url}`, dados)
+  const salvarVenda = (venda: Venda) => {
+    return ApiService.post(`${url}`, venda)
   }
 
   const buscarTodasVendas = () => {
@@ -20,8 +21,8 @@ export const VendaService = () => {
     return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
   }
 
-  const atualizarVenda = (id: number, dados: object) => {
-    return ApiService.put(`${url}/atualizar/${id}`, dados)
+  const atualizarVenda = (id: number, venda: Venda) => {
+    return ApiService.put(`${url}/atualizar/${id}`, venda)
   }
 
   const deletarVenda = (id: number) => {

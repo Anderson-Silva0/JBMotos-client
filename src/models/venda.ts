@@ -1,3 +1,6 @@
+import { ProdutoVenda } from "./ProdutoVenda"
+import { PagamentoCartao } from "./pagamentoCartao"
+
 export interface Venda {
   id: number
   cpfCliente: string
@@ -5,6 +8,8 @@ export interface Venda {
   dataHoraCadastro: string
   observacao: string
   formaDePagamento: string
+  pagamentoCartao: PagamentoCartao | null,
+  produtosVenda: ProdutoVenda[]
 }
 
 export const estadoInicialVenda: Venda = {
@@ -13,5 +18,7 @@ export const estadoInicialVenda: Venda = {
   cpfFuncionario: '',
   dataHoraCadastro: '',
   observacao: '',
-  formaDePagamento: ''
+  formaDePagamento: '',
+  pagamentoCartao: null,
+  produtosVenda: []
 }

@@ -1,12 +1,11 @@
 
-import { ProdutoSelecionadoProps, RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/venda/cadastro/page"
+import { ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/venda/cadastro/page"
 import { ProdutoVenda, estadoInicialProdutoVenda } from "@/models/ProdutoVenda"
 import { Estoque, estadoInicialEstoque } from "@/models/estoque"
 import { formatarParaReal } from "@/models/formatadorReal"
 import { Produto, estadoInicialProduto } from '@/models/produto'
 import { selectStylesVenda } from '@/models/selectStyles'
-import { mensagemAlerta, mensagemErro } from "@/models/toast"
-import { ProdutoVendaService } from '@/services/ProdutoVendaService'
+import { mensagemAlerta } from "@/models/toast"
 import { EstoqueService } from "@/services/estoqueService"
 import '@/styles/tabelaVenda.css'
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react"
@@ -17,8 +16,6 @@ interface LinhaTabelaProps {
   idLinha: number
   produtos: Produto[]
   qtdLinha: number[]
-  idVendaState: number
-  setOcorrenciasErros: Dispatch<SetStateAction<string[]>>
   valoresTotais: ValoresTotaisProps[]
   setValoresTotais: Dispatch<SetStateAction<ValoresTotaisProps[]>>
   atualizarIdProdutoIdLinhaSelecionado: (idProduto: number, idLinhaAtual: number) => void
@@ -27,6 +24,8 @@ interface LinhaTabelaProps {
   setProdutosSelecionados: Dispatch<SetStateAction<ProdutoSelecionadoProps[]>>
   registrosProdutosVenda: RegistroProdutoSelecionadoProps[]
   setRegistrosProdutosVenda: Dispatch<SetStateAction<RegistroProdutoSelecionadoProps[]>>
+  setProdutoVendaIdLinha: Dispatch<SetStateAction<ProdutoVendaIdLinhaProps[]>>
+  produtoVendaIdLinha: ProdutoVendaIdLinhaProps[]
 }
 
 interface OpcaoSelecionadaProps {
@@ -40,7 +39,7 @@ const estadoInicialOpcaoSelecionada: OpcaoSelecionadaProps = {
 }
 
 export function LinhaTabela(props: LinhaTabelaProps) {
-  const { salvarProdutoVenda } = ProdutoVendaService()
+
   const { buscarEstoquePorId } = EstoqueService()
 
   const [produtoAnterior, setProdutoAnterior] = useState<ProdutoSelecionadoProps>({
@@ -52,6 +51,15 @@ export function LinhaTabela(props: LinhaTabelaProps) {
   const [opcaoSelecionada, setOpcaoSelecionada] = useState<OpcaoSelecionadaProps>(estadoInicialOpcaoSelecionada)
   const [estoqueProdutoSelecionado, setEstoqueProdutoSelecionado] = useState<Estoque>(estadoInicialEstoque)
   const [produtosAtivos, setProdutosAtivos] = useState<Produto[]>([])
+
+  useEffect(() => {
+    if (props.produtosSelecionados.length === 0) {
+      setOpcaoSelecionada(estadoInicialOpcaoSelecionada)
+      setProdutoVenda(estadoInicialProdutoVenda)
+      setEstoqueProdutoSelecionado(estadoInicialEstoque)
+      setProdutosAtivos([])
+    }
+  }, [props.produtosSelecionados])
 
   useEffect(() => {
     const buscarProdutosAtivos = () => {
@@ -171,44 +179,6 @@ export function LinhaTabela(props: LinhaTabelaProps) {
     calculo()
   }, [produtoVenda.quantidade, opcaoSelecionada?.produto.precoVenda])
 
-  useEffect(() => {
-    const salvar = async () => {
-      try {
-        const produtoVendaAtualizado = {
-          ...produtoVenda,
-          idVenda: props.idVendaState,
-          idProduto: opcaoSelecionada.produto.id
-        }
-        await salvarProdutoVenda(produtoVendaAtualizado)
-        props.setOcorrenciasErros(prevState => [...prevState, 'sucesso'])
-      } catch (error: any) {
-        props.setOcorrenciasErros(prevState => [...prevState, 'erro'])
-        mostrarErrosProdutos(error)
-      }
-      definirEstadoInicialOpcoesProdutos()
-      setOpcaoSelecionada(estadoInicialOpcaoSelecionada)
-      setProdutoVenda(estadoInicialProdutoVenda)
-    }
-    if (props.idVendaState !== 0) {
-      salvar()
-    }
-  }, [props.idVendaState])
-
-
-  const mostrarErrosProdutos = (erro: any) => {
-    const err = erro.response.data
-    if (err.quantidade) {
-      mensagemErro(err.quantidade)
-    } else if (err.error) {
-      const msgErro = 'Produto não encontrado para o Id informado.'
-      err.error === msgErro ? (
-        mensagemErro('Faltou Selecionar algum Produto.')
-      ) : (
-        mensagemErro(err.error)
-      )
-    }
-  }
-
   const setPropQuantidade = (e: ChangeEvent<HTMLInputElement>) => {
     let novoValor = Number(e.target.value)
     if (novoValor > Number(estoqueProdutoSelecionado.quantidade) && estoqueProdutoSelecionado.status !== 'INDISPONIVEL'
@@ -230,9 +200,36 @@ export function LinhaTabela(props: LinhaTabelaProps) {
     }
   }
 
-  const definirEstadoInicialOpcoesProdutos = () => {
-    setOpcaoSelecionada(estadoInicialOpcaoSelecionada)
-  }
+  useEffect(() => {
+    const addProdutosVendaList = () => {
+      const { idLinha, produtoVendaIdLinha } = props
+
+      const novoProdutoVenda = { ...produtoVenda }
+
+      if (!novoProdutoVenda.idProduto || novoProdutoVenda.idProduto !== opcaoSelecionada.produto.id) {
+        novoProdutoVenda.idProduto = opcaoSelecionada.produto.id
+        novoProdutoVenda.valorUnidade = opcaoSelecionada.produto.precoVenda
+      }
+
+      const produtoIndex = produtoVendaIdLinha.findIndex(
+        (produto) => produto.idLinha === idLinha
+      )
+
+      const newProdutoVendaIdLinha = [...produtoVendaIdLinha]
+
+      if (produtoIndex !== -1) {
+        newProdutoVendaIdLinha.splice(produtoIndex, 1, { produtoVenda: novoProdutoVenda, idLinha })
+      } else {
+        if (novoProdutoVenda.quantidade > 0) {
+          newProdutoVendaIdLinha.push({ produtoVenda: novoProdutoVenda, idLinha })
+        }
+      }
+
+      props.setProdutoVendaIdLinha(newProdutoVendaIdLinha)
+    }
+
+    addProdutosVendaList()
+  }, [produtoVenda, opcaoSelecionada])
 
   useEffect(() => {
     props.registrosProdutosVenda.forEach(produtoVenda => {
