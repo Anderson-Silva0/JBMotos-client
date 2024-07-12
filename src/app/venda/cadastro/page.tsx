@@ -216,16 +216,24 @@ export default function CadastroVenda() {
 
   const gerarMensagemAlertaProdutosAtivos = (produtosAtivos: Produto[]) => {
     let mensagem = ''
+
     if (todosProdutos.length > 1 && produtosAtivos.length > 1) {
       mensagem = `Não é possível adicionar mais linhas, pois existem  
-      ${todosProdutos.length} produtos no total, mas apenas ${produtosAtivos.length} estão ativos.`
+          ${todosProdutos.length} produtos no total`
     } else if (todosProdutos.length > 1 && produtosAtivos.length === 1) {
       mensagem = `Não é possível adicionar mais linhas, pois existem  
-      ${todosProdutos.length} produtos no total, mas apenas ${produtosAtivos.length} ativo.`
+          ${todosProdutos.length} produtos no total`
     } else if (todosProdutos.length === 1) {
       mensagem = `Não é possível adicionar mais linhas, pois existe  
-      ${todosProdutos.length} produto no total, e ${produtosAtivos.length} ativo.`
+          ${todosProdutos.length} produto no total, e ${produtosAtivos.length} ativo.`
     }
+
+    if (produtosAtivos.length < todosProdutos.length && produtosAtivos.length > 1) {
+      mensagem += `, mas apenas ${produtosAtivos.length} estão ativos.`
+    } else if (produtosAtivos.length < todosProdutos.length && produtosAtivos.length == 1 && todosProdutos.length > 1) {
+      mensagem += `, mas apenas ${produtosAtivos.length} ativo.`
+    }
+
     return mensagem
   }
 
@@ -244,15 +252,20 @@ export default function CadastroVenda() {
     if (qtdLinha.length > 1) {
       novasLinhas.pop()
       if (qtdLinha.length === idProdutoIdLinhaSelecionado.length) {
-        valoresTotais.pop()
-        const idProdutoExcluido = idProdutoIdLinhaSelecionado.pop()?.idProduto
-        const produtoExcluido = produtosSelecionados.filter(produto => produto.produto.id === idProdutoExcluido)[0].produto
-        removerProdutoOrcamento(registrosProdutosVenda, produtoExcluido)
+        const produtoExcluido = idProdutoIdLinhaSelecionado.pop()
+        if (produtoExcluido) {
+          const produtoExcluidoNoPop = produtosSelecionados.filter(produto => produto.produto.id === produtoExcluido.idProduto)[0].produto
 
-        const indiceParaRemover = produtosVendaIdLinha.findIndex((item) => item.produtoVenda.idProduto === idProdutoExcluido)
-        produtosVendaIdLinha.splice(indiceParaRemover, 1)
+          const novosValoresTotais = valoresTotais.filter(valor => valor.idLinha !== produtoExcluido.idLinha)
+          setValoresTotais(novosValoresTotais)
 
-        setProdutos([...produtos, produtoExcluido])
+          const indiceParaRemover = produtosVendaIdLinha.findIndex((item) => item.produtoVenda.idProduto === produtoExcluido.idProduto)
+          if (indiceParaRemover >= 0) {
+            produtosVendaIdLinha.splice(indiceParaRemover, 1)
+          }
+
+          setProdutos([...produtos, produtoExcluidoNoPop])
+        }
       }
     }
     setQtdLinha(novasLinhas)

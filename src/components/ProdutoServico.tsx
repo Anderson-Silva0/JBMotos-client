@@ -2,7 +2,7 @@ import TabelaVenda from "./TabelaVenda";
 import { LinhaTabela } from "./LinhaTabela";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Produto } from "@/models/produto";
-import { IdProdutoEIdLinha, ProdutoSelecionadoProps, RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/venda/cadastro/page";
+import { IdProdutoEIdLinha, ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/venda/cadastro/page";
 import { mensagemAlerta, mensagemErro } from "@/models/toast";
 import { formatarParaReal } from "@/models/formatadorReal";
 import imgRemoverLinha from '@/images/icons8-delete-row-100.png';
@@ -13,16 +13,18 @@ interface ProdutoServicoProps {
     produtos: Produto[]
     setProdutos: Dispatch<SetStateAction<Produto[]>>
     todosProdutos: Produto[]
-    idVendaState: number
     produtosSelecionados: ProdutoSelecionadoProps[]
     setProdutosSelecionados: Dispatch<SetStateAction<ProdutoSelecionadoProps[]>>
-    setOcorrenciasErros: Dispatch<SetStateAction<string[]>>
     idProdutoIdLinhaSelecionado: IdProdutoEIdLinha[]
     setIdProdutoIdLinhaSelecionado: Dispatch<SetStateAction<IdProdutoEIdLinha[]>>
-    valoresTotais: ValoresTotaisProps[]
     qtdLinha: number[]
     setQtdLinha: Dispatch<SetStateAction<number[]>>
+    valoresTotais: ValoresTotaisProps[]
     setValoresTotais: Dispatch<SetStateAction<ValoresTotaisProps[]>>
+    setProdutoVendaIdLinha: Dispatch<SetStateAction<ProdutoVendaIdLinhaProps[]>>
+    produtoVendaIdLinha: ProdutoVendaIdLinhaProps[]
+    precoServico: number
+    setPrecoServico: Dispatch<SetStateAction<number>>
 }
 
 export default function ProdutoServico(props: ProdutoServicoProps) {
@@ -64,10 +66,20 @@ export default function ProdutoServico(props: ProdutoServicoProps) {
         if (props.qtdLinha.length > 1) {
             novasLinhas.pop()
             if (props.qtdLinha.length === props.idProdutoIdLinhaSelecionado.length) {
-                props.valoresTotais.pop()
-                const idProdutoExcluido = props.idProdutoIdLinhaSelecionado.pop()?.idProduto
-                const produtoExcluido = props.produtosSelecionados.filter(produto => produto.produto.id === idProdutoExcluido)[0].produto
-                props.setProdutos([...props.produtos, produtoExcluido])
+                const produtoExcluido = props.idProdutoIdLinhaSelecionado.pop()
+                if (produtoExcluido) {
+                    const produtoExcluidoNoPop = props.produtosSelecionados.filter(produto => produto.produto.id === produtoExcluido.idProduto)[0].produto
+
+                    const novosValoresTotais = props.valoresTotais.filter(valor => valor.idLinha !== produtoExcluido.idLinha)
+                    props.setValoresTotais(novosValoresTotais)
+
+                    const indiceParaRemover = props.produtoVendaIdLinha.findIndex((item) => item.produtoVenda.idProduto === produtoExcluido.idProduto)
+                    if (indiceParaRemover >= 0) {
+                        props.produtoVendaIdLinha.splice(indiceParaRemover, 1)
+                    }
+
+                    props.setProdutos([...props.produtos, produtoExcluidoNoPop])
+                }
             }
         }
         props.setQtdLinha(novasLinhas)
@@ -75,20 +87,28 @@ export default function ProdutoServico(props: ProdutoServicoProps) {
 
     const gerarMensagemAlertaProdutosAtivos = (produtosAtivos: Produto[]) => {
         let mensagem = ''
+
         if (props.todosProdutos.length > 1 && produtosAtivos.length > 1) {
             mensagem = `Não é possível adicionar mais linhas, pois existem  
-          ${props.todosProdutos.length} produtos no total, mas apenas ${produtosAtivos.length} estão ativos.`
+          ${props.todosProdutos.length} produtos no total`
         } else if (props.todosProdutos.length > 1 && produtosAtivos.length === 1) {
             mensagem = `Não é possível adicionar mais linhas, pois existem  
-          ${props.todosProdutos.length} produtos no total, mas apenas ${produtosAtivos.length} ativo.`
+          ${props.todosProdutos.length} produtos no total`
         } else if (props.todosProdutos.length === 1) {
             mensagem = `Não é possível adicionar mais linhas, pois existe  
           ${props.todosProdutos.length} produto no total, e ${produtosAtivos.length} ativo.`
         }
+
+        if (produtosAtivos.length < props.todosProdutos.length && produtosAtivos.length > 1) {
+            mensagem += `, mas apenas ${produtosAtivos.length} estão ativos.`
+        } else if (produtosAtivos.length < props.todosProdutos.length && produtosAtivos.length == 1 && props.todosProdutos.length > 1) {
+            mensagem += `, mas apenas ${produtosAtivos.length} ativo.`
+        }
+
         return mensagem
     }
 
-    const valorTotalServico = props.valoresTotais.reduce((acumulador, valor) => acumulador + valor.valorTotal, 0)
+    const valorTotalServico = props.valoresTotais.reduce((acumulador, valor) => acumulador + valor.valorTotal, 0) + props.precoServico
 
     return (
         <div className="div-form-container">
@@ -99,9 +119,9 @@ export default function ProdutoServico(props: ProdutoServicoProps) {
                             <LinhaTabela key={idLinha}
                                 idLinha={idLinha}
                                 produtos={props.produtos}
-                                idVendaState={props.idVendaState}
                                 qtdLinha={props.qtdLinha}
-                                setOcorrenciasErros={props.setOcorrenciasErros}
+                                produtoVendaIdLinha={props.produtoVendaIdLinha}
+                                setProdutoVendaIdLinha={props.setProdutoVendaIdLinha}
                                 atualizarIdProdutoIdLinhaSelecionado={atualizarIdProdutoIdLinhaSelecionado}
                                 valoresTotais={props.valoresTotais}
                                 setValoresTotais={props.setValoresTotais}

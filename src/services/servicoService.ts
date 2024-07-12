@@ -5,8 +5,8 @@ export const ServicoService = () => {
 
     const url = "/servico"
 
-    const salvarServico = (dados: Servico) => {
-        return ApiService.post(`${url}`, dados)
+    const salvarServico = (servico: Servico) => {
+        return ApiService.post(`${url}`, servico)
     }
 
     const buscarTodosServicos = () => {
@@ -25,8 +25,8 @@ export const ServicoService = () => {
         return ApiService.get(`${url}/buscar-por-cpfFuncionario/${cpfFuncionario}`)
     }
 
-    const atualizarServico = (id: number, dados: Servico) => {
-        return ApiService.put(`${url}/atualizar/${id}`, dados)
+    const atualizarServico = (id: number, servico: Servico) => {
+        return ApiService.put(`${url}/atualizar/${id}`, servico)
     }
 
     const deletarServico = (id: number) => {

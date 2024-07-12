@@ -1,6 +1,6 @@
 'use client'
 
-import { IdProdutoEIdLinha, ProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/venda/cadastro/page";
+import { IdProdutoEIdLinha, ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, ValoresTotaisProps } from "@/app/venda/cadastro/page";
 import { Card } from "@/components/Card";
 import { ExibeErro } from "@/components/ExibeErro";
 import { FormGroup } from "@/components/Form-group";
@@ -19,11 +19,9 @@ import { selectStyles } from "@/models/selectStyles";
 import { Servico, estadoInicialServico } from "@/models/servico";
 import { mensagemAlerta, mensagemErro, mensagemSucesso } from "@/models/toast";
 import { Venda, estadoInicialVenda } from "@/models/venda";
-import { VendaService } from "@/services/VendaService";
 import { ClienteService } from "@/services/clienteService";
 import { FuncionarioService } from "@/services/funcionarioService";
 import { MotoService } from "@/services/motoService";
-import { PagamentoCartaoService } from "@/services/pagamentoCartaoService";
 import { ProdutoService } from "@/services/produtoService";
 import { ServicoService } from "@/services/servicoService";
 import { Save } from "lucide-react";
@@ -39,8 +37,6 @@ export default function CadastroServico() {
     const { buscarMotosPorCpfCliente } = MotoService()
     const { salvarServico } = ServicoService()
     const { buscarTodosProdutos } = ProdutoService()
-    const { salvarPagamentoCartao } = PagamentoCartaoService()
-    const { salvarVenda, deletarVenda } = VendaService()
 
     const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
     const [servico, setServico] = useState<Servico>(estadoInicialServico)
@@ -52,16 +48,16 @@ export default function CadastroServico() {
     const [produtos, setProdutos] = useState<Produto[]>([])
     const [todosProdutos, setTodosProdutos] = useState<Produto[]>([])
     const [venda, setVenda] = useState<Venda>(estadoInicialVenda)
-    const [ocorrenciasErros, setOcorrenciasErros] = useState<string[]>([])
-    const [idVendaState, setIdVendaState] = useState<number>(0)
     const [produtosSelecionados, setProdutosSelecionados] = useState<ProdutoSelecionadoProps[]>([])
     const [pagamentoCartao, setPagamentoCartao] = useState<PagamentoCartao>(estadoInicialPagamentoCartao)
     const [opcaoSelecionadaParcela, setOpcaoSelecionadaParcela] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
     const [opcaoSelecionadaBandeira, setOpcaoSelecionadaBandeira] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
     const [idProdutoIdLinhaSelecionado, setIdProdutoIdLinhaSelecionado] = useState<IdProdutoEIdLinha[]>([])
+    const [precoServico, setPrecoServico] = useState<number>(0)
     const [valoresTotais, setValoresTotais] = useState<ValoresTotaisProps[]>([])
     const [qtdLinha, setQtdLinha] = useState<number[]>([1])
     const [totalTaxasState, setTotalTaxaState] = useState<number | string>(0)
+    const [produtosVendaIdLinha, setProdutoVendaIdLinha] = useState<ProdutoVendaIdLinhaProps[]>([])
 
     const [
         opcaoSelecionadaFuncionario,
@@ -87,8 +83,7 @@ export default function CadastroServico() {
         const value = parseFloat(e.target.value.replace(/\D/g, '')) / 100
         const limitedValue = Math.min(value, 100000)
         setServico({ ...servico, [key]: limitedValue })
-        const filteredValoresTotais = valoresTotais.filter(vt => vt.idLinha !== 300);
-        setValoresTotais([...filteredValoresTotais, { idLinha: 300, valorTotal: limitedValue }]);
+        setPrecoServico(limitedValue)
         setErros([])
     }
 
@@ -141,25 +136,21 @@ export default function CadastroServico() {
     }, [opcaoSelecionadaCliente])
 
     useEffect(() => {
-        if (opcaoSelecionadaFuncionario.value && opcaoSelecionadaMoto.value) {
-            setServico(
-                {
-                    ...servico,
-                    cpfFuncionario: String(opcaoSelecionadaFuncionario.value),
-                    idMoto: Number(opcaoSelecionadaMoto.value)
-                }
-            )
-        }
-        if (opcaoSelecionadaFuncionario.value && opcaoSelecionadaCliente.value && opcaoSelecionadaMoto.value) {
-            setVenda(
-                {
-                    ...venda,
-                    cpfFuncionario: String(opcaoSelecionadaFuncionario.value),
-                    cpfCliente: String(opcaoSelecionadaCliente.value),
-                    formaDePagamento: String(opcaoSelecionadaFormaDePagamento.value)
-                }
-            )
-        }
+        setServico(
+            {
+                ...servico,
+                cpfFuncionario: String(opcaoSelecionadaFuncionario.value),
+                idMoto: Number(opcaoSelecionadaMoto.value)
+            }
+        )
+        setVenda(
+            {
+                ...venda,
+                cpfFuncionario: String(opcaoSelecionadaFuncionario.value),
+                cpfCliente: String(opcaoSelecionadaCliente.value),
+                formaDePagamento: String(opcaoSelecionadaFormaDePagamento.value)
+            }
+        )
         setErros([])
     }, [opcaoSelecionadaFuncionario, opcaoSelecionadaCliente, opcaoSelecionadaFormaDePagamento, opcaoSelecionadaMoto])
 
@@ -201,39 +192,6 @@ export default function CadastroServico() {
         setVenda({ ...venda, observacao: '' })
     }
 
-    const exibirResultados = async () => {
-        if (ocorrenciasErros.includes('sucesso') && !ocorrenciasErros.includes('erro')) {
-            resetarVenda()
-        } else if (ocorrenciasErros.includes('erro')) {
-            if (idVendaState) {
-                console.log('ocorrenciasErros: ', ocorrenciasErros)
-                console.log('idVendaState: ', idVendaState)
-                // Está sendo executado quando eu tento salvar o serviço completo e venda completa apenas sem a informaçáo de 
-                // Total Taxas do pagamento cartão de crédito.
-                await deletarVenda(idVendaState)
-            }
-            mensagemAlerta('Ocorreram erros. Por favor, tente novamente.')
-        }
-
-        setIdVendaState(0)
-        setOcorrenciasErros([])
-    }
-
-    useEffect(() => {
-        if (ocorrenciasErros.length === qtdLinha.length) {
-            exibirResultados()
-        }
-    }, [ocorrenciasErros])
-
-    const validarCamposMotoECliente = () => {
-        if (!opcaoSelecionadaCliente.value) {
-            erros.push({ nomeInput: 'cpfCliente', mensagemErro: 'O campo CPF do Cliente é obrigatório.' })
-        }
-        if (!opcaoSelecionadaMoto.value) {
-            erros.push({ nomeInput: 'moto', mensagemErro: 'A seleção da Moto é obrigatória.' })
-        }
-    }
-
     const resetarVenda = () => {
         setAdicaoProduto(false)
         definirEstadoInicialPagamentoCartao()
@@ -242,6 +200,7 @@ export default function CadastroServico() {
         setVenda(estadoInicialVenda)
         setProdutosSelecionados([])
         setValoresTotais([])
+        setPrecoServico(0)
         setQtdLinha([1])
         buscarTodos()
         setErros([])
@@ -256,63 +215,42 @@ export default function CadastroServico() {
         setAdicaoProduto(false)
     }
 
-    const cadastrarPagamentoCartao = async (idVenda: number) => {
-        if (opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito") {
-            try {
-                await salvarPagamentoCartao({ ...pagamentoCartao, idVenda: idVenda })
-                definirEstadoInicialPagamentoCartao()
-            } catch (error: any) {
-                await deletarVenda(idVenda)
-                salvarErros(error, erros, setErros)
-            }
-        }
-    }
-
-    const cadastrarServico = async (idVenda: number | null) => {
-        try {
-            await salvarServico({ ...servico, idVenda })
-            resetarServico()
-            mensagemSucesso('Serviço cadastrado com sucesso!')
-        } catch (error) {
-            salvarErros(error, erros, setErros)
-            validarCamposMotoECliente()
-        }
-    }
-
-    const cadastrarVenda = async () => {
-        let result = null
-        if (produtosSelecionados.length) {
-            try {
-                const vendaResponse = await salvarVenda(venda)
-                resetarVenda()
-                const idVenda = vendaResponse.data.id
-                result = idVenda
-                console.log('idVenda: ', idVenda)
-                setIdVendaState(idVenda)
-            } catch (error: any) {
-                salvarErros(error, erros, setErros)
-            }
-        } else {
-            mensagemAlerta("Selecione algum produto.")
-        }
-
-        return result
-    }
-
     const submit = async () => {
-        let idVenda = null
-
         try {
-            if (adicaoProduto) {
-                idVenda = await cadastrarVenda()
+            const produtosVenda = produtosVendaIdLinha.map(item => item.produtoVenda)
 
-                if (idVenda != null) {
-                    await cadastrarPagamentoCartao(idVenda)
+            if (adicaoProduto) {
+                if (produtosSelecionados.length) {
+                    if (venda.formaDePagamento === "Cartão de Crédito") {
+                        await salvarServico({ ...servico, venda: { ...venda, pagamentoCartao, produtosVenda, observacao: "Venda de Serviço" } })
+                    } else {
+                        await salvarServico({ ...servico, venda: { ...venda, produtosVenda, observacao: "Venda de Serviço" } })
+                    }
+                    resetarServico()
+                    resetarVenda()
+                    mensagemSucesso('Serviço cadastrado com sucesso!')
+                } else {
+                    mensagemAlerta("Selecione algum produto.")
                 }
+            } else {
+                await salvarServico({ ...servico })
+                mensagemSucesso('Serviço cadastrado com sucesso!')
+                resetarServico()
+                resetarVenda()
             }
-            await cadastrarServico(idVenda)
         } catch (error) {
-            mensagemErro('Erro no preenchimento dos campos.')
+            mensagemErro('Erro no preenchimento dos campos')
+            exibeErroCampoCliente()
+            salvarErros(error, erros, setErros)
+        }
+    }
+
+    const exibeErroCampoCliente = () => {
+        if (!opcaoSelecionadaCliente.value) {
+            setErros([...erros, {
+                nomeInput: "cpfCliente",
+                mensagemErro: "O campo CPF do Cliente é obrigatório."
+            }])
         }
     }
 
@@ -323,7 +261,7 @@ export default function CadastroServico() {
             setValoresTotais(valoresTotais)
         } else {
             setAdicaoProduto(true)
-            setValoresTotais([{ idLinha: 300, valorTotal: servico.precoMaoDeObra }])
+            setPrecoServico(servico.precoMaoDeObra)
         }
     }
 
@@ -371,7 +309,7 @@ export default function CadastroServico() {
                         options={motosCliente.map(m => ({ label: `${m.placa} | ${m.marca} ${m.modelo}`, value: m.id }) as OpcoesSelecoes)}
                         instanceId="select-idMoto"
                     />
-                    {<ExibeErro erros={erros} nomeInput="moto" />}
+                    {<ExibeErro erros={erros} nomeInput="idMoto" />}
                 </FormGroup>
 
                 <FormGroup label="Serviços Realizados: *" htmlFor="servicosRealizados">
@@ -451,16 +389,18 @@ export default function CadastroServico() {
                         produtos={produtos}
                         setProdutos={setProdutos}
                         todosProdutos={todosProdutos}
-                        setOcorrenciasErros={setOcorrenciasErros}
-                        idVendaState={idVendaState}
                         qtdLinha={qtdLinha}
                         setQtdLinha={setQtdLinha}
+                        precoServico={precoServico}
+                        setPrecoServico={setPrecoServico}
                         valoresTotais={valoresTotais}
                         setValoresTotais={setValoresTotais}
                         produtosSelecionados={produtosSelecionados}
                         setProdutosSelecionados={setProdutosSelecionados}
                         idProdutoIdLinhaSelecionado={idProdutoIdLinhaSelecionado}
                         setIdProdutoIdLinhaSelecionado={setIdProdutoIdLinhaSelecionado}
+                        produtoVendaIdLinha={produtosVendaIdLinha}
+                        setProdutoVendaIdLinha={setProdutoVendaIdLinha}
                     />
                 )
             }
