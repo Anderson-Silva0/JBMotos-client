@@ -185,6 +185,8 @@ export default function ListarVendas() {
           <VendaCard
             key={venda.id}
             id={venda.id}
+            pagamentoCartao={null}
+            produtosVenda={[]}
             cpfCliente={venda.cpfCliente}
             cpfFuncionario={venda.cpfFuncionario}
             dataHoraCadastro={venda.dataHoraCadastro}
