@@ -5,7 +5,6 @@ import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Endereco, estadoInicialEndereco } from '../models/endereco'
-import { EnderecoService } from '../services/enderecoService'
 import '../styles/cardListagem.css'
 import { ConfirmarDecisao } from './ConfirmarDecisao'
 
@@ -20,20 +19,11 @@ export default function FuncionarioCard({ funcionario, setFuncionarios }: Funcio
   const [enderecosState, setEnderecoState] = useState<Endereco>(estadoInicialEndereco)
 
   const { buscarTodosFuncionarios, alternarStatusFuncionario } = FuncionarioService()
-  const { buscarEnderecoPorId } = EnderecoService()
 
   useEffect(() => {
-    async function buscar() {
-      try {
-        if (funcionario.endereco) {
-          const response = await buscarEnderecoPorId(funcionario.endereco.id)
-          setEnderecoState(response.data)
-        }
-      } catch (error: any) {
-        mensagemErro(error.response.data)
-      }
+    if (funcionario.endereco) {
+      setEnderecoState(funcionario.endereco)
     }
-    buscar()
   }, [])
 
   const handlerAlternar = () => {

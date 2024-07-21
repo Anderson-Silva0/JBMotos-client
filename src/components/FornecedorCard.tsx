@@ -20,20 +20,10 @@ export default function FornecedorCard({ fornecedor, setFornecedores }: Forneced
   const { buscarTodosFornecedores, alternarStatusFornecedor } = FornecedorService()
   const [enderecosState, setEnderecoState] = useState<Endereco>(estadoInicialEndereco)
 
-  const { buscarEnderecoPorId } = EnderecoService()
-
   useEffect(() => {
-    async function buscar() {
-      try {
-        if (fornecedor.endereco) {
-          const response = await buscarEnderecoPorId(fornecedor.endereco.id)
-          setEnderecoState(response.data)
-        }
-      } catch (error: any) {
-        mensagemErro(error.response.data)
-      }
+    if (fornecedor.endereco) {
+      setEnderecoState(fornecedor.endereco)
     }
-    buscar()
   }, [])
 
   const handlerAlternar = () => {

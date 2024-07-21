@@ -5,7 +5,6 @@ import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Endereco, estadoInicialEndereco } from '../models/endereco'
-import { EnderecoService } from '../services/enderecoService'
 import '../styles/cardListagem.css'
 import { ConfirmarDecisao } from './ConfirmarDecisao'
 
@@ -20,20 +19,11 @@ export default function ClienteCard({ cliente, setClientes }: ClienteCardProps) 
   const [enderecosState, setEnderecoState] = useState<Endereco>(estadoInicialEndereco)
 
   const { buscarTodosClientes, alternarStatusCliente } = ClienteService()
-  const { buscarEnderecoPorId } = EnderecoService()
 
   useEffect(() => {
-    async function buscar() {
-      try {
-        if (cliente.endereco) {
-          const response = await buscarEnderecoPorId(cliente.endereco.id)
-          setEnderecoState(response.data)
-        }
-      } catch (error: any) {
-        mensagemErro(error.response.data)
-      }
+    if (cliente.endereco) {
+      setEnderecoState(cliente.endereco)
     }
-    buscar()
   }, [])
 
   const handlerAlternar = () => {
