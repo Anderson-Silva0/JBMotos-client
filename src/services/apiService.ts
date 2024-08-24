@@ -1,5 +1,8 @@
-import axios from "axios"
+import axios from "axios";
 
 export const ApiService = axios.create({
-    baseURL: "http://192.168.1.101:8080/api"
-})
+    baseURL: "https://9854-168-194-66-123.ngrok-free.app/api",
+    headers: { 
+        'ngrok-skip-browser-warning': 'true' 
+    }
+});
