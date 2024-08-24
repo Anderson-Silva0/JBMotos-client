@@ -12,7 +12,7 @@ import { Erros, salvarErros } from "@/models/erros";
 import { formasPagamentos } from "@/models/formasPagamento";
 import { formatarParaReal } from "@/models/formatadorReal";
 import { Funcionario } from "@/models/funcionario";
-import { Moto } from "@/models/moto";
+import { estadoInicialMoto, Moto } from "@/models/moto";
 import { PagamentoCartao, estadoInicialPagamentoCartao } from "@/models/pagamentoCartao";
 import { Produto } from "@/models/produto";
 import { selectStyles } from "@/models/selectStyles";
@@ -136,11 +136,13 @@ export default function CadastroServico() {
     }, [opcaoSelecionadaCliente])
 
     useEffect(() => {
+        let motoResult = estadoInicialMoto
+        motoResult.id = Number(opcaoSelecionadaMoto.value)
         setServico(
             {
                 ...servico,
                 cpfFuncionario: String(opcaoSelecionadaFuncionario.value),
-                idMoto: Number(opcaoSelecionadaMoto.value)
+                moto: motoResult
             }
         )
         setVenda(
