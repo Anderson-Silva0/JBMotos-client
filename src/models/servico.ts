@@ -1,9 +1,10 @@
+import { estadoInicialMoto, Moto } from "./moto"
 import { Venda } from "./venda"
 
 export interface Servico {
     id: number,
     cpfFuncionario: string,
-    idMoto: number,
+    moto: Moto,
     venda: Venda | null,
     dataHoraCadastro: string,
     servicosRealizados: string,
@@ -14,7 +15,7 @@ export interface Servico {
 export const estadoInicialServico: Servico = {
     id: 0,
     cpfFuncionario: '',
-    idMoto: 0,
+    moto: estadoInicialMoto,
     venda: null,
     dataHoraCadastro: '',
     servicosRealizados: '',

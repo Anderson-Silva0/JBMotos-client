@@ -29,6 +29,10 @@ export const ServicoService = () => {
         return ApiService.put(`${url}/atualizar/${id}`, servico)
     }
 
+    const filtrarServico = (nomeCampo: string, valor: string) => {
+        return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
+    }
+
     const deletarServico = (id: number) => {
         return ApiService.delete(`${url}/deletar/${id}`)
     }
@@ -37,6 +41,7 @@ export const ServicoService = () => {
         salvarServico,
         buscarTodosServicos,
         buscarServicoPorId,
+        filtrarServico,
         buscarServicoPorIdVenda,
         buscarServicoPorCpfFuncionario,
         atualizarServico,
