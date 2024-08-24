@@ -417,4 +417,8 @@
     width: 32vw;
     margin: 1px;
   }
+
+  .cardListagem-container-venda {
+    width: 98%;
+  }
 }
