@@ -86,7 +86,7 @@ label {
 .logo {
   border-radius: 25px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 10px 0 20px rgba(255, 255, 255, 0.3);
-  width: 105px;
+  width: 10em;
   height: 90%;
 }
 
@@ -127,7 +127,7 @@ label {
   .logo {
     border-radius: 25px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 10px 0 20px rgba(255, 255, 255, 0.3);
-    width: 110px;
+    width: 18vmax;
     height: 100%;
   }
 
