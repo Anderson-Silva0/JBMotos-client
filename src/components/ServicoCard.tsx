@@ -73,33 +73,34 @@ export default function ServicoCard(servico: Servico) {
           <div className='div-resultado'>{funcionarioState.nome}</div>
           <div className='div-dados'>CPF do Funcionário</div>
           <div className='div-resultado'>{funcionarioState.cpf}</div>
-          <div className='div-dados'>Data e Hora de Cadastro da Serviço</div>
+          <div className='div-dados'>Data e Hora de Cadastro do Serviço</div>
           <div className='div-resultado'>{servico.dataHoraCadastro}</div>
         </div>
         <div className='items'>
           <div className='div-dados'>Motocicleta</div>
-          <div className='div-resultado'>{servico.moto.marca} | {servico.moto.modelo}</div>
+          <div className='div-resultado'>{servico.moto.marca} {servico.moto.modelo} <span style={{ fontWeight: 'bolder' }}>[ {servico.moto.placa} ]</span></div>
           <div className='div-dados' style={!servico.observacao ? { display: 'none' } : undefined}>Observação</div>
           <div className='div-resultado'>{servico.observacao}</div>
           <div className='div-dados'>Preço de Mão de Obra</div>
           <div className='div-resultado'>{formatarParaReal(servico.precoMaoDeObra)}</div>
           <div className='div-dados'>Serviços realizados</div>
           <div className='div-resultado'>{servico.servicosRealizados}</div>
-          {servico.venda && (
-            <>
-              <div className='div-dados' style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  Preço da Venda
+          {
+            servico.venda && (
+              <>
+                <div className='div-dados' style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div>
+                    Preço da Venda
+                  </div>
+                  <div title='Ver Produtos da Venda' onClick={listarProdutosVenda}>
+                    <PackageSearch width={30} height={30} style={{ cursor: 'pointer' }} />
+                  </div>
                 </div>
-                <div title='Ver Produtos da Venda' onClick={listarProdutosVenda}>
-                  <PackageSearch width={30} height={30} style={{ cursor: 'pointer' }} />
-                </div>
-              </div>
-              <div className='div-resultado'>{formatarParaReal(valorTotalVendaState)}</div>
-              <div className='div-dados'>Total do Serviço</div>
-              <div className='div-resultado'>{formatarParaReal(valorTotalVendaState + servico.precoMaoDeObra)}</div>
-            </>
-          )
+                <div className='div-resultado'>{formatarParaReal(valorTotalVendaState)}</div>
+                <div className='div-dados'>Total do Serviço</div>
+                <div className='div-resultado'>{formatarParaReal(valorTotalVendaState + servico.precoMaoDeObra)}</div>
+              </>
+            )
           }
         </div>
       </div>
