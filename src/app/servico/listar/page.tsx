@@ -80,7 +80,7 @@ export default function ListarServicos() {
                 <Image src={imgVenda} width={60} height={60} alt="" /> {servicos.length} Serviço Realizado
               </>
             ) : (
-              'Nenhum Serviço realizada no sistema'
+              'Nenhum Serviço realizado no sistema'
             )
           ) : campoSelecionado !== '' && valorInputBuscar !== '' && (
             <>

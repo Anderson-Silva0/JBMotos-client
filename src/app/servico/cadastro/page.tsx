@@ -308,7 +308,7 @@ export default function CadastroServico() {
                         placeholder="Selecione..."
                         value={opcaoSelecionadaMoto}
                         onChange={(option: any) => setOpcaoSelecionadaMoto(option)}
-                        options={motosCliente.map(m => ({ label: `${m.placa} | ${m.marca} ${m.modelo}`, value: m.id }) as OpcoesSelecoes)}
+                        options={motosCliente.map(m => ({ label: `${m.marca} ${m.modelo} - [ ${m.placa} ]`, value: m.id }) as OpcoesSelecoes)}
                         instanceId="select-idMoto"
                     />
                     {<ExibeErro erros={erros} nomeInput="idMoto" />}
