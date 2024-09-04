@@ -1,8 +1,9 @@
 import axios from "axios"
 
 export const ApiService = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_NGROK_URL + "/api",
+    baseURL: process.env.NEXT_PUBLIC_BASE_URL + "/api",
     headers: {
-        'ngrok-skip-browser-warning': 'true'
+        'Content-Type': 'application/json',
+        //'ngrok-skip-browser-warning': 'true'
     }
 })

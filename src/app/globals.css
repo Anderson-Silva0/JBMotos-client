@@ -54,6 +54,7 @@ body {
   flex-direction: column;
   align-items: center;
   width: 50%;
+  height: 88%;
 }
 
 label {
@@ -88,9 +89,25 @@ label {
 }
 
 .div-login-pair {
+  position: relative;
   display: flex;
-  padding: 0.8em 0 0.8em 0;
+  padding: 0.8em 0 1.2em 0;
   gap: 0.4em;
+}
+
+.div-msg {
+  position: absolute;
+  text-wrap: nowrap;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
+#olho-id {
+  position: absolute;
+  right: 0; 
+  bottom: 12%;
+  cursor: pointer;
 }
 
 .divBotaoCadastrar, .divBotaoCadastrarLogin button:hover {

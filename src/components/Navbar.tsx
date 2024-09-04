@@ -110,7 +110,6 @@ export default function NavBar() {
                     </ul>
                 </nav>
             </header>
-            <main></main>
         </>
     )
 }
