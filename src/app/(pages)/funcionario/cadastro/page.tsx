@@ -4,29 +4,42 @@ import { Card } from "@/components/Card"
 import { ExibeErro } from "@/components/ExibeErro"
 import { FormGroup } from "@/components/Form-group"
 import { InputCep, InputCpf, InputTelefone } from "@/components/Input"
+import { AuthRegisterModelFuncionario, estadoInicialAuthRegisterModelFuncionario, ROLE, roleSelectOptions } from "@/models/authRegisterModel"
 import { Endereco, estadoInicialEndereco } from "@/models/endereco"
 import { Erros, salvarErros } from "@/models/erros"
-import { Funcionario, estadoInicialFuncionario } from "@/models/funcionario"
+import { estadoInicialFuncionario, Funcionario } from "@/models/funcionario"
+import { estadoInicialOpcoesSelecoes, OpcoesSelecoes } from "@/models/Selecoes"
+import { selectStyles } from "@/models/selectStyles"
 import { mensagemErro, mensagemSucesso } from "@/models/toast"
+import { AuthenticationService } from "@/services/authenticationService"
 import { EnderecoService } from "@/services/enderecoService"
-import { FuncionarioService } from "@/services/funcionarioService"
 import { Save } from 'lucide-react'
 import { ChangeEvent, useEffect, useState, } from "react"
+import Select from 'react-select'
 
 export default function CadastroFuncionario() {
 
   const {
-    salvarFuncionario
-  } = FuncionarioService()
+    authRegisterFuncionario
+  } = AuthenticationService()
   const {
     obterEnderecoPorCep
   } = EnderecoService()
 
   const [erros, setErros] = useState<Erros[]>([])
-
+  const [authFuncionario, setAuthFuncionario] = useState<AuthRegisterModelFuncionario>(estadoInicialAuthRegisterModelFuncionario)
   const [funcionario, setFuncionario] = useState<Funcionario>(estadoInicialFuncionario)
-
   const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
+  const [confirmarSenha, setConfirmarSenha] = useState<string>('')
+
+  const [opcaoSelecionadaRole,
+    setOpcaoSelecionadaRole
+  ] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
+
+  const setPropsAuthFuncionario = (key: string, e: ChangeEvent<HTMLInputElement>) => {
+    setAuthFuncionario({ ...authFuncionario, [key]: e.target.value })
+    setErros([])
+  }
 
   const setPropsFuncionario = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setFuncionario({ ...funcionario, [key]: e.target.value })
@@ -44,15 +57,33 @@ export default function CadastroFuncionario() {
     obterEnderecoPorCep(endereco, setEndereco, erros, setErros)
   }, [endereco.cep])
 
+  useEffect(() => {
+    setAuthFuncionario(
+      {
+        ...authFuncionario,
+        role: String(opcaoSelecionadaRole?.value)
+      }
+    )
+    setErros([])
+  }, [opcaoSelecionadaRole])
+
   const submit = async () => {
     try {
-      await salvarFuncionario({ ...funcionario, endereco })
+      if (confirmarSenha === authFuncionario.senha) {
+        await authRegisterFuncionario({ ...authFuncionario, funcionario: { ...funcionario, endereco } })
+      } else {
+        throw new Error()
+      }
       mensagemSucesso("Funcionário cadastrado com sucesso!")
+      setAuthFuncionario(estadoInicialAuthRegisterModelFuncionario)
       setFuncionario(estadoInicialFuncionario)
       setEndereco(estadoInicialEndereco)
       setErros([])
     } catch (erro: any) {
       mensagemErro('Erro no preenchimento dos campos.')
+      if (confirmarSenha != authFuncionario.senha) {
+        mensagemErro("As senhas não estão iguais.")
+      }
       salvarErros(erro, erros, setErros)
     }
   }
@@ -85,6 +116,45 @@ export default function CadastroFuncionario() {
             onChange={e => setPropsFuncionario("telefone", e)}
           />
           {<ExibeErro erros={erros} nomeInput='telefone' />}
+        </FormGroup>
+        <FormGroup label="Login: *" htmlFor="login">
+          <input
+            value={authFuncionario.login}
+            id="email"
+            onChange={e => setPropsAuthFuncionario("login", e)}
+            type="text"
+          />
+          {<ExibeErro erros={erros} nomeInput='login' />}
+          {<ExibeErro erros={erros} nomeInput='loginError' />}
+        </FormGroup>
+        <FormGroup label="Senha: *" htmlFor="senha">
+          <input
+            value={authFuncionario.senha}
+            onChange={e => setPropsAuthFuncionario("senha", e)}
+            id="senha"
+            type="password"
+          />
+          {<ExibeErro erros={erros} nomeInput='senha' />}
+        </FormGroup>
+        <FormGroup label="Confirmar senha: *" htmlFor="confirmar-senha">
+          <input
+            value={confirmarSenha}
+            onChange={e => setConfirmarSenha(e.target.value)}
+            id="confirmar-senha"
+            type="password"
+          />
+          {<ExibeErro erros={erros} nomeInput='confirmarSenha' />}
+        </FormGroup>
+        <FormGroup label="Permissão no Sistema: *" htmlFor="formaDePagamento">
+          <Select
+            styles={selectStyles}
+            placeholder="Selecione..."
+            value={opcaoSelecionadaRole}
+            onChange={(option: any) => setOpcaoSelecionadaRole(option)}
+            options={roleSelectOptions}
+            instanceId="select-divisoes"
+          />
+          {<ExibeErro erros={erros} nomeInput='role' />}
         </FormGroup>
       </Card>
       <Card titulo="Endereço do Funcionário">

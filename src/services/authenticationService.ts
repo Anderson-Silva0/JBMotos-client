@@ -1,3 +1,4 @@
+import { AuthRegisterModelFuncionario } from "@/models/authRegisterModel"
 import { ApiService } from "./apiService"
 import { Authentication } from "@/models/authentication"
 
@@ -9,12 +10,12 @@ export const AuthenticationService = () => {
         return ApiService.post(`${url}/login`, auth)
     }
 
-    const authRegister = () => {
-        return ApiService.post(`${url}/cadastrar`)
+    const authRegisterFuncionario = (authFuncionario: AuthRegisterModelFuncionario) => {
+        return ApiService.post(`${url}/cadastrar`, authFuncionario)
     }
 
     return {
         authLogin,
-        authRegister
+        authRegisterFuncionario
     }
 }

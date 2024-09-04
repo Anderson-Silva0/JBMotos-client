@@ -45,7 +45,6 @@ export default function Login() {
       router.push('/home')
     } catch (erro: any) {
       salvarErros(erro, erros, setErros)
-      console.log(erro)
       if (erro && erro.response && erro.response.data && erro.response.data.loginError) {
         mensagemErro(erro.response.data.loginError)
       }

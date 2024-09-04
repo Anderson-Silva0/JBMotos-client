@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { decode } from 'jsonwebtoken'
 
-interface DecodedToken {
+export interface DecodedToken {
     sub: string
     userName: string
     exp: number
@@ -27,9 +27,9 @@ export function middleware(request: NextRequest) {
         try {
             const decodedToken = decode(token) as DecodedToken
             expirationDate = new Date(decodedToken.exp * 1000)
+            
             if (CURRENT_DATE_MILLIS >= expirationDate.getTime()) {
                 if (request.nextUrl.pathname != '/') {
-                    console.log('removeu')
                     return NextResponse.redirect(logoutUrl)
                 }
                 return NextResponse.redirect(loginUrl)
@@ -48,7 +48,6 @@ export function middleware(request: NextRequest) {
     }
 
     return response
-
 }
 
 export const config = {

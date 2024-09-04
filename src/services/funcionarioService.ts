@@ -5,10 +5,6 @@ export const FuncionarioService = () => {
 
     const url = "/funcionario"
 
-    const salvarFuncionario = (funcionario: Funcionario) => {
-        return ApiService.post(`${url}`, funcionario)
-    }
-
     const buscarTodosFuncionarios = () => {
         return ApiService.get(`${url}/buscar-todos`)
     }
@@ -34,7 +30,6 @@ export const FuncionarioService = () => {
     }
 
     return {
-        salvarFuncionario,
         buscarTodosFuncionarios,
         buscarFuncionarioPorCpf,
         filtrarFuncionario,
