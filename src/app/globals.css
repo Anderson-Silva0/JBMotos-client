@@ -4,6 +4,11 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
+html {
+  min-height: 100vh;
+  height: 100%;
+}
+
 body {
   position: relative;
   overflow-x: hidden;
@@ -36,7 +41,8 @@ body {
   justify-content: center;
 }
 
-.divBotaoCadastrar, .divBotaoCadastrarLogin {
+.divBotaoCadastrar,
+.divBotaoCadastrarLogin {
   display: flex;
   justify-content: center;
   width: 100%;
@@ -62,7 +68,12 @@ label {
   display: block;
 }
 
-.divBotaoCadastrar, .divBotaoCadastrarLogin button {
+.divBotaoCadastrar button {
+  border-radius: 2vw;
+  font-size: 2.4vw;
+  margin: 3vh;
+  padding: 1.2%;
+
   max-width: 25%;
   border: none;
   background-image: linear-gradient(to top, #002855 40%, #0353A4);
@@ -73,19 +84,21 @@ label {
   transition: background-color 0.2s, transform 0.2s;
 }
 
-.divBotaoCadastrar button {
-  border-radius: 2vw;
-  font-size: 2.4vw;
-  margin: 3vh;
-  padding: 1.2%;
-}
-
 .divBotaoCadastrarLogin button {
   min-width: 25%;
   border-radius: 1vw;
   font-size: 1em;
   margin: 1vh;
   padding: 1.6%;
+
+  max-width: 25%;
+  border: none;
+  background-image: linear-gradient(to top, #002855 40%, #0353A4);
+  color: #979DAC;
+  font-weight: 900;
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
 }
 
 .div-login-pair {
@@ -105,17 +118,28 @@ label {
 
 #olho-id {
   position: absolute;
-  right: 0; 
+  right: 0;
   bottom: 12%;
   cursor: pointer;
 }
 
-.divBotaoCadastrar, .divBotaoCadastrarLogin button:hover {
+.divBotaoCadastrar button:hover {
   background-image: linear-gradient(to top, #002855 10%, #0353A4);
   box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
 }
 
-.divBotaoCadastrar, .divBotaoCadastrarLogin button:active {
+.divBotaoCadastrar button:active {
+  background: linear-gradient(to right, rgb(40, 80, 120), rgb(10, 25, 60));
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.divBotaoCadastrarLogin button:hover {
+  background-image: linear-gradient(to top, #002855 10%, #0353A4);
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.divBotaoCadastrarLogin button:active {
   background: linear-gradient(to right, rgb(40, 80, 120), rgb(10, 25, 60));
   transform: translateY(3px);
   box-shadow: none;

@@ -15,11 +15,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-br" style={{height: '100vh'}}>
+    <html lang="pt-br">
       <body className={inter.className}>
-        <div className='div-principal'>
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   )

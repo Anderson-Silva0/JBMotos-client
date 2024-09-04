@@ -53,48 +53,50 @@ export default function Login() {
   }
 
   return (
-    <div className='div-form-container-login'>
-      <Card titulo="Login">
-        <FormGroup label="" htmlFor="login">
-          <div className='div-login-pair'>
-            <User size='8vh' strokeWidth={3} />
-            <input
-              value={authentication.login}
-              onChange={e => setPropsAuthentication("login", e)}
-              id="login"
-              placeholder="Login"
-              type="email"
-            />
-            <div className='div-msg'>
-              {<ExibeErro erros={erros} nomeInput='login' />}
+    <div className='div-principal'>
+      <div className='div-form-container-login'>
+        <Card titulo="Login">
+          <FormGroup label="" htmlFor="login">
+            <div className='div-login-pair'>
+              <User size='8vh' strokeWidth={3} />
+              <input
+                value={authentication.login}
+                onChange={e => setPropsAuthentication("login", e)}
+                id="login"
+                placeholder="Login"
+                type="email"
+              />
+              <div className='div-msg'>
+                {<ExibeErro erros={erros} nomeInput='login' />}
+              </div>
             </div>
-          </div>
-        </FormGroup>
-        <FormGroup label="" htmlFor="email">
-          <div className='div-login-pair'>
-            <LockIcon size='8vh' strokeWidth={3} />
-            <input
-              value={authentication.senha}
-              onChange={e => setPropsAuthentication("senha", e)}
-              id="email"
-              placeholder="Senha"
-              type={inputType}
-            />
-            <div className='div-msg'>
-              {<ExibeErro erros={erros} nomeInput='senha' />}
+          </FormGroup>
+          <FormGroup label="" htmlFor="email">
+            <div className='div-login-pair'>
+              <LockIcon size='8vh' strokeWidth={3} />
+              <input
+                value={authentication.senha}
+                onChange={e => setPropsAuthentication("senha", e)}
+                id="email"
+                placeholder="Senha"
+                type={inputType}
+              />
+              <div className='div-msg'>
+                {<ExibeErro erros={erros} nomeInput='senha' />}
+              </div>
             </div>
+          </FormGroup>
+          <div id="olho-id">
+            <Olho estaVisivel={estaVisivel} setEstaVisivel={setEstaVisivel} isLogin={true} />
           </div>
-        </FormGroup>
-        <div id="olho-id">
-          <Olho estaVisivel={estaVisivel} setEstaVisivel={setEstaVisivel} isLogin={true} />
+        </Card>
+        <div className="divBotaoCadastrarLogin">
+          <button
+            onClick={submit}
+            type="submit">
+            Entrar
+          </button>
         </div>
-      </Card>
-      <div className="divBotaoCadastrarLogin">
-        <button
-          onClick={submit}
-          type="submit">
-          Entrar
-        </button>
       </div>
     </div>
   )
