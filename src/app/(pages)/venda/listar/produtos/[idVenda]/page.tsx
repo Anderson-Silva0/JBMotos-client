@@ -1,54 +1,83 @@
+'use client'
+
 import { LinhaProduto } from "@/components/LinhaProduto"
 import { Olho } from "@/components/Olho"
 import TabelaVenda from "@/components/TabelaVenda"
 import imgProduto from '@/images/checklist.png'
 import imgVenda from '@/images/vendas.png'
-import { ProdutoVenda } from "@/models/ProdutoVenda"
+import { estadoInicialProdutoVenda, ProdutoVenda } from "@/models/ProdutoVenda"
 import { formatarParaReal } from "@/models/formatadorReal"
 import { Produto } from "@/models/produto"
+import { mensagemErro } from "@/models/toast"
 import { ProdutoVendaService } from "@/services/ProdutoVendaService"
 import { VendaService } from "@/services/VendaService"
 import { ProdutoService } from "@/services/produtoService"
 import '@/styles/cardListagem.css'
 import Image from "next/image"
+import { useEffect, useState } from "react"
 
-interface ProdutosDoVendaProps {
+interface ProdutosDaVendaProps {
   params: {
     idVenda: number
   }
 }
 
-export default async function ProdutosDoVenda({ params }: ProdutosDoVendaProps) {
+export default function ProdutosDaVenda({ params }: ProdutosDaVendaProps) {
   const { buscarProdutoPorId } = ProdutoService()
 
   const { buscarTodosPorIdVenda } = ProdutoVendaService()
 
   const { valorTotalDaVenda, lucroDaVenda } = VendaService()
 
-  const produtosDoVendaResponse: ProdutoVenda[] = (await buscarTodosPorIdVenda(params.idVenda)).data
+  const [produtosDaVendaState, setProdutosDaVendaState] = useState<ProdutoVenda[]>([])
+  const [valorTotalVenda, setValorTotalVenda] = useState<number>(0)
+  const [lucroDaVendaState, setLucroDaVendaState] = useState<number>(0)
+  const [idNomeProdutoMap, setIdNomeProdutoMap] = useState<Map<number, string>>()
 
-  const valorTotalVenda = (await valorTotalDaVenda(params.idVenda)).data
-  const lucroVenda: number = (await lucroDaVenda(params.idVenda)).data
+  useEffect(() => {
+    const buscarInformacoesDaVenda = async () => {
+      try {
+        const produtosDaVendaResponse = await buscarTodosPorIdVenda(params.idVenda)
+        setProdutosDaVendaState(produtosDaVendaResponse.data)
 
-  const obterNomeProduto = async (idProduto: number) => {
-    const produtoResponse = (await buscarProdutoPorId(idProduto)).data as Produto
-    return produtoResponse.nome
-  }
+        const valorTotalVendaResponse = await valorTotalDaVenda(params.idVenda)
+        setValorTotalVenda(valorTotalVendaResponse.data)
+
+        const lucroDaVendaResponse = await lucroDaVenda(params.idVenda)
+        setLucroDaVendaState(lucroDaVendaResponse.data)
+
+        const mapIdNomeProduto = new Map<number, string>()
+
+        const promises = produtosDaVendaResponse.data.map(async (prod: ProdutoVenda) => {
+          const response = await buscarProdutoPorId(prod.idProduto)
+          const produtoResponse = response.data as Produto
+          mapIdNomeProduto.set(produtoResponse.id, produtoResponse.nome)
+        })
+
+        await Promise.all(promises)
+
+        setIdNomeProdutoMap(mapIdNomeProduto)
+      } catch (erro: any) {
+        mensagemErro("Erro ao carregar dados.")
+      }
+    }
+    buscarInformacoesDaVenda()
+  }, [])
 
   return (
     <div className="div-container-produtoVenda">
       <h1 className="centered-text">
         {
-          produtosDoVendaResponse.length > 1 ? (
+          produtosDaVendaState.length > 1 ? (
             <>
               A <Image src={imgVenda} width={60} height={60} alt="" /> Venda
-              contém {produtosDoVendaResponse.length} Produtos { }
+              contém {produtosDaVendaState.length} Produtos { }
               <Image src={imgProduto} width={60} height={60} alt="" />
             </>
-          ) : produtosDoVendaResponse.length === 1 && (
+          ) : produtosDaVendaState.length === 1 && (
             <>
               A <Image src={imgVenda} width={60} height={60} alt="" /> Venda
-              contém {produtosDoVendaResponse.length} Produto { }
+              contém {produtosDaVendaState.length} Produto { }
               <Image src={imgProduto} width={60} height={60} alt="" />
             </>
           )
@@ -57,7 +86,7 @@ export default async function ProdutosDoVenda({ params }: ProdutosDoVendaProps) 
       <div className="cardListagem-container">
         <span id="info-title-venda">
           {
-            produtosDoVendaResponse.length === 1 ? (
+            produtosDaVendaState.length === 1 ? (
               <div className="div-dados-title">
                 Detalhes do Produto
               </div>
@@ -70,9 +99,10 @@ export default async function ProdutosDoVenda({ params }: ProdutosDoVendaProps) 
         </span>
         <TabelaVenda>
           {
-            await Promise.all(
-              produtosDoVendaResponse.map(async (produtoVenda) => {
-                const nomeProduto = await obterNomeProduto(produtoVenda.idProduto)
+            produtosDaVendaState.map((produtoVenda) => {
+              const nomeProduto = idNomeProdutoMap?.get(produtoVenda.idProduto)
+              console.log('nomeProduto: ', nomeProduto)
+              if (nomeProduto) {
                 return (
                   <LinhaProduto
                     key={produtoVenda.id}
@@ -80,8 +110,8 @@ export default async function ProdutosDoVenda({ params }: ProdutosDoVendaProps) 
                     produtoVenda={produtoVenda}
                   />
                 )
-              })
-            )
+              }
+            })
           }
         </TabelaVenda>
       </div>
@@ -89,7 +119,7 @@ export default async function ProdutosDoVenda({ params }: ProdutosDoVendaProps) 
         <div className='div-dados-title'>Total da Venda</div>
         <div className='div-resultado'>{formatarParaReal(valorTotalVenda)}</div>
         <div className='div-dados-title'>Lucro da Venda</div>
-        <Olho lucroVenda={formatarParaReal(lucroVenda)} />
+        <Olho isLogin={false} lucroVenda={formatarParaReal(lucroDaVendaState)} />
       </div>
     </div>
   )

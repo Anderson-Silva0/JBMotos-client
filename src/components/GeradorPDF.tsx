@@ -1,4 +1,4 @@
-import { RegistroProdutoSelecionadoProps } from '@/app/venda/cadastro/page'
+import { RegistroProdutoSelecionadoProps } from '@/app/(pages)/venda/cadastro/page'
 import { Produto } from '@/models/produto'
 import '@/styles/home.css'
 import jsPDF from 'jspdf'

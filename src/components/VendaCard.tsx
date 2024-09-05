@@ -1,4 +1,4 @@
-import { RegistroProdutoSelecionadoProps } from '@/app/venda/cadastro/page'
+import { RegistroProdutoSelecionadoProps } from '@/app/(pages)/venda/cadastro/page'
 import { ProdutoVenda } from '@/models/ProdutoVenda'
 import { Cliente, estadoInicialCliente } from '@/models/cliente'
 import { formatarParaReal } from '@/models/formatadorReal'

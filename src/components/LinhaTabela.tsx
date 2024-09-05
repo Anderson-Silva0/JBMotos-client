@@ -1,5 +1,5 @@
 
-import { ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/venda/cadastro/page"
+import { ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/(pages)/venda/cadastro/page"
 import { ProdutoVenda, estadoInicialProdutoVenda } from "@/models/ProdutoVenda"
 import { Estoque, estadoInicialEstoque } from "@/models/estoque"
 import { formatarParaReal } from "@/models/formatadorReal"

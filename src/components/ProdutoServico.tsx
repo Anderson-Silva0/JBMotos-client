@@ -2,7 +2,7 @@ import TabelaVenda from "./TabelaVenda";
 import { LinhaTabela } from "./LinhaTabela";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Produto } from "@/models/produto";
-import { IdProdutoEIdLinha, ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/venda/cadastro/page";
+import { IdProdutoEIdLinha, ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/(pages)/venda/cadastro/page";
 import { mensagemAlerta, mensagemErro } from "@/models/toast";
 import { formatarParaReal } from "@/models/formatadorReal";
 import imgRemoverLinha from '@/images/icons8-delete-row-100.png';

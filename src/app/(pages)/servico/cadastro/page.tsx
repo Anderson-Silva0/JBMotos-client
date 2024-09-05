@@ -1,6 +1,6 @@
 'use client'
 
-import { IdProdutoEIdLinha, ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, ValoresTotaisProps } from "@/app/venda/cadastro/page";
+import { IdProdutoEIdLinha, ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, ValoresTotaisProps } from "@/app/(pages)/venda/cadastro/page";
 import { Card } from "@/components/Card";
 import { ExibeErro } from "@/components/ExibeErro";
 import { FormGroup } from "@/components/Form-group";
