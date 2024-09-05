@@ -5,7 +5,7 @@ import { Olho } from "@/components/Olho"
 import TabelaVenda from "@/components/TabelaVenda"
 import imgProduto from '@/images/checklist.png'
 import imgVenda from '@/images/vendas.png'
-import { estadoInicialProdutoVenda, ProdutoVenda } from "@/models/ProdutoVenda"
+import { ProdutoVenda } from "@/models/ProdutoVenda"
 import { formatarParaReal } from "@/models/formatadorReal"
 import { Produto } from "@/models/produto"
 import { mensagemErro } from "@/models/toast"
