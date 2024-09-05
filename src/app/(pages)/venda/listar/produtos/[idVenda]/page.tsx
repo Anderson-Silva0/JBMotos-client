@@ -101,7 +101,6 @@ export default function ProdutosDaVenda({ params }: ProdutosDaVendaProps) {
           {
             produtosDaVendaState.map((produtoVenda) => {
               const nomeProduto = idNomeProdutoMap?.get(produtoVenda.idProduto)
-              console.log('nomeProduto: ', nomeProduto)
               if (nomeProduto) {
                 return (
                   <LinhaProduto
