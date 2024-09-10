@@ -10,13 +10,13 @@ import { PagamentoCredito } from "@/components/PagamentoCredito"
 import TabelaVenda from "@/components/TabelaVenda"
 import imgRemoverLinha from '@/images/icons8-delete-row-100.png'
 import imgAdicionarLinha from '@/images/icons8-insert-row-48.png'
+import { DecodedToken } from "@/middleware"
 import { ProdutoVenda } from "@/models/ProdutoVenda"
 import { OpcoesSelecoes, estadoInicialOpcoesSelecoes } from "@/models/Selecoes"
 import { Cliente } from "@/models/cliente"
 import { Erros, salvarErros } from "@/models/erros"
 import { formasPagamentos } from "@/models/formasPagamento"
 import { formatarParaReal } from "@/models/formatadorReal"
-import { Funcionario } from "@/models/funcionario"
 import { PagamentoCartao, estadoInicialPagamentoCartao } from "@/models/pagamentoCartao"
 import { Produto } from "@/models/produto"
 import { selectStyles } from "@/models/selectStyles"
@@ -24,8 +24,9 @@ import { mensagemAlerta, mensagemErro, mensagemSucesso } from "@/models/toast"
 import { Venda, estadoInicialVenda } from "@/models/venda"
 import { VendaService } from "@/services/VendaService"
 import { ClienteService } from "@/services/clienteService"
-import { FuncionarioService } from "@/services/funcionarioService"
 import { ProdutoService } from "@/services/produtoService"
+import Cookies from 'js-cookie'
+import { decode } from 'jsonwebtoken'
 import { Save } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
@@ -61,9 +62,20 @@ export interface ProdutoVendaIdLinhaProps {
 
 export default function CadastroVenda() {
   const { buscarTodosClientes } = ClienteService()
-  const { buscarTodosFuncionarios } = FuncionarioService()
   const { buscarTodosProdutos } = ProdutoService()
   const { salvarVenda } = VendaService()
+
+  const [userName, setUserName] = useState<string>('')
+  const [cpfUser, setCpfUser] = useState<string>('')
+
+  useEffect(() => {
+    const token = Cookies.get('login-token')
+    if (token) {
+      const decodedToken = decode(token) as DecodedToken
+      setUserName(decodedToken.userName)
+      setCpfUser(decodedToken.userCpf)
+    }
+  }, [])
 
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
   const [registrosProdutosVenda, setRegistrosProdutosVenda] = useState<RegistroProdutoSelecionadoProps[]>([])
@@ -74,22 +86,19 @@ export default function CadastroVenda() {
   const [venda, setVenda] = useState<Venda>(estadoInicialVenda)
   const [qtdLinha, setQtdLinha] = useState<number[]>([1])
   const [clientes, setClientes] = useState<Cliente[]>([])
-  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
   const [valoresTotais, setValoresTotais] = useState<ValoresTotaisProps[]>([])
   const [idProdutoIdLinhaSelecionado, setIdProdutoIdLinhaSelecionado] = useState<IdProdutoEIdLinha[]>([])
   const [pagamentoCartao, setPagamentoCartao] = useState<PagamentoCartao>(estadoInicialPagamentoCartao)
   const [opcaoSelecionadaParcela, setOpcaoSelecionadaParcela] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
   const [opcaoSelecionadaBandeira, setOpcaoSelecionadaBandeira] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
-  const [totalTaxasState, setTotalTaxaState] = useState<number | string>(0)
+  const [taxaJuros, setTaxaJuros] = useState<number>(0)
+  const [descontoTonReais, setDescontoTonReais] = useState<number | string>(0)
+  const [valorLiquido, setValorLiquido] = useState<number | string>(0)
   const [produtosVendaIdLinha, setProdutoVendaIdLinha] = useState<ProdutoVendaIdLinhaProps[]>([])
+  const [valorTotalVenda, setValorTotalVenda] = useState<number>(0)
 
   const [opcaoSelecionadaCliente,
     setOpcaoSelecionadaCliente
-  ] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
-
-  const [
-    opcaoSelecionadaFuncionario,
-    setOpcaoSelecionadaFuncionario
   ] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
 
   const [
@@ -99,7 +108,6 @@ export default function CadastroVenda() {
 
   const definirEstadoInicialSelecaoVenda = () => {
     setOpcaoSelecionadaCliente(estadoInicialOpcoesSelecoes)
-    setOpcaoSelecionadaFuncionario(estadoInicialOpcoesSelecoes)
     setOpcaoSelecionadaFormaDePagamento(estadoInicialOpcoesSelecoes)
     setVenda({ ...venda, observacao: '' })
   }
@@ -110,11 +118,6 @@ export default function CadastroVenda() {
       const todosClientes = todosClientesResponse.data
       const clientesAtivos = todosClientes.filter((c: Cliente) => c.statusCliente === 'ATIVO')
       setClientes(clientesAtivos)
-
-      const todosFuncionariosResponse = await buscarTodosFuncionarios()
-      const todosFuncionarios = todosFuncionariosResponse.data
-      const funcionariosAtivos = todosFuncionarios.filter((f: Funcionario) => f.statusFuncionario === 'ATIVO')
-      setFuncionarios(funcionariosAtivos)
 
       const todosProdutosResponse = await buscarTodosProdutos()
       setProdutos(todosProdutosResponse.data)
@@ -135,18 +138,18 @@ export default function CadastroVenda() {
       {
         ...venda,
         cpfCliente: String(opcaoSelecionadaCliente?.value),
-        cpfFuncionario: String(opcaoSelecionadaFuncionario?.value),
+        cpfFuncionario: cpfUser,
         formaDePagamento: String(opcaoSelecionadaFormaDePagamento?.value)
       }
     )
     setErros([])
-  }, [opcaoSelecionadaCliente, opcaoSelecionadaFuncionario, opcaoSelecionadaFormaDePagamento])
+  }, [opcaoSelecionadaCliente, opcaoSelecionadaFormaDePagamento])
 
   const definirEstadoInicialPagamentoCartao = () => {
     setPagamentoCartao(estadoInicialPagamentoCartao)
     setOpcaoSelecionadaParcela(estadoInicialOpcoesSelecoes)
     setOpcaoSelecionadaBandeira(estadoInicialOpcoesSelecoes)
-    setTotalTaxaState(0)
+    setTaxaJuros(0)
   }
 
   const limparTudoAposVenda = () => {
@@ -187,12 +190,12 @@ export default function CadastroVenda() {
   useEffect(() => {
     const definirPagamentoCartao = () => {
       if (opcaoSelecionadaFormaDePagamento.label === "Cartão de Crédito") {
-        if (opcaoSelecionadaParcela.value || opcaoSelecionadaBandeira.value || totalTaxasState) {
+        if (opcaoSelecionadaParcela.value || opcaoSelecionadaBandeira.value || taxaJuros) {
           setPagamentoCartao(
             {
               parcela: opcaoSelecionadaParcela.value,
               bandeira: opcaoSelecionadaBandeira.value,
-              totalTaxas: totalTaxasState,
+              totalTaxas: taxaJuros,
               idVenda: 0
             }
           )
@@ -201,14 +204,14 @@ export default function CadastroVenda() {
         setPagamentoCartao(estadoInicialPagamentoCartao)
         setOpcaoSelecionadaParcela(estadoInicialOpcoesSelecoes)
         setOpcaoSelecionadaBandeira(estadoInicialOpcoesSelecoes)
-        setTotalTaxaState(0)
+        setTaxaJuros(0)
       }
 
       setErros([])
     }
 
     definirPagamentoCartao()
-  }, [opcaoSelecionadaParcela, opcaoSelecionadaBandeira, totalTaxasState, opcaoSelecionadaFormaDePagamento])
+  }, [opcaoSelecionadaParcela, opcaoSelecionadaBandeira, taxaJuros, opcaoSelecionadaFormaDePagamento])
 
   const handlerRealizarVenda = () => {
     ConfirmarDecisao("Confirmação de Venda", "Tem certeza de que deseja realizar esta venda?", submit)
@@ -291,7 +294,15 @@ export default function CadastroVenda() {
     }
   }
 
-  const valorTotalVenda = valoresTotais.reduce((acumulador, valor) => acumulador + valor.valorTotal, 0)
+  useEffect(() => {
+    const totalVenda = valoresTotais.reduce((acumulador, valor) => acumulador + valor.valorTotal, 0)
+    setValorTotalVenda(totalVenda)
+  }, [valoresTotais])
+
+  useEffect(() => {
+    setDescontoTonReais(Number(taxaJuros) / 100 * valorTotalVenda)
+    setValorLiquido(valorTotalVenda - Number(descontoTonReais))
+  }, [valorTotalVenda, taxaJuros, descontoTonReais])
 
   const obterNomeClienteSelecionado = () => {
     let nomeClienteSelecionado = ''
@@ -324,17 +335,6 @@ export default function CadastroVenda() {
           />
           {<ExibeErro erros={erros} nomeInput="cpfCliente" />}
         </FormGroup>
-        <FormGroup label="Selecione o Funcionário (Vendedor): *" htmlFor="cpfFuncionario">
-          <Select
-            styles={selectStyles}
-            placeholder="Selecione..."
-            value={opcaoSelecionadaFuncionario}
-            onChange={(option: any) => setOpcaoSelecionadaFuncionario(option)}
-            options={funcionarios.map(f => ({ label: f.nome, value: f.cpf }) as OpcoesSelecoes)}
-            instanceId="select-cpfFuncionario"
-          />
-          {<ExibeErro erros={erros} nomeInput="cpfFuncionario" />}
-        </FormGroup>
         <FormGroup label="Selecione a forma de pagamento*" htmlFor="formaDePagamento">
           <Select
             styles={selectStyles}
@@ -350,8 +350,8 @@ export default function CadastroVenda() {
 
               <PagamentoCredito
                 erros={erros}
-                totalTaxasState={totalTaxasState}
-                setTotalTaxaState={setTotalTaxaState}
+                taxaJuros={taxaJuros}
+                setTaxaJuros={setTaxaJuros}
                 opcaoSelecionadaBandeira={opcaoSelecionadaBandeira}
                 setOpcaoSelecionadaBandeira={setOpcaoSelecionadaBandeira}
                 opcaoSelecionadaParcela={opcaoSelecionadaParcela}
@@ -395,12 +395,34 @@ export default function CadastroVenda() {
           })
         }
       </TabelaVenda>
-      <div id="valor-total-venda">
-        <span>Total da Venda</span>
-        <span>
-          {formatarParaReal(valorTotalVenda)}
-        </span>
+
+      <div style={{ display: 'flex', justifyContent: 'space-around', width: '50vw' }}>
+        <div id="valor-total-venda">
+          <span>Valor Bruto</span>
+          <span>
+            {formatarParaReal(valorTotalVenda)}
+          </span>
+        </div>
+        {
+          opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito" && (
+            <>
+              <div id="valor-total-venda" >
+                <span style={{ color: 'red' }}>Desconto Ton</span>
+                <span style={{ color: 'red' }}>
+                  {formatarParaReal(descontoTonReais)}
+                </span>
+              </div>
+              <div id="valor-total-venda">
+                <span>Valor Líquido</span>
+                <span>
+                  {formatarParaReal(valorLiquido)}
+                </span>
+              </div>
+            </>
+          )
+        }
       </div>
+
       <div className="div-botoes-line">
         <button onClick={adicionarLinha} className="botao-add-line">
           <Image src={imgAdicionarLinha} width={40} height={40} alt={""} />
@@ -420,7 +442,7 @@ export default function CadastroVenda() {
           nomeCliente={obterNomeClienteSelecionado()}
           cpfCliente={opcaoSelecionadaCliente.value}
           formaPagamento={opcaoSelecionadaFormaDePagamento.value}
-          nomeFuncionario={opcaoSelecionadaFuncionario.label}
+          nomeFuncionario={userName}
           observacao={venda.observacao}
           produtosVenda={registrosProdutosVenda}
           valorTotalVenda={formatarParaReal(valorTotalVenda)}

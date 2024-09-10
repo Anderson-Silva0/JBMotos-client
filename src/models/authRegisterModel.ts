@@ -1,6 +1,7 @@
 import { estadoInicialFuncionario, Funcionario } from "./funcionario"
 
 export enum ROLE {
+    SUPORTE = "SUPORTE",
     ADMIN = "ADMIN",
     OPERADOR = "OPERADOR"
 }

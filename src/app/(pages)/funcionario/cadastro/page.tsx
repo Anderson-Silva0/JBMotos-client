@@ -78,6 +78,8 @@ export default function CadastroFuncionario() {
       setAuthFuncionario(estadoInicialAuthRegisterModelFuncionario)
       setFuncionario(estadoInicialFuncionario)
       setEndereco(estadoInicialEndereco)
+      setConfirmarSenha('')
+      setOpcaoSelecionadaRole(estadoInicialOpcoesSelecoes)
       setErros([])
     } catch (erro: any) {
       mensagemErro('Erro no preenchimento dos campos.')

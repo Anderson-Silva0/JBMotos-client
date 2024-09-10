@@ -7,6 +7,7 @@ export interface DecodedToken {
     userName: string
     exp: number
     role: string
+    userCpf: string
 }
 
 export function middleware(request: NextRequest) {

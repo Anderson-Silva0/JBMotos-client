@@ -14,7 +14,7 @@ import { FuncionarioService } from '@/services/funcionarioService'
 import { PagamentoCartaoService } from '@/services/pagamentoCartaoService'
 import { ProdutoService } from '@/services/produtoService'
 import '@/styles/cardListagem.css'
-import { Edit, Info } from 'lucide-react'
+import { Info } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { GeradorPDF, TipoRecibo } from './GeradorPDF'
@@ -111,16 +111,9 @@ export default function VendaCard(venda: Venda) {
     setMostrarInfo(true)
   }
 
-  const atualizar = () => {
-    router.push(`/venda/atualizar/${venda.id}`)
-  }
-
   return (
     <div ref={cardListagemContainer} className="cardListagem-container-venda">
       <span id="info-title-venda">Detalhes da Venda</span>
-      <div className='div-btn-edit' onClick={atualizar} title='Editar'>
-        <Edit className='icones-atualizacao-e-delecao' />
-      </div>
       <div className='container-items'>
         <div className='items'>
           <div className='div-dados'>Nome do Cliente</div>
