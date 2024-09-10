@@ -1,6 +1,11 @@
 'use client'
 
-import { IdProdutoEIdLinha, ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, ValoresTotaisProps } from "@/app/(pages)/venda/cadastro/page";
+import {
+    IdProdutoEIdLinha,
+    ProdutoSelecionadoProps,
+    ProdutoVendaIdLinhaProps,
+    ValoresTotaisProps
+} from "@/app/(pages)/venda/cadastro/page";
 import { Card } from "@/components/Card";
 import { ExibeErro } from "@/components/ExibeErro";
 import { FormGroup } from "@/components/Form-group";
@@ -20,7 +25,6 @@ import { Servico, estadoInicialServico } from "@/models/servico";
 import { mensagemAlerta, mensagemErro, mensagemSucesso } from "@/models/toast";
 import { Venda, estadoInicialVenda } from "@/models/venda";
 import { ClienteService } from "@/services/clienteService";
-import { FuncionarioService } from "@/services/funcionarioService";
 import { MotoService } from "@/services/motoService";
 import { ProdutoService } from "@/services/produtoService";
 import { ServicoService } from "@/services/servicoService";
@@ -29,18 +33,31 @@ import { ChangeEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import imgAddProduto from "@/images/icons8-add-product-66.png";
 import imgARemoveProduto from "@/images/icons8-remove-product-64.png";
+import Cookies from 'js-cookie'
+import { decode } from 'jsonwebtoken'
 import Select from "react-select";
+import { DecodedToken } from "@/middleware";
 
 export default function CadastroServico() {
-    const { buscarTodosFuncionarios } = FuncionarioService()
     const { buscarTodosClientes } = ClienteService()
     const { buscarMotosPorCpfCliente } = MotoService()
     const { salvarServico } = ServicoService()
     const { buscarTodosProdutos } = ProdutoService()
 
+    const [userName, setUserName] = useState<string>('')
+    const [cpfUser, setCpfUser] = useState<string>('')
+
+    useEffect(() => {
+        const token = Cookies.get('login-token')
+        if (token) {
+            const decodedToken = decode(token) as DecodedToken
+            setUserName(decodedToken.userName)
+            setCpfUser(decodedToken.userCpf)
+        }
+    }, [])
+
     const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
     const [servico, setServico] = useState<Servico>(estadoInicialServico)
-    const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
     const [motosCliente, setMotosCliente] = useState<Moto[]>([])
     const [clientes, setClientes] = useState<Cliente[]>([])
     const [erros, setErros] = useState<Erros[]>([])
@@ -56,13 +73,8 @@ export default function CadastroServico() {
     const [precoServico, setPrecoServico] = useState<number>(0)
     const [valoresTotais, setValoresTotais] = useState<ValoresTotaisProps[]>([])
     const [qtdLinha, setQtdLinha] = useState<number[]>([1])
-    const [totalTaxasState, setTotalTaxaState] = useState<number | string>(0)
+    const [taxaJuros, setTaxaJuros] = useState<number>(0)
     const [produtosVendaIdLinha, setProdutoVendaIdLinha] = useState<ProdutoVendaIdLinhaProps[]>([])
-
-    const [
-        opcaoSelecionadaFuncionario,
-        setOpcaoSelecionadaFuncionario
-    ] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
 
     const [
         opcaoSelecionadaCliente,
@@ -89,11 +101,6 @@ export default function CadastroServico() {
 
     const buscarTodos = async () => {
         try {
-            const todosFuncionariosResponse = await buscarTodosFuncionarios()
-            const todosFuncionarios = todosFuncionariosResponse.data
-            const funcionariosAtivos = todosFuncionarios.filter((f: Funcionario) => f.statusFuncionario === 'ATIVO')
-            setFuncionarios(funcionariosAtivos)
-
             const todosClientesResponse = await buscarTodosClientes()
             const todosClientes = todosClientesResponse.data
             const clientesAtivos = todosClientes.filter((c: Cliente) => c.statusCliente === 'ATIVO')
@@ -141,30 +148,30 @@ export default function CadastroServico() {
         setServico(
             {
                 ...servico,
-                cpfFuncionario: String(opcaoSelecionadaFuncionario.value),
+                cpfFuncionario: cpfUser,
                 moto: motoResult
             }
         )
         setVenda(
             {
                 ...venda,
-                cpfFuncionario: String(opcaoSelecionadaFuncionario.value),
+                cpfFuncionario: cpfUser,
                 cpfCliente: String(opcaoSelecionadaCliente.value),
                 formaDePagamento: String(opcaoSelecionadaFormaDePagamento.value)
             }
         )
         setErros([])
-    }, [opcaoSelecionadaFuncionario, opcaoSelecionadaCliente, opcaoSelecionadaFormaDePagamento, opcaoSelecionadaMoto])
+    }, [opcaoSelecionadaCliente, opcaoSelecionadaFormaDePagamento, opcaoSelecionadaMoto])
 
     useEffect(() => {
         const definirPagamentoCartao = () => {
             if (opcaoSelecionadaFormaDePagamento.label === "Cartão de Crédito") {
-                if (opcaoSelecionadaParcela.value || opcaoSelecionadaBandeira.value || totalTaxasState) {
+                if (opcaoSelecionadaParcela.value || opcaoSelecionadaBandeira.value || taxaJuros) {
                     setPagamentoCartao(
                         {
                             parcela: opcaoSelecionadaParcela.value,
                             bandeira: opcaoSelecionadaBandeira.value,
-                            totalTaxas: totalTaxasState,
+                            totalTaxas: taxaJuros,
                             idVenda: 0
                         }
                     )
@@ -173,20 +180,20 @@ export default function CadastroServico() {
                 setPagamentoCartao(estadoInicialPagamentoCartao)
                 setOpcaoSelecionadaParcela(estadoInicialOpcoesSelecoes)
                 setOpcaoSelecionadaBandeira(estadoInicialOpcoesSelecoes)
-                setTotalTaxaState(0)
+                setTaxaJuros(0)
             }
 
             setErros([])
         }
 
         definirPagamentoCartao()
-    }, [opcaoSelecionadaParcela, opcaoSelecionadaBandeira, totalTaxasState, opcaoSelecionadaFormaDePagamento])
+    }, [opcaoSelecionadaParcela, opcaoSelecionadaBandeira, taxaJuros, opcaoSelecionadaFormaDePagamento])
 
     const definirEstadoInicialPagamentoCartao = () => {
         setPagamentoCartao(estadoInicialPagamentoCartao)
         setOpcaoSelecionadaParcela(estadoInicialOpcoesSelecoes)
         setOpcaoSelecionadaBandeira(estadoInicialOpcoesSelecoes)
-        setTotalTaxaState(0)
+        setTaxaJuros(0)
     }
 
     const definirEstadoInicialSelecaoVenda = () => {
@@ -211,7 +218,6 @@ export default function CadastroServico() {
     const resetarServico = () => {
         setServico(estadoInicialServico)
         setErros([])
-        setOpcaoSelecionadaFuncionario(estadoInicialOpcoesSelecoes)
         setOpcaoSelecionadaCliente(estadoInicialOpcoesSelecoes)
         setOpcaoSelecionadaMoto(estadoInicialOpcoesSelecoes)
         setAdicaoProduto(false)
@@ -260,7 +266,7 @@ export default function CadastroServico() {
         if (adicaoProduto) {
             setAdicaoProduto(false)
             resetarVenda()
-            setValoresTotais(valoresTotais)
+            setValoresTotais([])
         } else {
             setAdicaoProduto(true)
             setPrecoServico(servico.precoMaoDeObra)
@@ -277,18 +283,6 @@ export default function CadastroServico() {
                 <Save size='6vh' strokeWidth={3} /> Cadastro de Serviço
             </h1>
             <Card titulo="Dados do Serviço">
-                <FormGroup label="Selecione o Funcionário*" htmlFor="cpfFuncionario">
-                    <Select
-                        styles={selectStyles}
-                        placeholder="Selecione..."
-                        value={opcaoSelecionadaFuncionario}
-                        onChange={(option: any) => setOpcaoSelecionadaFuncionario(option)}
-                        options={funcionarios.map(f => ({ label: f.nome, value: f.cpf }) as OpcoesSelecoes)}
-                        instanceId="select-cpfFuncionario"
-                    />
-                    {<ExibeErro erros={erros} nomeInput="cpfFuncionario" />}
-                </FormGroup>
-
                 <FormGroup label="Selecione o Cliente*" htmlFor="cpfCliente">
                     <Select
                         styles={selectStyles}
@@ -358,8 +352,8 @@ export default function CadastroServico() {
 
                                 <PagamentoCredito
                                     erros={erros}
-                                    totalTaxasState={totalTaxasState}
-                                    setTotalTaxaState={setTotalTaxaState}
+                                    taxaJuros={taxaJuros}
+                                    setTaxaJuros={setTaxaJuros}
                                     opcaoSelecionadaBandeira={opcaoSelecionadaBandeira}
                                     setOpcaoSelecionadaBandeira={setOpcaoSelecionadaBandeira}
                                     opcaoSelecionadaParcela={opcaoSelecionadaParcela}
@@ -403,6 +397,10 @@ export default function CadastroServico() {
                         setIdProdutoIdLinhaSelecionado={setIdProdutoIdLinhaSelecionado}
                         produtoVendaIdLinha={produtosVendaIdLinha}
                         setProdutoVendaIdLinha={setProdutoVendaIdLinha}
+                        taxaJuros={taxaJuros}
+                        setTaxaJuros={setTaxaJuros}
+                        opcaoSelecionadaFormaDePagamento={opcaoSelecionadaFormaDePagamento}
+                        setOpcaoSelecionadaFormaDePagamento={setOpcaoSelecionadaFormaDePagamento}
                     />
                 )
             }

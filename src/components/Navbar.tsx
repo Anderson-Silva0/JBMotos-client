@@ -5,11 +5,29 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import '../styles/navbar.css'
 import Dropdown from './Dropdown'
+import { LogOut } from 'lucide-react'
+import Cookies from 'js-cookie'
+import { decode } from 'jsonwebtoken'
+import { DecodedToken } from '@/middleware'
+import { ROLE } from '@/models/authRegisterModel'
 
 export default function NavBar() {
+
+    const [userRole, setUserRole] = useState<string>('')
+
+    function loadUserRole() {
+        const token = Cookies.get('login-token')
+        if (token) {
+            const decodedToken = decode(token) as DecodedToken
+            setUserRole(decodedToken.role)
+        }
+    }
+
     const [componenteClicado, setComponenteClicado] = useState<string>('')
 
     useEffect(() => {
+        loadUserRole()
+        
         const mobileMenu = document.querySelector('.mobile-menu') as HTMLElement
         const navList = document.querySelector('.nav-list') as HTMLElement
         const navLinks = document.querySelectorAll('.nav-list li')
@@ -65,13 +83,15 @@ export default function NavBar() {
                                 <a href="/cliente/listar">Listar</a>
                             </Dropdown>
                         </li>
-                        <li>
-                            <Dropdown titulo="Funcionário" componenteClicado={componenteClicado}
-                                setComponenteClicado={setComponenteClicado}>
-                                <a href="/funcionario/cadastro">Cadastrar</a>
-                                <a href="/funcionario/listar">Listar</a>
-                            </Dropdown>
-                        </li>
+                        {userRole === ROLE.ADMIN &&
+                            <li>
+                                <Dropdown titulo="Funcionário" componenteClicado={componenteClicado}
+                                    setComponenteClicado={setComponenteClicado}>
+                                    <a href="/funcionario/cadastro">Cadastrar</a>
+                                    <a href="/funcionario/listar">Listar</a>
+                                </Dropdown>
+                            </li>
+                        }
                         <li>
                             <Dropdown titulo="Fornecedor" componenteClicado={componenteClicado}
                                 setComponenteClicado={setComponenteClicado}>
@@ -106,6 +126,11 @@ export default function NavBar() {
                                 <a href="/moto/cadastro">Cadastrar</a>
                                 <a href="/moto/listar">Listar</a>
                             </Dropdown>
+                        </li>
+                        <li>
+                            <a href="/logout">
+                                <LogOut />
+                            </a>
                         </li>
                     </ul>
                 </nav>
