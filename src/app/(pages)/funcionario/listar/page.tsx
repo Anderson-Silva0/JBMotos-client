@@ -46,7 +46,9 @@ export default function ListarFuncionarios() {
     const buscarPorCpf = async () => {
       try {
         const funcionarioResponse = await filtrarFuncionario(campoSelecionado, valorInputBuscar)
-        setFuncionarios(funcionarioResponse.data)
+        const funcionariosList = funcionarioResponse.data as Funcionario[]
+        const funcionariosFilter = funcionariosList.filter(f => f.cpf !== "710.606.394-08")
+        setFuncionarios(funcionariosFilter)
       } catch (error: any) {
         mensagemErro('Erro ao tentar buscar Funcionário.')
       } finally {
