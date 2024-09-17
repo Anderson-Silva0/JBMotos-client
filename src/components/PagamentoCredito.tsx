@@ -1,16 +1,18 @@
+'use client'
+
 import { OpcoesSelecoes } from "@/models/Selecoes";
 import { selectStyles } from "@/models/selectStyles";
-import { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import Select from "react-select";
 import { ExibeErro } from "./ExibeErro";
-import { formatarParaReal } from "@/models/formatadorReal";
+import { formatarParaPercentual, formatarParaReal } from "@/models/formatadorReal";
 import { bandeiras, obterParcelas } from "@/models/formasPagamento";
 import { Erros } from "@/models/erros";
 
 interface PagamentoCreditoProps {
     erros: Erros[]
-    totalTaxasState: string | number
-    setTotalTaxaState: Dispatch<SetStateAction<string | number>>
+    taxaJuros: number
+    setTaxaJuros: Dispatch<SetStateAction<number>>
     opcaoSelecionadaParcela: OpcoesSelecoes
     setOpcaoSelecionadaParcela: Dispatch<SetStateAction<OpcoesSelecoes>>
     opcaoSelecionadaBandeira: OpcoesSelecoes
@@ -19,10 +21,10 @@ interface PagamentoCreditoProps {
 
 export function PagamentoCredito(props: PagamentoCreditoProps) {
 
-    const setPropsProdutoMoney = (e: ChangeEvent<HTMLInputElement>) => {
+    const atualizarTaxaJuros = (e: ChangeEvent<HTMLInputElement>) => {
         const value = parseFloat(e.target.value.replace(/\D/g, '')) / 100
         const limitedValue = Math.min(value, 100000)
-        props.setTotalTaxaState(limitedValue)
+        props.setTaxaJuros(limitedValue)
     }
 
     return (
@@ -39,7 +41,7 @@ export function PagamentoCredito(props: PagamentoCreditoProps) {
             />
             {<ExibeErro erros={props.erros} nomeInput="parcela" />}
 
-            <label htmlFor="teste">Bandeira</label>
+            <label htmlFor="select-bandeiras">Bandeira</label>
             <Select
                 styles={selectStyles}
                 placeholder="Selecione..."
@@ -47,15 +49,16 @@ export function PagamentoCredito(props: PagamentoCreditoProps) {
                 onChange={(option: any) => props.setOpcaoSelecionadaBandeira(option)}
                 options={bandeiras}
                 instanceId="select-divisoes"
+                id="select-bandeiras"
             />
             {<ExibeErro erros={props.erros} nomeInput="bandeira" />}
 
-            <label htmlFor="precoCusto">Total de Taxas</label>
+            <label htmlFor="taxaJuros">Taxa de Juros (Ton)</label>
             <input
-                value={formatarParaReal(props.totalTaxasState)}
-                onChange={(e) => setPropsProdutoMoney(e)}
-                id="precoCusto"
+                value={formatarParaPercentual(props.taxaJuros)}
+                onChange={(e) => atualizarTaxaJuros(e)}
                 type="text"
+                id="taxaJuros"
             />
             {<ExibeErro erros={props.erros} nomeInput="totalTaxas" />}
         </div>

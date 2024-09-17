@@ -1,4 +1,4 @@
-import { formatarParaReal } from '@/models/formatadorReal'
+import { formatarParaPercentual } from '@/models/formatadorReal'
 import { PagamentoCartao } from '@/models/pagamentoCartao'
 import '@/styles/card.css'
 import '@/styles/cardListagem.css'
@@ -16,8 +16,8 @@ export default function InfoCard({ pagamentoCartao }: InfoCardProps) {
             <div className='div-dados'>Bandeira</div>
             <div className='div-resultado'>{pagamentoCartao.bandeira}</div>
 
-            <div className='div-dados'>Total de Taxas</div>
-            <div className='div-resultado'>{formatarParaReal(pagamentoCartao.totalTaxas)}</div>
+            <div className='div-dados'>Taxa de Juros (Ton)</div>
+            <div className='div-resultado'>{formatarParaPercentual(Number(pagamentoCartao.totalTaxas))}</div>
         </div>
     )
 }

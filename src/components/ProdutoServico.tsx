@@ -1,13 +1,16 @@
+'use client'
+
 import TabelaVenda from "./TabelaVenda";
 import { LinhaTabela } from "./LinhaTabela";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Produto } from "@/models/produto";
 import { IdProdutoEIdLinha, ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/(pages)/venda/cadastro/page";
-import { mensagemAlerta, mensagemErro } from "@/models/toast";
+import { mensagemAlerta } from "@/models/toast";
 import { formatarParaReal } from "@/models/formatadorReal";
 import imgRemoverLinha from '@/images/icons8-delete-row-100.png';
 import imgAdicionarLinha from '@/images/icons8-insert-row-48.png';
 import Image from "next/image";
+import { OpcoesSelecoes } from "@/models/Selecoes";
 
 interface ProdutoServicoProps {
     produtos: Produto[]
@@ -25,11 +28,18 @@ interface ProdutoServicoProps {
     produtoVendaIdLinha: ProdutoVendaIdLinhaProps[]
     precoServico: number
     setPrecoServico: Dispatch<SetStateAction<number>>
+    taxaJuros: number
+    setTaxaJuros: Dispatch<SetStateAction<number>>
+    opcaoSelecionadaFormaDePagamento: OpcoesSelecoes
+    setOpcaoSelecionadaFormaDePagamento: (value: SetStateAction<OpcoesSelecoes>) => void
 }
 
 export default function ProdutoServico(props: ProdutoServicoProps) {
 
     const [registrosProdutosVenda, setRegistrosProdutosVenda] = useState<RegistroProdutoSelecionadoProps[]>([])
+    const [valorTotalServico, setValorTotalServico] = useState<number>(0)
+    const [descontoTonReais, setDescontoTonReais] = useState<number>(0)
+    const [valorLiquido, setValorLiquido] = useState<number>(0)
 
     const atualizarElemento = (indice: number, idProduto: number, idLinha: number) => {
         props.setIdProdutoIdLinhaSelecionado(prevState => {
@@ -108,7 +118,15 @@ export default function ProdutoServico(props: ProdutoServicoProps) {
         return mensagem
     }
 
-    const valorTotalServico = props.valoresTotais.reduce((acumulador, valor) => acumulador + valor.valorTotal, 0) + props.precoServico
+    useEffect(() => {
+        const totalServico = props.valoresTotais.reduce((acumulador, valor) => acumulador + valor.valorTotal, 0) + props.precoServico
+        setValorTotalServico(totalServico)
+    }, [props.valoresTotais, props.precoServico])
+
+    useEffect(() => {
+        setDescontoTonReais(props.taxaJuros / 100 * valorTotalServico)
+        setValorLiquido(valorTotalServico - descontoTonReais)
+    }, [valorTotalServico, props.taxaJuros, descontoTonReais])
 
     return (
         <div className="div-form-container">
@@ -136,11 +154,31 @@ export default function ProdutoServico(props: ProdutoServicoProps) {
                 }
             </TabelaVenda>
 
-            <div id="valor-total-venda">
-                <span>Total do Serviço</span>
-                <span>
-                    {formatarParaReal(valorTotalServico)}
-                </span>
+            <div style={{ display: 'flex', justifyContent: 'space-around', width: '50vw' }}>
+                <div id="valor-total-venda">
+                    <span>Valor Bruto</span>
+                    <span>
+                        {formatarParaReal(valorTotalServico)}
+                    </span>
+                </div>
+                {
+                    props.opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito" && (
+                        <>
+                            <div id="valor-total-venda" >
+                                <span style={{ color: 'red' }}>Desconto Ton</span>
+                                <span style={{ color: 'red' }}>
+                                    {formatarParaReal(descontoTonReais)}
+                                </span>
+                            </div>
+                            <div id="valor-total-venda">
+                                <span>Valor Líquido</span>
+                                <span>
+                                    {formatarParaReal(valorLiquido)}
+                                </span>
+                            </div>
+                        </>
+                    )
+                }
             </div>
             <div className="div-botoes-line">
                 <button onClick={adicionarLinha} className="botao-add-line">
