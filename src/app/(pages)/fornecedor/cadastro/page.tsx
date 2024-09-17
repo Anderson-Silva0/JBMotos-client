@@ -17,7 +17,7 @@ export default function CadastroFornecedor() {
   const { salvarFornecedor } = FornecedorService()
 
   const {
-    obterEnderecoPorCep
+    obterEnderecoPorCepTodoBrasil
   } = EnderecoService()
 
   const [erros, setErros] = useState<Erros[]>([])
@@ -39,7 +39,7 @@ export default function CadastroFornecedor() {
   }
 
   useEffect(() => {
-    obterEnderecoPorCep(endereco, setEndereco, erros, setErros)
+    obterEnderecoPorCepTodoBrasil(endereco, setEndereco, erros, setErros)
   }, [endereco.cep])
 
   const submit = async () => {

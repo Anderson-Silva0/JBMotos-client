@@ -72,12 +72,47 @@ export const EnderecoService = () => {
         }
     }
 
+    const obterEnderecoPorCepTodoBrasil = async (
+        endereco: Endereco,
+        setEndereco: Dispatch<SetStateAction<Endereco>>,
+        erros: Erros[],
+        setErros: Dispatch<SetStateAction<Erros[]>>
+    ) => {
+        if (endereco.cep.length < 9 && endereco.rua || endereco.cidade || endereco.bairro) {
+            setEndereco({ ...endereco, rua: '', bairro: '', cidade: '' })
+        }
+        const buscarEndereco = async () => {
+            try {
+                const enderecoResponse = await buscarEnderecoPorCep(endereco.cep)
+                if (enderecoResponse.data.erro) {
+                    setErros([...erros, {
+                        nomeInput: 'cep',
+                        mensagemErro: 'CEP inexistente. Verifique e corrija.',
+                    }])
+                }
+                setEndereco({
+                    ...endereco,
+                    rua: enderecoResponse.data.logradouro,
+                    bairro: enderecoResponse.data.bairro,
+                    cidade: enderecoResponse.data.localidade
+                })
+            } catch (error: any) {
+                mensagemErro('Erro ao tentar buscar Endereço por CEP.')
+            }
+        }
+        if (endereco.cep.length === 9) {
+            buscarEndereco()
+        }
+    }
+
     return {
         salvarEndereco,
         buscarTodosEnderecos,
         buscarEnderecoPorId,
         atualizarEndereco,
         deletarEndereco,
-        obterEnderecoPorCep
+        obterEnderecoPorCep,
+        obterEnderecoPorCepTodoBrasil,
+        buscarEnderecoPorCep
     }
 }

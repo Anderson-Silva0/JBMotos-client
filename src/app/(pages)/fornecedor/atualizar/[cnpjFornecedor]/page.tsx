@@ -29,7 +29,7 @@ export default function AtualizarFornecedor({ params }: AtualizarFornecedorProps
   } = FornecedorService()
   const {
     buscarEnderecoPorId,
-    obterEnderecoPorCep
+    obterEnderecoPorCepTodoBrasil
   } = EnderecoService()
 
   const [erros, setErros] = useState<Erros[]>([])
@@ -51,7 +51,7 @@ export default function AtualizarFornecedor({ params }: AtualizarFornecedorProps
   }
 
   useEffect(() => {
-    obterEnderecoPorCep(endereco, setEndereco, erros, setErros)
+    obterEnderecoPorCepTodoBrasil(endereco, setEndereco, erros, setErros)
   }, [endereco.cep])
 
   useEffect(() => {

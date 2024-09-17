@@ -17,13 +17,24 @@ interface FornecedorCardProps {
 export default function FornecedorCard({ fornecedor, setFornecedores }: FornecedorCardProps) {
   const router = useRouter()
 
+  const {
+    buscarEnderecoPorCep
+  } = EnderecoService()
+
   const { buscarTodosFornecedores, alternarStatusFornecedor } = FornecedorService()
   const [enderecosState, setEnderecoState] = useState<Endereco>(estadoInicialEndereco)
+  const [estadoState, setEstadoState] = useState<string>("")
 
   useEffect(() => {
-    if (fornecedor.endereco) {
-      setEnderecoState(fornecedor.endereco)
+    const loadEndereco = async () => {
+      if (fornecedor.endereco) {
+        const enderecoResponse = await buscarEnderecoPorCep(fornecedor.endereco.cep)
+        setEstadoState(enderecoResponse.data.estado)
+        setEnderecoState(fornecedor.endereco)
+      }
     }
+
+    loadEndereco()
   }, [])
 
   const handlerAlternar = () => {
@@ -115,6 +126,8 @@ export default function FornecedorCard({ fornecedor, setFornecedores }: Forneced
           <div className='div-resultado'>{enderecosState.bairro}</div>
           <div className='div-dados'>Cidade</div>
           <div className='div-resultado'>{enderecosState.cidade}</div>
+          <div className='div-dados'>Estado</div>
+          <div className='div-resultado'>{estadoState}</div>
         </div>
       </div>
       <div className='icones-container'>

@@ -48,6 +48,9 @@ export default function Login() {
       if (erro && erro.response && erro.response.data && erro.response.data.loginError) {
         mensagemErro(erro.response.data.loginError)
       }
+      if (erro.code && erro.code === "ERR_NETWORK") {
+        mensagemErro("Falha na comunicação com o servidor.")
+      }
     }
   }
 
