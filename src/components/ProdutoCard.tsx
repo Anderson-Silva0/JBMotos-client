@@ -11,6 +11,10 @@ import { useRouter } from 'next/navigation'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import '../styles/cardListagem.css'
 import { ConfirmarDecisao } from './ConfirmarDecisao'
+import Cookies from 'js-cookie'
+import { decode } from 'jsonwebtoken'
+import { DecodedToken } from '@/middleware'
+import { ROLE } from '@/models/authRegisterModel'
 
 interface ProdutoCardProps {
   produto: Produto
@@ -20,12 +24,21 @@ interface ProdutoCardProps {
 export default function ProdutoCard({ produto, setProdutos }: ProdutoCardProps) {
   const router = useRouter()
 
-  const [estoqueState, setEstoqueState] = useState<Estoque>(estadoInicialEstoque)
-  const [fornecedorState, setFornecedorState] = useState<Fornecedor>(estadoInicialFornecedor)
-
   const { buscarEstoquePorId } = EstoqueService()
   const { buscarFornecedorPorCnpj } = FornecedorService()
   const { buscarTodosProdutos, alternarStatusProduto } = ProdutoService()
+
+  const [estoqueState, setEstoqueState] = useState<Estoque>(estadoInicialEstoque)
+  const [fornecedorState, setFornecedorState] = useState<Fornecedor>(estadoInicialFornecedor)
+  const [userRole, setUserRole] = useState<string>('')
+
+  function loadUserRole() {
+    const token = Cookies.get('login-token')
+    if (token) {
+      const decodedToken = decode(token) as DecodedToken
+      setUserRole(decodedToken.role)
+    }
+  }
 
   useEffect(() => {
     async function buscar() {
@@ -39,6 +52,7 @@ export default function ProdutoCard({ produto, setProdutos }: ProdutoCardProps) 
         mensagemErro(error.response.data)
       }
     }
+    loadUserRole()
     buscar()
   }, [])
 
@@ -98,12 +112,20 @@ export default function ProdutoCard({ produto, setProdutos }: ProdutoCardProps) 
           <span id="info-title">Produto</span>
           <div className='div-dados'>Nome</div>
           <div className='div-resultado'>{produto.nome}</div>
-          <div className='div-dados'>Preço de Custo</div>
-          <div className='div-resultado'>{formatarParaReal(produto.precoCusto)}</div>
+          {userRole === ROLE.ADMIN &&
+            <>
+              <div className='div-dados'>Preço de Custo</div>
+              <div className='div-resultado'>{formatarParaReal(produto.precoCusto)}</div>
+            </>
+          }
           <div className='div-dados'>Preço de Venda</div>
           <div className='div-resultado'>{formatarParaReal(produto.precoVenda)}</div>
-          <div className='div-dados'>Lucro do Produto</div>
-          <div className='div-resultado'>{formatarParaReal(lucroProduto)}</div>
+          {userRole === ROLE.ADMIN &&
+            <>
+              <div className='div-dados'>Lucro do Produto</div>
+              <div className='div-resultado'>{formatarParaReal(lucroProduto)}</div>
+            </>
+          }
           <div className='div-dados'>Marca</div>
           <div className='div-resultado'>{produto.marca}</div>
           <div className='div-dados'>Fornecedor</div>

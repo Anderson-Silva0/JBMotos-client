@@ -16,7 +16,6 @@ import { Cliente } from "@/models/cliente";
 import { Erros, salvarErros } from "@/models/erros";
 import { formasPagamentos } from "@/models/formasPagamento";
 import { formatarParaReal } from "@/models/formatadorReal";
-import { Funcionario } from "@/models/funcionario";
 import { estadoInicialMoto, Moto } from "@/models/moto";
 import { PagamentoCartao, estadoInicialPagamentoCartao } from "@/models/pagamentoCartao";
 import { Produto } from "@/models/produto";
@@ -44,14 +43,12 @@ export default function CadastroServico() {
     const { salvarServico } = ServicoService()
     const { buscarTodosProdutos } = ProdutoService()
 
-    const [userName, setUserName] = useState<string>('')
     const [cpfUser, setCpfUser] = useState<string>('')
 
     useEffect(() => {
         const token = Cookies.get('login-token')
         if (token) {
             const decodedToken = decode(token) as DecodedToken
-            setUserName(decodedToken.userName)
             setCpfUser(decodedToken.userCpf)
         }
     }, [])

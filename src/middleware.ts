@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { decode } from 'jsonwebtoken'
+import { ROLE } from './models/authRegisterModel'
 
 export interface DecodedToken {
     sub: string
@@ -22,27 +23,31 @@ export function middleware(request: NextRequest) {
     const token = request.cookies.get('login-token')?.value
     let expirationDate = new Date(CURRENT_DATE_MILLIS - ONE_HOUR_MILLIS)
 
+    const currentPath = request.nextUrl.pathname
     const response = NextResponse.next()
 
     if (token) {
         try {
             const decodedToken = decode(token) as DecodedToken
             expirationDate = new Date(decodedToken.exp * 1000)
-            
+
             if (CURRENT_DATE_MILLIS >= expirationDate.getTime()) {
-                if (request.nextUrl.pathname != '/') {
+                if (currentPath != '/') {
                     return NextResponse.redirect(logoutUrl)
                 }
                 return NextResponse.redirect(loginUrl)
             }
-            if (request.nextUrl.pathname === '/') {
+            if (currentPath === '/') {
+                return NextResponse.redirect(homeUrl)
+            }
+            if (decodedToken.role === ROLE.OPERADOR && currentPath.startsWith('/funcionario')) {
                 return NextResponse.redirect(homeUrl)
             }
         } catch (error) {
             console.error('Token inválido ou erro ao verificar:', error)
         }
     } else {
-        if (request.nextUrl.pathname === '/') {
+        if (currentPath === '/') {
             return response
         }
         return NextResponse.redirect(loginUrl)

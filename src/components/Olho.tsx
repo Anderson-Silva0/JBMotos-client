@@ -54,19 +54,19 @@ export function Olho({ estaVisivel, setEstaVisivel, lucroVenda, isLogin }: OlhoP
   } else {
     return (
       estaVisivelNotLogin ? (
-        <>
+        <div className="container-lucro">
+          <div className='div-resultado'>{lucroVenda}</div>
           <div className="div-olho" onClick={atualizarEstadoOlhoNotLogin}>
             <Image src={imgVisivel} width={25} height={25} alt="" />
           </div>
-          <div className='div-resultado'>{lucroVenda}</div>
-        </>
+        </div>
       ) : (
-        <>
+        <div className="container-lucro">
+          <div>• • • • • • • •</div>
           <div className="div-olho" onClick={atualizarEstadoOlhoNotLogin}>
             <Image src={imgNaoVisivel} width={25} height={25} alt="" />
           </div>
-          <div>••••••</div>
-        </>
+        </div>
       )
     )
   }

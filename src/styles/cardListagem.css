@@ -78,7 +78,7 @@
   margin-bottom: 1%;
   display: flex;
   justify-content: space-between;
-  
+
   flex-direction: column;
 }
 
@@ -112,7 +112,7 @@
 .value-box-venda {
   display: flex;
   flex-direction: column;
-  width: 35%;
+  width: 26%;
   justify-content: center;
   align-items: center;
   padding: 10px;
@@ -122,6 +122,13 @@
   background-color: #F8F9FA;
   box-shadow: 1px 1px 4px 4px #495057;
   font-size: 15pt;
+}
+
+.container-lucro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 52%;
 }
 
 .div-olho {
@@ -261,6 +268,14 @@
 }
 
 @media (max-width: 999px) {
+  .value-box-venda {
+      width: 60%;
+  }
+
+  .container-lucro {
+    width: 62%;
+  }
+
   .cardListagem-container {
     width: 90%;
     margin: 5vh auto;
