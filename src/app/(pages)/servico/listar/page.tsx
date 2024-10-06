@@ -1,6 +1,7 @@
 'use client'
 
 import { InputCpf, InputPlaca } from "@/components/Input"
+import LoadingLogo from "@/components/LoadingLogo"
 import ServicoCard from "@/components/ServicoCard"
 import imgVenda from "@/images/vendas.png"
 import { Servico } from "@/models/servico"
@@ -63,7 +64,7 @@ export default function ListarServicos() {
   }
 
   if (!foiCarregado) {
-    return <h1 className="carregando">Carregando...</h1>
+    return <LoadingLogo />
   }
 
   return (

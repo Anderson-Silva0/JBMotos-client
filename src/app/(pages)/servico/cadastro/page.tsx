@@ -36,6 +36,8 @@ import Cookies from 'js-cookie'
 import { decode } from 'jsonwebtoken'
 import Select from "react-select";
 import { DecodedToken } from "@/middleware";
+import { ConfirmarDecisao } from "@/components/ConfirmarDecisao";
+import LoadingLogo from "@/components/LoadingLogo";
 
 export default function CadastroServico() {
     const { buscarTodosClientes } = ClienteService()
@@ -250,6 +252,10 @@ export default function CadastroServico() {
         }
     }
 
+    const handlerRealizarServico = () => {
+        ConfirmarDecisao("Confirmação de Serviço", "Tem certeza de que deseja realizar este serviço?", submit)
+    }
+
     const exibeErroCampoCliente = () => {
         if (!opcaoSelecionadaCliente.value) {
             setErros([...erros, {
@@ -271,7 +277,7 @@ export default function CadastroServico() {
     }
 
     if (!foiCarregado) {
-        return <h1 className="carregando">Carregando...</h1>
+        return <LoadingLogo />
     }
 
     return (
@@ -404,7 +410,7 @@ export default function CadastroServico() {
 
             <div className="divBotaoCadastrar">
                 <button
-                    onClick={submit}
+                    onClick={handlerRealizarServico}
                     type="submit">
                     Realizar Serviço
                 </button>

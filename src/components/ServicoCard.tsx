@@ -83,7 +83,7 @@ export default function ServicoCard(servico: Servico) {
           <div className='div-resultado'>{servico.observacao}</div>
           <div className='div-dados'>Preço de Mão de Obra</div>
           <div className='div-resultado'>{formatarParaReal(servico.precoMaoDeObra)}</div>
-          <div className='div-dados'>Serviços realizados</div>
+          <div className='div-dados'>Serviços Realizados</div>
           <div className='div-resultado'>{servico.servicosRealizados}</div>
           {
             servico.venda && (

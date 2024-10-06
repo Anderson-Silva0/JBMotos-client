@@ -2,6 +2,7 @@
 
 import FuncionarioCard from "@/components/FuncionarioCard"
 import { InputCpf, InputTelefone } from "@/components/Input"
+import LoadingLogo from "@/components/LoadingLogo"
 import imgFuncionario from "@/images/employee.png"
 import { parseDate } from "@/models/StringParaDate"
 import { Funcionario } from "@/models/funcionario"
@@ -69,7 +70,7 @@ export default function ListarFuncionarios() {
   }
 
   if (!foiCarregado) {
-    return <h1 className="carregando">Carregando...</h1>
+    return <LoadingLogo />
   }
 
   return (

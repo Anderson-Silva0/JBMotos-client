@@ -2,6 +2,7 @@
 
 import ClienteCard from "@/components/ClienteCard"
 import { InputCpf, InputTelefone } from "@/components/Input"
+import LoadingLogo from "@/components/LoadingLogo"
 import imgCliente from "@/images/client.png"
 import { parseDate } from "@/models/StringParaDate"
 import { Cliente } from "@/models/cliente"
@@ -67,7 +68,7 @@ export default function ListarClientes() {
   }
 
   if (!foiCarregado) {
-    return <h1 className="carregando">Carregando...</h1>
+    return <LoadingLogo />
   }
 
   return (

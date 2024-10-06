@@ -1,5 +1,6 @@
 'use client'
 
+import LoadingLogo from "@/components/LoadingLogo"
 import ProdutoCard from "@/components/ProdutoCard"
 import imgProduto from '@/images/checklist.png'
 import { parseDate } from "@/models/StringParaDate"
@@ -66,7 +67,7 @@ export default function ListarProdutos() {
   }
 
   if (!foiCarregado) {
-    return <h1 className="carregando">Carregando...</h1>
+    return <LoadingLogo />
   }
 
   return (

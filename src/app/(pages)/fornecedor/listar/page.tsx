@@ -2,6 +2,7 @@
 
 import FornecedorCard from "@/components/FornecedorCard"
 import { InputCnpj, InputTelefone } from "@/components/Input"
+import LoadingLogo from "@/components/LoadingLogo"
 import imgFornecedor from "@/images/supplier.png"
 import { parseDate } from "@/models/StringParaDate"
 import { Fornecedor } from "@/models/fornecedor"
@@ -67,7 +68,7 @@ export default function ListarFornecedores() {
   }
 
   if (!foiCarregado) {
-    return <h1 className="carregando">Carregando...</h1>
+    return <LoadingLogo />
   }
 
   return (

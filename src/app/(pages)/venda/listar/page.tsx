@@ -1,6 +1,7 @@
 'use client'
 
 import { InputCpf } from "@/components/Input"
+import LoadingLogo from "@/components/LoadingLogo"
 import VendaCard from "@/components/VendaCard"
 import imgVenda from "@/images/vendas.png"
 import { parseDate } from "@/models/StringParaDate"
@@ -63,7 +64,7 @@ export default function ListarVendas() {
   }
 
   if (!foiCarregado) {
-    return <h1 className="carregando">Carregando...</h1>
+    return <LoadingLogo />
   }
 
   return (

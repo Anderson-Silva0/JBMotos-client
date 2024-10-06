@@ -6,6 +6,7 @@ import { ExibeErro } from "@/components/ExibeErro"
 import { FormGroup } from "@/components/Form-group"
 import { GeradorPDF, TipoRecibo, removerProdutoOrcamento } from "@/components/GeradorPDF"
 import { LinhaTabela } from "@/components/LinhaTabela"
+import LoadingLogo from "@/components/LoadingLogo"
 import { PagamentoCredito } from "@/components/PagamentoCredito"
 import TabelaVenda from "@/components/TabelaVenda"
 import imgRemoverLinha from '@/images/icons8-delete-row-100.png'
@@ -315,7 +316,7 @@ export default function CadastroVenda() {
   }
 
   if (!foiCarregado) {
-    return <h1 className="carregando">Carregando...</h1>
+    return <LoadingLogo />
   }
 
   return (

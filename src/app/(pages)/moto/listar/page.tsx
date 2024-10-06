@@ -1,6 +1,7 @@
 'use client'
 
 import { InputCpf, InputPlaca } from "@/components/Input"
+import LoadingLogo from "@/components/LoadingLogo"
 import MotoCard from "@/components/MotoCard"
 import imgMoto from "@/images/moto.png"
 import { parseDate } from "@/models/StringParaDate"
@@ -67,7 +68,7 @@ export default function ListarMotos() {
   }
 
   if (!foiCarregado) {
-    return <h1 className="carregando">Carregando...</h1>
+    return <LoadingLogo />
   }
 
   return (
