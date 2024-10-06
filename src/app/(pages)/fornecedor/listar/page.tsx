@@ -10,6 +10,7 @@ import { mensagemErro } from "@/models/toast"
 import { FornecedorService } from "@/services/fornecedorService"
 import { Search } from "lucide-react"
 import Image from "next/image"
+import '@/styles/card.css'
 import { useEffect, useState } from "react"
 
 export default function ListarFornecedores() {
@@ -68,7 +69,7 @@ export default function ListarFornecedores() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo />
+    return <LoadingLogo descricao='Carregando' />
   }
 
   return (

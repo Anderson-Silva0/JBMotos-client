@@ -316,7 +316,7 @@ export default function CadastroVenda() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo />
+    return <LoadingLogo descricao='Carregando' />
   }
 
   return (

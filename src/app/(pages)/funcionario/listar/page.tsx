@@ -10,6 +10,7 @@ import { mensagemErro } from "@/models/toast"
 import { FuncionarioService } from "@/services/funcionarioService"
 import { Search } from "lucide-react"
 import Image from "next/image"
+import '@/styles/card.css'
 import { useEffect, useState } from "react"
 
 export default function ListarFuncionarios() {
@@ -70,7 +71,7 @@ export default function ListarFuncionarios() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo />
+    return <LoadingLogo descricao='Carregando' />
   }
 
   return (

@@ -10,6 +10,7 @@ import { ProdutoService } from "@/services/produtoService"
 import { Search } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
+import '@/styles/card.css'
 
 export default function ListarProdutos() {
   const [produtos, setProdutos] = useState<Produto[]>([])
@@ -67,7 +68,7 @@ export default function ListarProdutos() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo />
+    return <LoadingLogo descricao='Carregando' />
   }
 
   return (

@@ -123,6 +123,28 @@
   text-align: start;
 }
 
+#container-loading {
+  position: relative;
+}
+
+.content-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+}
+
+.content-loading-desc {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+  font-weight: bolder;
+  font-size: 1.6em;
+}
+
 @media (max-width: 999px) {
   .card {
     width: 90%;

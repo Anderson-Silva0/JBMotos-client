@@ -10,6 +10,7 @@ import { mensagemErro } from "@/models/toast"
 import { ServicoService } from "@/services/servicoService"
 import { Search } from "lucide-react"
 import Image from "next/image"
+import '@/styles/card.css'
 import { useEffect, useState } from "react"
 
 export default function ListarServicos() {
@@ -64,7 +65,7 @@ export default function ListarServicos() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo />
+    return <LoadingLogo descricao='Carregando' />
   }
 
   return (

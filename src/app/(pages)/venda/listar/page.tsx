@@ -10,6 +10,7 @@ import { Venda } from "@/models/venda"
 import { VendaService } from "@/services/VendaService"
 import { Search } from "lucide-react"
 import Image from "next/image"
+import '@/styles/card.css'
 import { useEffect, useState } from "react"
 
 export default function ListarVendas() {
@@ -64,7 +65,7 @@ export default function ListarVendas() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo />
+    return <LoadingLogo descricao='Carregando' />
   }
 
   return (

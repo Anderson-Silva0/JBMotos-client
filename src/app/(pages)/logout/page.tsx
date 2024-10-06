@@ -3,6 +3,8 @@
 import React, { useEffect } from 'react'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
+import LoadingLogo from '@/components/LoadingLogo'
+import '@/styles/card.css'
 
 export default function Logout() {
     const key = 'login-token'
@@ -17,8 +19,8 @@ export default function Logout() {
     }, [key, router])
 
     return (
-        <div style={{ textAlign: 'center', marginTop: '50px' }}>
-            <p>Logging out...</p>
+        <div>
+            <LoadingLogo descricao='Saindo' />
         </div>
-    );
+    )
 }

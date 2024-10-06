@@ -277,7 +277,7 @@ export default function CadastroServico() {
     }
 
     if (!foiCarregado) {
-        return <LoadingLogo />
+        return <LoadingLogo descricao='Carregando' />
     }
 
     return (
