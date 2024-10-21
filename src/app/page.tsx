@@ -12,7 +12,9 @@ import { Authentication, estadoInicialAuthentication } from '@/models/authentica
 import { mensagemErro, mensagemSucesso } from '@/models/toast'
 import { AuthenticationService } from '@/services/authenticationService'
 import Cookies from 'js-cookie'
+import '@/styles/card.css'
 import { useRouter } from 'next/navigation'
+import LoadingLogo from '@/components/LoadingLogo'
 
 export default function Login() {
 
@@ -52,6 +54,16 @@ export default function Login() {
         mensagemErro("Falha na comunicação com o servidor.")
       }
     }
+  }
+
+  const hasLoginCookie = Cookies.get('login-token')
+
+  if (hasLoginCookie) {
+    return (
+      <div className='div-principal'>
+        <LoadingLogo descricao='Entrando' />
+      </div>
+    )
   }
 
   return (
