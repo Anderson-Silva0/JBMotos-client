@@ -19,6 +19,7 @@ import { decode } from 'jsonwebtoken'
 import { DecodedToken } from '@/middleware'
 import { ROLE } from '@/models/authRegisterModel'
 import { useEffect, useState } from "react"
+import { Venda } from "@/models/venda"
 
 
 interface ProdutosDaVendaProps {
@@ -32,7 +33,7 @@ export default function ProdutosDaVenda({ params }: ProdutosDaVendaProps) {
 
   const { buscarTodosPorIdVenda } = ProdutoVendaService()
 
-  const { valorTotalDaVenda, lucroDaVenda } = VendaService()
+  const { buscarVendaPorId, lucroDaVenda } = VendaService()
 
   const [produtosDaVendaState, setProdutosDaVendaState] = useState<ProdutoVenda[]>([])
   const [valorTotalVenda, setValorTotalVenda] = useState<number>(0)
@@ -51,26 +52,32 @@ export default function ProdutosDaVenda({ params }: ProdutosDaVendaProps) {
   useEffect(() => {
     const buscarInformacoesDaVenda = async () => {
       try {
-        const produtosDaVendaResponse = await buscarTodosPorIdVenda(params.idVenda)
-        setProdutosDaVendaState(produtosDaVendaResponse.data)
+        const vendaResponse = await buscarVendaPorId(params.idVenda)
+        const venda = vendaResponse.data as Venda
 
-        const valorTotalVendaResponse = await valorTotalDaVenda(params.idVenda)
-        setValorTotalVenda(valorTotalVendaResponse.data)
+        if (venda) {
+          const produtosVenda = venda.produtosVenda
+          if (produtosVenda) {
+            setProdutosDaVendaState(produtosVenda)
+          }
 
-        const lucroDaVendaResponse = await lucroDaVenda(params.idVenda)
-        setLucroDaVendaState(lucroDaVendaResponse.data)
+          const valorTotalVendaResponse = venda.valorTotalVenda
+          if (valorTotalVendaResponse) {
+            setValorTotalVenda(valorTotalVendaResponse)
+          }
 
-        const mapIdNomeProduto = new Map<number, string>()
+          const lucroDaVendaResponse = await lucroDaVenda(params.idVenda)
+          setLucroDaVendaState(lucroDaVendaResponse.data)
 
-        const promises = produtosDaVendaResponse.data.map(async (prod: ProdutoVenda) => {
-          const response = await buscarProdutoPorId(prod.idProduto)
-          const produtoResponse = response.data as Produto
-          mapIdNomeProduto.set(produtoResponse.id, produtoResponse.nome)
-        })
+          const mapIdNomeProduto = new Map<number, string>()
 
-        await Promise.all(promises)
+          produtosVenda.map(produtoVenda => {
+            const produto = produtoVenda.produto
+            mapIdNomeProduto.set(produto.id, produto.nome)
+          })
 
-        setIdNomeProdutoMap(mapIdNomeProduto)
+          setIdNomeProdutoMap(mapIdNomeProduto)
+        }
       } catch (erro: any) {
         mensagemErro("Erro ao carregar dados.")
       }
@@ -115,7 +122,7 @@ export default function ProdutosDaVenda({ params }: ProdutosDaVendaProps) {
         <TabelaVenda>
           {
             produtosDaVendaState.map((produtoVenda) => {
-              const nomeProduto = idNomeProdutoMap?.get(produtoVenda.idProduto)
+              const nomeProduto = idNomeProdutoMap?.get(produtoVenda.produto.id)
               if (nomeProduto) {
                 return (
                   <LinhaProduto

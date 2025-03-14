@@ -1,18 +1,11 @@
 import { RegistroProdutoSelecionadoProps } from '@/app/(pages)/venda/cadastro/page'
-import { ProdutoVenda } from '@/models/ProdutoVenda'
 import { Cliente, estadoInicialCliente } from '@/models/cliente'
 import { formatarParaReal } from '@/models/formatadorReal'
 import { Funcionario, estadoInicialFuncionario } from '@/models/funcionario'
 import { PagamentoCartao, estadoInicialPagamentoCartao } from '@/models/pagamentoCartao'
-import { Produto } from '@/models/produto'
 import { mensagemErro } from '@/models/toast'
 import { Venda } from '@/models/venda'
-import { ProdutoVendaService } from '@/services/ProdutoVendaService'
 import { VendaService } from '@/services/VendaService'
-import { ClienteService } from '@/services/clienteService'
-import { FuncionarioService } from '@/services/funcionarioService'
-import { PagamentoCartaoService } from '@/services/pagamentoCartaoService'
-import { ProdutoService } from '@/services/produtoService'
 import '@/styles/cardListagem.css'
 import { Info } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -23,12 +16,7 @@ import InfoCard from './InfoCard'
 export default function VendaCard(venda: Venda) {
   const router = useRouter()
 
-  const { buscarClientePorCpf } = ClienteService()
-  const { buscarFuncionarioPorCpf } = FuncionarioService()
   const { valorTotalDaVenda } = VendaService()
-  const { buscarTodosPorIdVenda } = ProdutoVendaService()
-  const { buscarProdutoPorId } = ProdutoService()
-  const { buscarPagamentoCartaoPorIdVenda } = PagamentoCartaoService()
 
   const [clienteState, setClienteState] = useState<Cliente>(estadoInicialCliente)
   const [funcionarioState, setFuncionarioState] = useState<Funcionario>(estadoInicialFuncionario)
@@ -42,15 +30,11 @@ export default function VendaCard(venda: Venda) {
   useEffect(() => {
     const buscar = async () => {
       try {
-        const clienteResponse = await buscarClientePorCpf(venda.cpfCliente)
-        setClienteState(clienteResponse.data)
+        setClienteState(venda.cliente)
+        setFuncionarioState(venda.funcionario)
 
-        const funcionarioResponse = await buscarFuncionarioPorCpf(venda.cpfFuncionario)
-        setFuncionarioState(funcionarioResponse.data)
-
-        if (venda.formaDePagamento === "Cartão de Crédito") {
-          const pagamentoCartaoResponse = await buscarPagamentoCartaoPorIdVenda(venda.id)
-          setPagamentoCartao(pagamentoCartaoResponse.data)
+        if (venda.pagamentoCartao && venda.formaDePagamento === "Cartão de Crédito") {
+          setPagamentoCartao(venda.pagamentoCartao)
         }
       } catch (error: any) {
         mensagemErro(error.response.data)
@@ -59,33 +43,23 @@ export default function VendaCard(venda: Venda) {
     buscar()
   }, [])
 
-  const obterNomeProduto = async (idProduto: number) => {
-    const produtoResponse = await buscarProdutoPorId(idProduto)
-    const produto = produtoResponse.data as Produto
-    return produto.nome
-  }
-
   useEffect(() => {
     const buscar = async () => {
-      const valorTotalVendaResponse = await valorTotalDaVenda(venda.id)
-      setValorTotal(formatarParaReal(valorTotalVendaResponse.data))
+      if (venda.valorTotalVenda) {
+        setValorTotal(formatarParaReal(venda.valorTotalVenda))
+      }
 
-      const produtosVendaResponse = await buscarTodosPorIdVenda(venda.id)
-      const produtosVenda = produtosVendaResponse.data as ProdutoVenda[]
-
-      const registrosProdutosVenda = await Promise.all(
-        produtosVenda.map(async (produtoVenda) => {
-          const nomeProduto = await obterNomeProduto(produtoVenda.idProduto)
-
-          return {
-            idProduto: produtoVenda.idProduto,
-            nomeProduto: nomeProduto,
-            quantidade: produtoVenda.quantidade,
-            valorUnidade: formatarParaReal(produtoVenda.valorUnidade),
-            valorTotal: formatarParaReal(produtoVenda.valorTotal)
-          } as RegistroProdutoSelecionadoProps
-        })
-      )
+      const produtosVenda = venda.produtosVenda
+      const registrosProdutosVenda = produtosVenda.map(produtoVenda => {
+        const produto = produtoVenda.produto
+        return {
+          idProduto: produto.id,
+          nomeProduto: produto.nome,
+          quantidade: produtoVenda.quantidade,
+          valorUnidade: formatarParaReal(produtoVenda.valorUnidade),
+          valorTotal: formatarParaReal(produtoVenda.valorTotal)
+        } as RegistroProdutoSelecionadoProps
+      })
 
       setProdutosVendaState(registrosProdutosVenda)
     }
@@ -119,11 +93,11 @@ export default function VendaCard(venda: Venda) {
           <div className='div-dados'>Nome do Cliente</div>
           <div className='div-resultado'>{clienteState.nome}</div>
           <div className='div-dados'>CPF do Cliente</div>
-          <div className='div-resultado'>{venda.cpfCliente}</div>
+          <div className='div-resultado'>{venda.cliente.cpf}</div>
           <div className='div-dados'>Nome do Funcionário</div>
           <div className='div-resultado'>{funcionarioState.nome}</div>
           <div className='div-dados'>CPF do Funcionário</div>
-          <div className='div-resultado'>{venda.cpfFuncionario}</div>
+          <div className='div-resultado'>{venda.funcionario.cpf}</div>
         </div>
         <div className='items'>
           <div className='div-dados'>Data e Hora de Cadastro da Venda</div>
@@ -162,7 +136,7 @@ export default function VendaCard(venda: Venda) {
         <GeradorPDF
           tipoRecibo={TipoRecibo.comprovante}
           nomeCliente={clienteState.nome}
-          cpfCliente={venda.cpfCliente}
+          cpfCliente={venda.cliente.cpf}
           formaPagamento={venda.formaDePagamento}
           nomeFuncionario={funcionarioState.nome}
           observacao={venda.observacao}

@@ -1,5 +1,6 @@
 
-import { ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/(pages)/venda/cadastro/page"
+import { ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, 
+RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/(pages)/venda/cadastro/page"
 import { ProdutoVenda, estadoInicialProdutoVenda } from "@/models/ProdutoVenda"
 import { Estoque, estadoInicialEstoque } from "@/models/estoque"
 import { formatarParaReal } from "@/models/formatadorReal"
@@ -122,8 +123,11 @@ export function LinhaTabela(props: LinhaTabelaProps) {
       props.atualizarIdProdutoIdLinhaSelecionado(opcaoSelecionada.produto.id, props.idLinha)
     }
     const verificarEstoque = async () => {
-      const estoqueResponse = await buscarEstoquePorId(opcaoSelecionada.produto.idEstoque)
-      setEstoqueProdutoSelecionado(estoqueResponse.data)
+      const idEstoque = opcaoSelecionada.produto.idEstoque
+      if (idEstoque) {
+        const estoqueResponse = await buscarEstoquePorId(idEstoque)
+        setEstoqueProdutoSelecionado(estoqueResponse.data)
+      }
     }
     if (opcaoSelecionada.produto.id) {
       verificarEstoque()
@@ -206,8 +210,8 @@ export function LinhaTabela(props: LinhaTabelaProps) {
 
       const novoProdutoVenda = { ...produtoVenda }
 
-      if (!novoProdutoVenda.idProduto || novoProdutoVenda.idProduto !== opcaoSelecionada.produto.id) {
-        novoProdutoVenda.idProduto = opcaoSelecionada.produto.id
+      if (!novoProdutoVenda.produto.id || novoProdutoVenda.produto.id !== opcaoSelecionada.produto.id) {
+        novoProdutoVenda.produto.id = opcaoSelecionada.produto.id
         novoProdutoVenda.valorUnidade = opcaoSelecionada.produto.precoVenda
       }
 

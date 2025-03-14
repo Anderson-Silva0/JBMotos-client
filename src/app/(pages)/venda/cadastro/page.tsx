@@ -138,8 +138,8 @@ export default function CadastroVenda() {
     setVenda(
       {
         ...venda,
-        cpfCliente: String(opcaoSelecionadaCliente?.value),
-        cpfFuncionario: cpfUser,
+        cliente: { ...venda.cliente, cpf: String(opcaoSelecionadaCliente?.value) },
+        funcionario: { ...venda.funcionario, cpf: cpfUser },
         formaDePagamento: String(opcaoSelecionadaFormaDePagamento?.value)
       }
     )
@@ -169,7 +169,13 @@ export default function CadastroVenda() {
   const submit = async () => {
     if (produtosSelecionados.length) {
       try {
-        const produtosVenda = produtosVendaIdLinha.map(item => item.produtoVenda)
+        const produtosVenda = produtosVendaIdLinha.map(item => {
+          const produtoVenda = { ...item.produtoVenda }
+          produtoVenda.produto = { ...produtoVenda.produto }
+          produtoVenda.produto.id = produtoVenda.idProduto
+
+          return produtoVenda
+        })
 
         if (opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito") {
           await salvarVenda({ ...venda, produtosVenda, pagamentoCartao })
@@ -263,7 +269,7 @@ export default function CadastroVenda() {
           const novosValoresTotais = valoresTotais.filter(valor => valor.idLinha !== produtoExcluido.idLinha)
           setValoresTotais(novosValoresTotais)
 
-          const indiceParaRemover = produtosVendaIdLinha.findIndex((item) => item.produtoVenda.idProduto === produtoExcluido.idProduto)
+          const indiceParaRemover = produtosVendaIdLinha.findIndex((item) => item.produtoVenda.produto.id === produtoExcluido.idProduto)
           if (indiceParaRemover >= 0) {
             produtosVendaIdLinha.splice(indiceParaRemover, 1)
           }

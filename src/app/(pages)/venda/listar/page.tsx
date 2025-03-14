@@ -189,11 +189,12 @@ export default function ListarVendas() {
             id={venda.id}
             pagamentoCartao={null}
             produtosVenda={[]}
-            cpfCliente={venda.cpfCliente}
-            cpfFuncionario={venda.cpfFuncionario}
+            cliente={venda.cliente}
+            funcionario={venda.funcionario}
             dataHoraCadastro={venda.dataHoraCadastro}
             observacao={venda.observacao}
             formaDePagamento={venda.formaDePagamento}
+            valorTotalVenda={venda.valorTotalVenda}
           />
         )
       })}
