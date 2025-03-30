@@ -82,7 +82,7 @@ export default function SupplierCard({
   };
 
   const update = () => {
-    router.push(`/supplier/update/${encodeURIComponent(supplier.cnpj)}`);
+    router.push(`/fornecedor/atualizar/${encodeURIComponent(supplier.cnpj)}`);
   };
 
   return (

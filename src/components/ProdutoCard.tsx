@@ -103,7 +103,7 @@ export default function ProdutoCard({
   };
 
   const update = () => {
-    router.push(`/product/update/${product.id}`);
+    router.push(`/produto/atualizar/${product.id}`);
   };
 
   const productProfit = Number(product.salePrice) - Number(product.costPrice);

@@ -78,7 +78,7 @@ export default function MotorcycleCard({ motorcycle, setMotorcycle }: Motorcycle
   };
 
   const atualizar = () => {
-    router.push(`/motorcycle/update/${motorcycle.id}`);
+    router.push(`/moto/atualizar/${motorcycle.id}`);
   };
 
   return (

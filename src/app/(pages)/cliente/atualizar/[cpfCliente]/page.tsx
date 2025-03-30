@@ -14,63 +14,62 @@ import { Edit3 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 
-interface AtualizarClienteProps {
+interface UpdateCustomerProps {
   params: {
-    cpfCliente: string;
+    customerCpf: string;
   };
 }
 
-export default function AtualizarCliente({ params }: AtualizarClienteProps) {
+export default function UpdateCustomer({ params }: UpdateCustomerProps) {
   const router = useRouter();
 
-  const { updateCustomer: atualizarCliente, findCustomerByCpf: buscarClientePorCpf } = CustomerService();
-  const { findAddressById: buscarEnderecoPorId, getAddressByCep: obterEnderecoPorCep } = AddressService();
+  const { updateCustomer, findCustomerByCpf } = CustomerService();
+  const { findAddressById, getAddressByCep } = AddressService();
 
-  const [erros, setErros] = useState<Errors[]>([]);
+  const [errors, setErrors] = useState<Errors[]>([]);
 
-  const [cliente, setCliente] = useState<Customer>(customerInitialState);
+  const [customer, setCustomer] = useState<Customer>(customerInitialState);
 
-  const [endereco, setEndereco] = useState<Address>(addressInitialState);
+  const [address, setAddress] = useState<Address>(addressInitialState);
 
-  const setPropsCliente = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setCliente({ ...cliente, [key]: e.target.value });
-    setErros([]);
+  const setCustomerProps = (key: string, e: ChangeEvent<HTMLInputElement>) => {
+    setCustomer({ ...customer, [key]: e.target.value });
+    setErrors([]);
   };
 
-  const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setEndereco({ ...endereco, [key]: e.target.value });
-    if (endereco.cep.length < 9 || erros) {
-      setErros([]);
+  const setAddressProps = (key: string, e: ChangeEvent<HTMLInputElement>) => {
+    setAddress({ ...address, [key]: e.target.value });
+    if (address.cep.length < 9 || errors) {
+      setErrors([]);
     }
   };
 
   useEffect(() => {
-    obterEnderecoPorCep(endereco, setEndereco, erros, setErros);
-  }, [endereco.cep]);
+    getAddressByCep(address, setAddress, errors, setErrors);
+  }, [address.cep]);
 
   useEffect(() => {
-    const buscar = async () => {
-      const clienteResponse = (await buscarClientePorCpf(params.cpfCliente))
-        .data as Customer;
-      setCliente(clienteResponse);
+    async function search() {
+      const customerResponse = (await findCustomerByCpf(params.customerCpf)).data as Customer;
+      setCustomer(customerResponse);
 
-      if (clienteResponse.address) {
-        const enderecoResponse = (
-          await buscarEnderecoPorId(clienteResponse.address.id)
+      if (customerResponse.address) {
+        const addressResponse = (
+          await findAddressById(customerResponse.address.id)
         ).data as Address;
-        setEndereco(enderecoResponse);
+        setAddress(addressResponse);
       }
-    };
-    buscar();
+    }
+    search();
   }, []);
 
   const submit = async () => {
     try {
-      await atualizarCliente(cliente.cpf, { ...cliente, address: endereco });
+      await updateCustomer(customer.cpf, { ...customer, address: address });
       successMessage("Cliente atualizado com sucesso.");
       router.push("/cliente/listar");
     } catch (error: any) {
-      saveErrors(error, erros, setErros);
+      saveErrors(error, errors, setErrors);
       errorMessage("Erro no preenchimento dos campos.");
     }
   };
@@ -78,33 +77,34 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
   return (
     <div className="div-form-container">
       <h1 className="centered-text">
-        <Edit3 size="6vh" strokeWidth={3} /> Atualização de Cliente
+        <Edit3 size="6vh" strokeWidth={3} /> 
+        Atualização de Cliente
       </h1>
       <Card title="Dados do Cliente">
         <FormGroup label="Nome: *" htmlFor="nome">
           <input
-            value={cliente.name}
-            onChange={(e) => setPropsCliente("nome", e)}
+            value={customer.name}
+            onChange={(e) => setCustomerProps("nome", e)}
             id="nome"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="nome" />}
+          {<DisplayError errors={errors} inputName="nome" />}
         </FormGroup>
         <FormGroup label="Email: *" htmlFor="email">
           <input
-            value={cliente.email}
-            onChange={(e) => setPropsCliente("email", e)}
+            value={customer.email}
+            onChange={(e) => setCustomerProps("email", e)}
             id="email"
             type="email"
           />
-          {<DisplayError errors={erros} inputName="email" />}
+          {<DisplayError errors={errors} inputName="email" />}
         </FormGroup>
         <FormGroup label="Celular: *" htmlFor="telefone">
           <PhoneInput
-            value={cliente.phone}
-            onChange={(e) => setPropsCliente("telefone", e)}
+            value={customer.phone}
+            onChange={(e) => setCustomerProps("telefone", e)}
           />
-          {<DisplayError errors={erros} inputName="telefone" />}
+          {<DisplayError errors={errors} inputName="telefone" />}
         </FormGroup>
       </Card>
       <Card title="Endereço do Cliente">
@@ -112,49 +112,49 @@ export default function AtualizarCliente({ params }: AtualizarClienteProps) {
           <span className="cep-message">
             Digite o CEP para preenchimento automático do endereço.
           </span>
-          <cepInput
-            value={endereco.cep}
-            onChange={(e) => setPropsEndereco("cep", e)}
+          <CepInput
+            value={address.cep}
+            onChange={(e) => setAddressProps("cep", e)}
           />
-          {<DisplayError errors={erros} inputName="cep" />}
+          {<DisplayError errors={errors} inputName="cep" />}
         </FormGroup>
         <FormGroup label="Logradouro: *" htmlFor="rua">
           <input
-            value={endereco.road}
-            onChange={(e) => setPropsEndereco("rua", e)}
+            value={address.road}
+            onChange={(e) => setAddressProps("rua", e)}
             id="rua"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="rua" />}
+          {<DisplayError errors={errors} inputName="rua" />}
         </FormGroup>
         <FormGroup label="Número: *" htmlFor="numero">
           <input
             className="input-number-form"
-            value={endereco.number}
-            onChange={(e) => setPropsEndereco("numero", e)}
+            value={address.number}
+            onChange={(e) => setAddressProps("numero", e)}
             id="numero"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={erros} inputName="numero" />}
+          {<DisplayError errors={errors} inputName="numero" />}
         </FormGroup>
         <FormGroup label="Bairro: *" htmlFor="bairro">
           <input
-            value={endereco.neighborhood}
-            onChange={(e) => setPropsEndereco("bairro", e)}
+            value={address.neighborhood}
+            onChange={(e) => setAddressProps("bairro", e)}
             id="bairro"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="bairro" />}
+          {<DisplayError errors={errors} inputName="bairro" />}
         </FormGroup>
         <FormGroup label="Cidade: *" htmlFor="cidade">
           <input
-            value={endereco.city}
-            onChange={(e) => setPropsEndereco("cidade", e)}
+            value={address.city}
+            onChange={(e) => setAddressProps("cidade", e)}
             id="cidade"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="cidade" />}
+          {<DisplayError errors={errors} inputName="cidade" />}
         </FormGroup>
       </Card>
       <div className="divBotaoCadastrar">

@@ -58,7 +58,7 @@ export default function RepairCard(repair: Repair) {
     }
 
     if (repair.sale) {
-      router.push(`/sale/list/products/${repair.sale.id}`);
+      router.push(`/venda/listar/produtos/${repair.sale.id}`);
     }
   };
 

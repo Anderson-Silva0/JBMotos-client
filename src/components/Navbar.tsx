@@ -28,8 +28,8 @@ export default function NavBar() {
     loadUserRole();
 
     const mobileMenu = document.querySelector(".mobile-menu") as HTMLElement;
-    const navList = document.querySelector(".nav-list") as HTMLElement;
-    const navLinks = document.querySelectorAll(".nav-list li");
+    const navList = document.querySelector(".nav-listar") as HTMLElement;
+    const navLinks = document.querySelectorAll(".nav-listar li");
 
     const animateLinks = () => {
       Array.from(navLinks).forEach((link: any, index: number) => {
@@ -68,7 +68,7 @@ export default function NavBar() {
             <div className="line2"></div>
             <div className="line3"></div>
           </div>
-          <ul className="nav-list">
+          <ul className="nav-listar">
             <li>
               <a href="/">Home</a>
             </li>
@@ -78,8 +78,8 @@ export default function NavBar() {
                 componentClicked={clickedComponent}
                 setComponentClicked={setClickedComponent}
               >
-                <a href="/customer/register">Cadastrar</a>
-                <a href="/customer/list">Listar</a>
+                <a href="/cliente/cadastrar">Cadastrar</a>
+                <a href="/cliente/listar">Listar</a>
               </Dropdown>
             </li>
             {userRole === ROLE.ADMIN && (
@@ -89,8 +89,8 @@ export default function NavBar() {
                   componentClicked={clickedComponent}
                   setComponentClicked={setClickedComponent}
                 >
-                  <a href="/employee/register">Cadastrar</a>
-                  <a href="/employee/list">Listar</a>
+                  <a href="/funcionario/cadastrar">Cadastrar</a>
+                  <a href="/funcionario/listar">Listar</a>
                 </Dropdown>
               </li>
             )}
@@ -100,8 +100,8 @@ export default function NavBar() {
                 componentClicked={clickedComponent}
                 setComponentClicked={setClickedComponent}
               >
-                <a href="/supplier/register">Cadastrar</a>
-                <a href="/supplier/list">Listar</a>
+                <a href="/fornecedor/cadastrar">Cadastrar</a>
+                <a href="/fornecedor/listar">Listar</a>
               </Dropdown>
             </li>
             <li>
@@ -110,8 +110,8 @@ export default function NavBar() {
                 componentClicked={clickedComponent}
                 setComponentClicked={setClickedComponent}
               >
-                <a href="/produto/register">Cadastrar</a>
-                <a href="/produto/list">Listar</a>
+                <a href="/produto/cadastrar">Cadastrar</a>
+                <a href="/produto/listar">Listar</a>
               </Dropdown>
             </li>
             <li>
@@ -120,8 +120,8 @@ export default function NavBar() {
                 componentClicked={clickedComponent}
                 setComponentClicked={setClickedComponent}
               >
-                <a href="/venda/register">Realizar</a>
-                <a href="/venda/list">Listar</a>
+                <a href="/venda/cadastrar">Realizar</a>
+                <a href="/venda/listar">Listar</a>
               </Dropdown>
             </li>
             <li>
@@ -130,8 +130,8 @@ export default function NavBar() {
                 componentClicked={clickedComponent}
                 setComponentClicked={setClickedComponent}
               >
-                <a href="/servico/register">Realizar</a>
-                <a href="/servico/list">Listar</a>
+                <a href="/servico/cadastrar">Realizar</a>
+                <a href="/servico/listar">Listar</a>
               </Dropdown>
             </li>
             <li>
@@ -140,8 +140,8 @@ export default function NavBar() {
                 componentClicked={clickedComponent}
                 setComponentClicked={setClickedComponent}
               >
-                <a href="/moto/register">Cadastrar</a>
-                <a href="/moto/list">Listar</a>
+                <a href="/moto/cadastrar">Cadastrar</a>
+                <a href="/moto/listar">Listar</a>
               </Dropdown>
             </li>
             <li>

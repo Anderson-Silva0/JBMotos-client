@@ -73,7 +73,7 @@ export default function EmployeeCard({
   };
 
   const update = () => {
-    router.push(`/employee/update/${employee.cpf}`);
+    router.push(`/funcionario/atualizar/${employee.cpf}`);
   };
 
   return (
