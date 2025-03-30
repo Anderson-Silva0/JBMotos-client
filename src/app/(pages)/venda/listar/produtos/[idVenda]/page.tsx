@@ -7,11 +7,8 @@ import imgProduto from "@/images/checklist.png";
 import imgVenda from "@/images/vendas.png";
 import { ProductOfSale } from "@/models/ProdutoVenda";
 import { formatToBRL } from "@/models/formatadorReal";
-import { Product } from "@/models/produto";
 import { errorMessage } from "@/models/toast";
-import { ProductOfSaleService } from "@/services/ProdutoVendaService";
 import { SaleService } from "@/services/VendaService";
-import { ProductService } from "@/services/produtoService";
 import "@/styles/cardListagem.css";
 import Image from "next/image";
 import Cookies from "js-cookie";
@@ -21,26 +18,19 @@ import { ROLE } from "@/models/authRegisterModel";
 import { useEffect, useState } from "react";
 import { Sale } from "@/models/venda";
 
-interface ProdutosDaVendaProps {
+interface ProductsOfSaleProps {
   params: {
-    idVenda: number;
+    saleId: number;
   };
 }
 
-export default function ProdutosDaVenda({ params }: ProdutosDaVendaProps) {
-  const { findProductById: buscarProdutoPorId } = ProductService();
+export default function ProductsOfSale({ params }: ProductsOfSaleProps) {
+  const { findSaleById, saleProfit } = SaleService();
 
-  const { findAllProductOfSaleBySaleId: buscarTodosPorIdVenda } = ProductOfSaleService();
-
-  const { findSaleById: buscarVendaPorId, saleProfit: lucroDaVenda } = SaleService();
-
-  const [produtosDaVendaState, setProdutosDaVendaState] = useState<
-    ProductOfSale[]
-  >([]);
-  const [valorTotalVenda, setValorTotalVenda] = useState<number>(0);
-  const [lucroDaVendaState, setLucroDaVendaState] = useState<number>(0);
-  const [idNomeProdutoMap, setIdNomeProdutoMap] =
-    useState<Map<number, string>>();
+  const [productsOfSaleState, setProductsOfSaleState] = useState<ProductOfSale[]>([]);
+  const [totalSaleValue, setTotalSaleValue] = useState<number>(0);
+  const [saleProfitState, setSaleProfitState] = useState<number>(0);
+  const [idNameProductMap, setIdNameProductMap] = useState<Map<number, string>>();
   const [userRole, setUserRole] = useState<string>("");
 
   function loadUserRole() {
@@ -52,56 +42,56 @@ export default function ProdutosDaVenda({ params }: ProdutosDaVendaProps) {
   }
 
   useEffect(() => {
-    const buscarInformacoesDaVenda = async () => {
+    const fetchSaleInformation = async () => {
       try {
-        const vendaResponse = await buscarVendaPorId(params.idVenda);
-        const venda = vendaResponse.data as Sale;
+        const saleResponse = await findSaleById(params.saleId);
+        const sale = saleResponse.data as Sale;
 
-        if (venda) {
-          const produtosVenda = venda.productsOfSale;
-          if (produtosVenda) {
-            setProdutosDaVendaState(produtosVenda);
+        if (sale) {
+          const productsOfSale = sale.productsOfSale;
+          if (productsOfSale) {
+            setProductsOfSaleState(productsOfSale);
           }
 
-          const valorTotalVendaResponse = venda.totalSaleValue;
-          if (valorTotalVendaResponse) {
-            setValorTotalVenda(valorTotalVendaResponse);
+          const totalSaleValueResponse = sale.totalSaleValue;
+          if (totalSaleValueResponse) {
+            setTotalSaleValue(totalSaleValueResponse);
           }
 
-          const lucroDaVendaResponse = await lucroDaVenda(params.idVenda);
-          setLucroDaVendaState(lucroDaVendaResponse.data);
+          const saleProfitResponse = await saleProfit(params.saleId);
+          setSaleProfitState(saleProfitResponse.data);
 
-          const mapIdNomeProduto = new Map<number, string>();
+          const idNameProductMap = new Map<number, string>();
 
-          produtosVenda.map((produtoVenda) => {
-            const produto = produtoVenda.product;
-            mapIdNomeProduto.set(produto.id, produto.name);
+          productsOfSale.map((productOfSale) => {
+            const product = productOfSale.product;
+            idNameProductMap.set(product.id, product.name);
           });
 
-          setIdNomeProdutoMap(mapIdNomeProduto);
+          setIdNameProductMap(idNameProductMap);
         }
       } catch (erro: any) {
         errorMessage("Erro ao carregar dados.");
       }
     };
     loadUserRole();
-    buscarInformacoesDaVenda();
+    fetchSaleInformation();
   }, []);
 
   return (
     <div className="div-container-produtoVenda">
       <h1 className="centered-text">
-        {produtosDaVendaState.length > 1 ? (
+        {productsOfSaleState.length > 1 ? (
           <>
             A <Image src={imgVenda} width={60} height={60} alt="" /> Venda
-            contém {produtosDaVendaState.length} Produtos {}
+            contém {productsOfSaleState.length} Produtos {}
             <Image src={imgProduto} width={60} height={60} alt="" />
           </>
         ) : (
-          produtosDaVendaState.length === 1 && (
+          productsOfSaleState.length === 1 && (
             <>
               A <Image src={imgVenda} width={60} height={60} alt="" /> Venda
-              contém {produtosDaVendaState.length} Produto {}
+              contém {productsOfSaleState.length} Produto {}
               <Image src={imgProduto} width={60} height={60} alt="" />
             </>
           )
@@ -109,15 +99,15 @@ export default function ProdutosDaVenda({ params }: ProdutosDaVendaProps) {
       </h1>
       <div className="cardListagem-container">
         <span id="info-title-venda">
-          {produtosDaVendaState.length === 1 ? (
+          {productsOfSaleState.length === 1 ? (
             <div className="div-dados-title">Detalhes do Produto</div>
           ) : (
             <div className="div-dados-title">Detalhes dos Produtos</div>
           )}
         </span>
         <SaleTable>
-          {produtosDaVendaState.map((produtoVenda) => {
-            const nomeProduto = idNomeProdutoMap?.get(produtoVenda.product.id);
+          {productsOfSaleState.map((produtoVenda) => {
+            const nomeProduto = idNameProductMap?.get(produtoVenda.product.id);
             if (nomeProduto) {
               return (
                 <ProductRow
@@ -133,12 +123,12 @@ export default function ProdutosDaVenda({ params }: ProdutosDaVendaProps) {
       <div className="value-box-venda">
         <div className="div-dados-title">Total da Venda</div>
         <div className="div-resultado" style={{ alignItems: "center" }}>
-          {formatToBRL(valorTotalVenda)}
+          {formatToBRL(totalSaleValue)}
         </div>
         {userRole === ROLE.ADMIN && (
           <>
             <div className="div-dados-title">Lucro da Venda</div>
-            <Eye isLogin={false} saleProfit={formatToBRL(lucroDaVendaState)} />
+            <Eye isLogin={false} saleProfit={formatToBRL(saleProfitState)} />
           </>
         )}
       </div>

@@ -20,77 +20,76 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import Select from "react-select";
 
-interface AtualizarMotoProps {
+interface UpdateMotorcycleProps {
   params: {
-    idMoto: number;
+    motorcycleId: number;
   };
 }
 
-export default function AtualizarMoto({ params }: AtualizarMotoProps) {
+export default function UpdateMotorcycle({ params }: UpdateMotorcycleProps) {
   const router = useRouter();
 
-  const { updateMotorcycle: atualizarMoto, findMotorcycleById: buscarMotoPorId } = MotorcycleService();
+  const { updateMotorcycle, findMotorcycleById } = MotorcycleService();
 
-  const { findAllCustomer: buscarTodosClientes } = CustomerService();
+  const { findAllCustomer } = CustomerService();
 
-  const [opcaoSelecionadaCliente, setOpcaoSelecionadaCliente] =
-    useState<selectionOptions>(selectionOptionsInitialState);
+  const [selectedCustomerOption, setSelectedCustomerOption] = useState<selectionOptions>(selectionOptionsInitialState);
 
-  const [erros, setErros] = useState<Errors[]>([]);
+  const [errors, setErrors] = useState<Errors[]>([]);
 
-  const [moto, setMoto] = useState<Motorcycle>(motorcycleInitialState);
+  const [motorcycle, setMotorcycle] = useState<Motorcycle>(motorcycleInitialState);
 
-  const [clientes, setClientes] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
 
-  const setPropsMoto = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setMoto({ ...moto, [key]: e.target.value });
-    setErros([]);
+  const setMotorcycleProps = (key: string, e: ChangeEvent<HTMLInputElement>) => {
+    setMotorcycle({ ...motorcycle, [key]: e.target.value });
+    setErrors([]);
   };
 
   useEffect(() => {
-    const buscar = async () => {
-      const motoResponse = (await buscarMotoPorId(params.idMoto)).data as Motorcycle;
-      setMoto(motoResponse);
+    const search = async () => {
+      const motorcycleResponse = (await findMotorcycleById(params.motorcycleId)).data as Motorcycle;
+      setMotorcycle(motorcycleResponse);
 
-      setOpcaoSelecionadaCliente({
-        label: motoResponse.customerCpf,
-        value: motoResponse.customerCpf,
+      setSelectedCustomerOption({
+        label: motorcycleResponse.customerCpf,
+        value: motorcycleResponse.customerCpf,
       });
     };
-    buscar();
+    search();
   }, []);
 
   useEffect(() => {
-    const buscarTodos = async () => {
+    const fetchAll = async () => {
       try {
-        const todosClientesResponse = await buscarTodosClientes();
-        const todosClientes = todosClientesResponse.data;
-        const clientesAtivos = todosClientes.filter(
+        const allCustomersResponse = await findAllCustomer();
+        const allCustomers = allCustomersResponse.data;
+        const activeCustomers = allCustomers.filter(
           (c: Customer) => c.customerStatus === "ATIVO"
         );
-        setClientes(clientesAtivos);
+        setCustomers(activeCustomers);
       } catch (erro: any) {
         errorMessage(erro.response.data);
       }
     };
-    buscarTodos();
+    fetchAll();
   }, []);
 
   useEffect(() => {
-    setMoto({
-      ...moto,
-      customerCpf: String(opcaoSelecionadaCliente?.value),
+    setMotorcycle({
+      ...motorcycle,
+      customerCpf: String(selectedCustomerOption?.value),
     });
-    setErros([]);
-  }, [opcaoSelecionadaCliente]);
+    setErrors([]);
+  }, [selectedCustomerOption]);
 
-  const atualizar = async () => {
+  const update = async () => {
     try {
-      await atualizarMoto(params.idMoto, moto);
+      await updateMotorcycle(params.motorcycleId, motorcycle);
       successMessage("Moto atualizada com sucesso!");
       router.push("/moto/listar");
     } catch (error: any) {
-      saveErrors(error, erros, setErros);
+      saveErrors(error, errors, setErrors);
       errorMessage("Erro no preenchimento dos campos.");
     }
   };
@@ -103,58 +102,58 @@ export default function AtualizarMoto({ params }: AtualizarMotoProps) {
       <Card title="Dados da Moto">
         <FormGroup label="Placa: *" htmlFor="placa">
           <PlateInput
-            value={moto.plate}
-            onChange={(e) => setPropsMoto("placa", e)}
+            value={motorcycle.plate}
+            onChange={(e) => setMotorcycleProps("placa", e)}
             id="placa"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="placa" />}
+          {<DisplayError errors={errors} inputName="placa" />}
         </FormGroup>
         <FormGroup label="Marca: *" htmlFor="marca">
           <input
-            value={moto.brand}
-            onChange={(e) => setPropsMoto("marca", e)}
+            value={motorcycle.brand}
+            onChange={(e) => setMotorcycleProps("marca", e)}
             id="marca"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="marca" />}
+          {<DisplayError errors={errors} inputName="marca" />}
         </FormGroup>
         <FormGroup label="Modelo: *" htmlFor="modelo">
           <input
-            value={moto.model}
-            onChange={(e) => setPropsMoto("modelo", e)}
+            value={motorcycle.model}
+            onChange={(e) => setMotorcycleProps("modelo", e)}
             id="modelo"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="modelo" />}
+          {<DisplayError errors={errors} inputName="modelo" />}
         </FormGroup>
         <FormGroup label="Ano: *" htmlFor="ano">
           <input
             className="input-number-form"
-            value={moto.year}
-            onChange={(e) => setPropsMoto("ano", e)}
+            value={motorcycle.year}
+            onChange={(e) => setMotorcycleProps("ano", e)}
             id="ano"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={erros} inputName="ano" />}
+          {<DisplayError errors={errors} inputName="ano" />}
         </FormGroup>
         <FormGroup label="Selecione o Cliente: *" htmlFor="cpfCliente">
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
-            value={opcaoSelecionadaCliente}
-            onChange={(option: any) => setOpcaoSelecionadaCliente(option)}
-            options={clientes.map(
+            value={selectedCustomerOption}
+            onChange={(option: any) => setSelectedCustomerOption(option)}
+            options={customers.map(
               (c) => ({ label: c.cpf, value: c.cpf } as selectionOptions)
             )}
             instanceId="select-cpfCliente"
           />
-          {<DisplayError errors={erros} inputName="cpfCliente" />}
+          {<DisplayError errors={errors} inputName="cpfCliente" />}
         </FormGroup>
       </Card>
       <div className="divBotaoCadastrar">
-        <button onClick={atualizar} type="submit">
+        <button onClick={update} type="submit">
           Atualizar Moto
         </button>
       </div>

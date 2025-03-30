@@ -21,108 +21,103 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import Select from "react-select";
 
-interface AtualizarProdutoProps {
+interface UpdateProductProps {
   params: {
-    idProduto: number;
+    productId: number;
   };
 }
 
-export default function AtualizarProduto({ params }: AtualizarProdutoProps) {
+export default function UpdateProduct({ params }: UpdateProductProps) {
   const router = useRouter();
 
-  const { findStockById: buscarEstoquePorId, updateStock: atualizarEstoque } = StockService();
-  const { findProductById: buscarProdutoPorId, updateProduct: atualizarProduto } = ProductService();
-  const { findSupplierByCnpj: buscarFornecedorPorCnpj, findAllSupplier: buscarTodosFornecedores } =
-    SupplierService();
+  const { findStockById, updateStock } = StockService();
+  const { findProductById, updateProduct } = ProductService();
+  const { findSupplierByCnpj, findAllSupplier } = SupplierService();
 
-  const [erros, setErros] = useState<Errors[]>([]);
+  const [errors, setErrors] = useState<Errors[]>([]);
 
-  const [estoque, setEstoque] = useState<Stock>(stockInitialState);
+  const [stock, setStock] = useState<Stock>(stockInitialState);
 
-  const [produto, setProduto] = useState<Product>(productInitialState);
+  const [product, setProduct] = useState<Product>(productInitialState);
 
-  const [fornecedores, setFornecedores] = useState<Supplier[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
 
-  const [opcaoSelecionadaFornecedor, setOpcaoSelecionadaFornecedor] =
-    useState<selectionOptions>(selectionOptionsInitialState);
+  const [selectedSupplierOption, setSelectedSupplierOption] = useState<selectionOptions>(selectionOptionsInitialState);
 
-  const setPropsProdutoMoney = (
-    key: string,
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
+  const setProductMoneyProps = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value.replace(/\D/g, "")) / 100;
     const limitedValue = Math.min(value, 100000);
-    setProduto({ ...produto, [key]: limitedValue });
-    setErros([]);
+    setProduct({ ...product, [key]: limitedValue });
+    setErrors([]);
   };
 
-  const setPropsProduto = (
+  const setProductProps = (
     key: string,
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
   ) => {
-    setProduto({ ...produto, [key]: e.target.value });
-    setErros([]);
+    setProduct({ ...product, [key]: e.target.value });
+    setErrors([]);
   };
 
-  const setPropsEstoque = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setEstoque({ ...estoque, [key]: e.target.value });
-    setErros([]);
+  const setStockProps = (key: string, e: ChangeEvent<HTMLInputElement>) => {
+    setStock({ ...stock, [key]: e.target.value });
+    setErrors([]);
   };
 
   useEffect(() => {
-    const buscar = async () => {
-      const produtoResponse = (await buscarProdutoPorId(params.idProduto))
+    const fetch = async () => {
+      const productResponse = (await findProductById(params.productId))
         .data as Product;
-      setProduto(produtoResponse);
+      setProduct(productResponse);
 
-      const fornecedorResponse = (
-        await buscarFornecedorPorCnpj(produtoResponse.supplierCNPJ)
+      const supplierResponse = (
+        await findSupplierByCnpj(productResponse.supplierCNPJ)
       ).data as Supplier;
-      const opcaoSelecao = {
-        label: fornecedorResponse.name,
-        value: fornecedorResponse.cnpj,
+      const selectionOption = {
+        label: supplierResponse.name,
+        value: supplierResponse.cnpj,
       };
-      setOpcaoSelecionadaFornecedor(opcaoSelecao);
+      setSelectedSupplierOption(selectionOption);
 
-      const estoqueResponse = (
-        await buscarEstoquePorId(produtoResponse.stockId)
+      const stockResponse = (
+        await findStockById(productResponse.stockId)
       ).data as Stock;
-      setEstoque(estoqueResponse);
+      setStock(stockResponse);
     };
-    buscar();
+    fetch();
   }, []);
 
   useEffect(() => {
-    const buscarFornecedores = async () => {
+    const fetchSupplier = async () => {
       try {
-        const todosFornecedoresResponse = await buscarTodosFornecedores();
-        const todosFornecedores = todosFornecedoresResponse.data;
-        const fornecedoresAtivos = todosFornecedores.filter(
+        const allSuppliersResponse = await findAllSupplier();
+        const allSuppliers = allSuppliersResponse.data;
+        const activeSuppliers = allSuppliers.filter(
           (f: Supplier) => f.supplierStatus === "ATIVO"
         );
-        setFornecedores(fornecedoresAtivos);
+        setSuppliers(activeSuppliers);
       } catch (erro: any) {
         errorMessage(erro.response.data);
       }
     };
-    buscarFornecedores();
+    fetchSupplier();
   }, []);
 
   useEffect(() => {
-    setProduto({
-      ...produto,
-      supplierCNPJ: String(opcaoSelecionadaFornecedor.value),
+    setProduct({
+      ...product,
+      supplierCNPJ: String(selectedSupplierOption.value),
     });
-  }, [opcaoSelecionadaFornecedor]);
+  }, [selectedSupplierOption]);
 
   const submit = async () => {
     try {
-      await atualizarProduto(produto.id, produto);
-      await atualizarEstoque(estoque.id, estoque);
+      await updateProduct(product.id, product);
+      await updateStock(stock.id, stock);
       successMessage("Produto e Estoque atualizados com sucesso.");
       router.push("/produto/listar");
     } catch (error: any) {
-      saveErrors(error, erros, setErros);
+      saveErrors(error, errors, setErrors);
       errorMessage("Erro no preenchimento dos campos.");
     }
   };
@@ -132,47 +127,47 @@ export default function AtualizarProduto({ params }: AtualizarProdutoProps) {
       <Card title="Informações do Produto">
         <FormGroup label="Nome: *" htmlFor="nome">
           <input
-            value={produto.name}
-            onChange={(e) => setPropsProduto("nome", e)}
+            value={product.name}
+            onChange={(e) => setProductProps("nome", e)}
             id="nome"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="nome" />}
+          {<DisplayError errors={errors} inputName="nome" />}
         </FormGroup>
         <FormGroup label="Preço de Custo: *" htmlFor="precoCusto">
           <input
-            value={formatToBRL(produto.costPrice)}
-            onChange={(e) => setPropsProdutoMoney("precoCusto", e)}
+            value={formatToBRL(product.costPrice)}
+            onChange={(e) => setProductMoneyProps("precoCusto", e)}
             id="precoCusto"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="precoCusto" />}
+          {<DisplayError errors={errors} inputName="precoCusto" />}
         </FormGroup>
         <FormGroup label="Preço de Venda: *" htmlFor="precoVenda">
           <input
-            value={formatToBRL(produto.salePrice)}
-            onChange={(e) => setPropsProdutoMoney("precoVenda", e)}
+            value={formatToBRL(product.salePrice)}
+            onChange={(e) => setProductMoneyProps("precoVenda", e)}
             id="precoVenda"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="precoVenda" />}
+          {<DisplayError errors={errors} inputName="precoVenda" />}
         </FormGroup>
         <FormGroup label="Marca: *" htmlFor="marca">
           <input
-            value={produto.brand}
-            onChange={(e) => setPropsProduto("marca", e)}
+            value={product.brand}
+            onChange={(e) => setProductProps("marca", e)}
             id="marca"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="marca" />}
+          {<DisplayError errors={errors} inputName="marca" />}
         </FormGroup>
         <FormGroup label="Selecione o Fornecedor: *" htmlFor="cnpjFornecedor">
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
-            value={opcaoSelecionadaFornecedor}
-            onChange={(option: any) => setOpcaoSelecionadaFornecedor(option)}
-            options={fornecedores.map(
+            value={selectedSupplierOption}
+            onChange={(option: any) => setSelectedSupplierOption(option)}
+            options={suppliers.map(
               (fornecedor) =>
                 ({
                   label: fornecedor.name,
@@ -181,40 +176,40 @@ export default function AtualizarProduto({ params }: AtualizarProdutoProps) {
             )}
             instanceId="select-cnpjFornecedor"
           />
-          {<DisplayError errors={erros} inputName="cnpjFornecedor" />}
+          {<DisplayError errors={errors} inputName="cnpjFornecedor" />}
         </FormGroup>
         <FormGroup label="Estoque Mínimo: *" htmlFor="estoqueMinimo">
           <input
             className="input-number-form"
-            value={estoque.minStock}
-            onChange={(e) => setPropsEstoque("estoqueMinimo", e)}
+            value={stock.minStock}
+            onChange={(e) => setStockProps("estoqueMinimo", e)}
             id="estoqueMinimo"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={erros} inputName="estoqueMinimo" />}
+          {<DisplayError errors={errors} inputName="estoqueMinimo" />}
         </FormGroup>
         <FormGroup label="Estoque Máximo: *" htmlFor="estoqueMaximo">
           <input
             className="input-number-form"
-            value={estoque.maxStock}
-            onChange={(e) => setPropsEstoque("estoqueMaximo", e)}
+            value={stock.maxStock}
+            onChange={(e) => setStockProps("estoqueMaximo", e)}
             id="estoqueMaximo"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={erros} inputName="estoqueMaximo" />}
+          {<DisplayError errors={errors} inputName="estoqueMaximo" />}
         </FormGroup>
         <FormGroup label="Quantidade: *" htmlFor="quantidade">
           <input
             className="input-number-form"
-            value={estoque.quantity}
-            onChange={(e) => setPropsEstoque("quantidade", e)}
+            value={stock.quantity}
+            onChange={(e) => setStockProps("quantidade", e)}
             id="quantidade"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={erros} inputName="quantidade" />}
+          {<DisplayError errors={errors} inputName="quantidade" />}
         </FormGroup>
       </Card>
       <div className="divBotaoCadastrar">

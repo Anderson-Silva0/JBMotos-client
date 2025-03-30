@@ -13,48 +13,43 @@ import { SupplierService } from "@/services/fornecedorService";
 import { Save } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 
-export default function CadastroFornecedor() {
-  const { saveSupplier: salvarFornecedor } = SupplierService();
+export default function RegisterSupplier() {
+  const { saveSupplier } = SupplierService();
 
-  const { getAddressByCepInBrazil: obterEnderecoPorCepTodoBrasil } = AddressService();
+  const { getAddressByCepInBrazil } = AddressService();
 
-  const [erros, setErros] = useState<Errors[]>([]);
+  const [errors, setErrors] = useState<Errors[]>([]);
 
-  const [fornecedor, setFornecedor] = useState<Supplier>(
-    supplierInitialState
-  );
+  const [supplier, setSupplier] = useState<Supplier>(supplierInitialState);
 
-  const [endereco, setEndereco] = useState<Address>(addressInitialState);
+  const [address, setAddress] = useState<Address>(addressInitialState);
 
-  const setPropsFornecedor = (
-    key: string,
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
-    setFornecedor({ ...fornecedor, [key]: e.target.value });
-    setErros([]);
+  const setSupplierProps = (key: string, e: ChangeEvent<HTMLInputElement>) => {
+    setSupplier({ ...supplier, [key]: e.target.value });
+    setErrors([]);
   };
 
-  const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setEndereco({ ...endereco, [key]: e.target.value });
-    if (endereco.cep.length < 9 || key) {
-      setErros([]);
+  const setAddressProps = (key: string, e: ChangeEvent<HTMLInputElement>) => {
+    setAddress({ ...address, [key]: e.target.value });
+    if (address.cep.length < 9 || key) {
+      setErrors([]);
     }
   };
 
   useEffect(() => {
-    obterEnderecoPorCepTodoBrasil(endereco, setEndereco, erros, setErros);
-  }, [endereco.cep]);
+    getAddressByCepInBrazil(address, setAddress, errors, setErrors);
+  }, [address.cep]);
 
   const submit = async () => {
     try {
-      await salvarFornecedor({ ...fornecedor, address: endereco });
+      await saveSupplier({ ...supplier, address: address });
       successMessage("Fornecedor cadastrado com sucesso!");
-      setFornecedor(supplierInitialState);
-      setEndereco(addressInitialState);
-      setErros([]);
+      setSupplier(supplierInitialState);
+      setAddress(addressInitialState);
+      setErrors([]);
     } catch (erro: any) {
       errorMessage("Erro no preenchimento dos campos.");
-      saveErrors(erro, erros, setErros);
+      saveErrors(erro, errors, setErrors);
     }
   };
 
@@ -66,26 +61,26 @@ export default function CadastroFornecedor() {
       <Card title="Dados do Fornecedor">
         <FormGroup label="Nome: *" htmlFor="nome">
           <input
-            value={fornecedor.name}
-            onChange={(e) => setPropsFornecedor("nome", e)}
+            value={supplier.name}
+            onChange={(e) => setSupplierProps("nome", e)}
             id="nome"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="nome" />}
+          {<DisplayError errors={errors} inputName="nome" />}
         </FormGroup>
         <FormGroup label="CNPJ: *" htmlFor="cnpj">
           <CnpjInput
-            value={fornecedor.cnpj}
-            onChange={(e) => setPropsFornecedor("cnpj", e)}
+            value={supplier.cnpj}
+            onChange={(e) => setSupplierProps("cnpj", e)}
           />
-          {<DisplayError errors={erros} inputName="cnpj" />}
+          {<DisplayError errors={errors} inputName="cnpj" />}
         </FormGroup>
         <FormGroup label="Celular: *" htmlFor="telefone">
           <PhoneInput
-            value={fornecedor.phone}
-            onChange={(e) => setPropsFornecedor("telefone", e)}
+            value={supplier.phone}
+            onChange={(e) => setSupplierProps("telefone", e)}
           />
-          {<DisplayError errors={erros} inputName="telefone" />}
+          {<DisplayError errors={errors} inputName="telefone" />}
         </FormGroup>
       </Card>
       <Card title="Endereço do Fornecedor">
@@ -93,50 +88,50 @@ export default function CadastroFornecedor() {
           <span className="cep-message">
             Digite o CEP para preenchimento automático do endereço.
           </span>
-          <cepInput
+          <CepInput
             id="cep"
-            value={endereco.cep}
-            onChange={(e) => setPropsEndereco("cep", e)}
+            value={address.cep}
+            onChange={(e) => setAddressProps("cep", e)}
           />
-          {<DisplayError errors={erros} inputName="cep" />}
+          {<DisplayError errors={errors} inputName="cep" />}
         </FormGroup>
         <FormGroup label="Logradouro: *" htmlFor="rua">
           <input
-            value={endereco.road}
-            onChange={(e) => setPropsEndereco("rua", e)}
+            value={address.road}
+            onChange={(e) => setAddressProps("rua", e)}
             id="rua"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="rua" />}
+          {<DisplayError errors={errors} inputName="rua" />}
         </FormGroup>
         <FormGroup label="Número: *" htmlFor="numero">
           <input
             className="input-number-form"
-            value={endereco.number}
-            onChange={(e) => setPropsEndereco("numero", e)}
+            value={address.number}
+            onChange={(e) => setAddressProps("numero", e)}
             id="numero"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={erros} inputName="numero" />}
+          {<DisplayError errors={errors} inputName="numero" />}
         </FormGroup>
         <FormGroup label="Bairro: *" htmlFor="bairro">
           <input
-            value={endereco.neighborhood}
-            onChange={(e) => setPropsEndereco("bairro", e)}
+            value={address.neighborhood}
+            onChange={(e) => setAddressProps("bairro", e)}
             id="bairro"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="bairro" />}
+          {<DisplayError errors={errors} inputName="bairro" />}
         </FormGroup>
         <FormGroup label="Cidade: *" htmlFor="cidade">
           <input
-            value={endereco.city}
-            onChange={(e) => setPropsEndereco("cidade", e)}
+            value={address.city}
+            onChange={(e) => setAddressProps("cidade", e)}
             id="cidade"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="cidade" />}
+          {<DisplayError errors={errors} inputName="cidade" />}
         </FormGroup>
       </Card>
       <div className="divBotaoCadastrar">

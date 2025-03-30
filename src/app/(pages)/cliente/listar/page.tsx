@@ -26,7 +26,7 @@ export default function ListarClientes() {
 
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
-  const toggleCheckboxSelection = (value: string) => {
+  const checkboxSelectionToggle = (value: string) => {
     setSelectedValue(value === selectedValue ? null : value);
   };
 
@@ -275,7 +275,7 @@ export default function ListarClientes() {
             id="recente"
             value="recente"
             checked={selectedValue === "recente"}
-            onChange={() => toggleCheckboxSelection("recente")}
+            onChange={() => checkboxSelectionToggle("recente")}
           />
         </div>
         <div style={{ display: "flex", whiteSpace: "nowrap" }}>
@@ -289,7 +289,7 @@ export default function ListarClientes() {
             id="antigo"
             value="antigo"
             checked={selectedValue === "antigo"}
-            onChange={() => toggleCheckboxSelection("antigo")}
+            onChange={() => checkboxSelectionToggle("antigo")}
           />
         </div>
       </div>

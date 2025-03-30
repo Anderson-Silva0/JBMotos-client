@@ -7,16 +7,12 @@ import { CepInput, CpfInput, PhoneInput } from "@/components/Input";
 import {
   AuthRegisterModelEmployee,
   authRegisterModelEmployeeInitialState,
-  ROLE,
   roleSelectOptions,
 } from "@/models/authRegisterModel";
 import { Address, addressInitialState } from "@/models/endereco";
 import { Errors, saveErrors } from "@/models/erros";
 import { employeeInitialState, Employee } from "@/models/funcionario";
-import {
-  selectionOptionsInitialState,
-  selectionOptions,
-} from "@/models/Selecoes";
+import { selectionOptionsInitialState, selectionOptions } from "@/models/Selecoes";
 import { selectStyles } from "@/models/selectStyles";
 import { errorMessage, successMessage } from "@/models/toast";
 import { AuthenticationService } from "@/services/authenticationService";
@@ -25,79 +21,73 @@ import { Save } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import Select from "react-select";
 
-export default function CadastroFuncionario() {
-  const { authRegisterEmployee: authRegisterFuncionario } = AuthenticationService();
-  const { getAddressByCep: obterEnderecoPorCep } = AddressService();
+export default function RegisterEmployee() {
+  const { authRegisterEmployee } = AuthenticationService();
+  const { getAddressByCep } = AddressService();
 
-  const [erros, setErros] = useState<Errors[]>([]);
-  const [authFuncionario, setAuthFuncionario] =
-    useState<AuthRegisterModelEmployee>(authRegisterModelEmployeeInitialState);
-  const [funcionario, setFuncionario] =
-    useState<Employee>(employeeInitialState);
-  const [endereco, setEndereco] = useState<Address>(addressInitialState);
-  const [confirmarSenha, setConfirmarSenha] = useState<string>("");
+  const [errors, setErrors] = useState<Errors[]>([]);
+  const [employeeAuth, setEmployeeAuth] = useState<AuthRegisterModelEmployee>(authRegisterModelEmployeeInitialState);
+  const [employee, setEmployee] = useState<Employee>(employeeInitialState);
+  const [address, setAddress] = useState<Address>(addressInitialState);
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
 
-  const [opcaoSelecionadaRole, setOpcaoSelecionadaRole] =
-    useState<selectionOptions>(selectionOptionsInitialState);
+  const [selectedRoleOption, setSelectedRoleOption] = useState<selectionOptions>(selectionOptionsInitialState);
 
-  const setPropsAuthFuncionario = (
+  const setPropsAuthFuncionario = (key: string, e: ChangeEvent<HTMLInputElement>) => {
+    setEmployeeAuth({ ...employeeAuth, [key]: e.target.value });
+    setErrors([]);
+  };
+
+  const setEmployeeProps = (
     key: string,
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    setAuthFuncionario({ ...authFuncionario, [key]: e.target.value });
-    setErros([]);
+    setEmployee({ ...employee, [key]: e.target.value });
+    setErrors([]);
   };
 
-  const setPropsFuncionario = (
-    key: string,
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
-    setFuncionario({ ...funcionario, [key]: e.target.value });
-    setErros([]);
-  };
-
-  const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setEndereco({ ...endereco, [key]: e.target.value });
-    if (endereco.cep.length < 9 || key) {
-      setErros([]);
+  const setAddressProps = (key: string, e: ChangeEvent<HTMLInputElement>) => {
+    setAddress({ ...address, [key]: e.target.value });
+    if (address.cep.length < 9 || key) {
+      setErrors([]);
     }
   };
 
   useEffect(() => {
-    obterEnderecoPorCep(endereco, setEndereco, erros, setErros);
-  }, [endereco.cep]);
+    getAddressByCep(address, setAddress, errors, setErrors);
+  }, [address.cep]);
 
   useEffect(() => {
-    setAuthFuncionario({
-      ...authFuncionario,
-      role: String(opcaoSelecionadaRole?.value),
+    setEmployeeAuth({
+      ...employeeAuth,
+      role: String(selectedRoleOption?.value),
     });
-    setErros([]);
-  }, [opcaoSelecionadaRole]);
+    setErrors([]);
+  }, [selectedRoleOption]);
 
   const submit = async () => {
     try {
-      if (confirmarSenha === authFuncionario.password) {
-        await authRegisterFuncionario({
-          ...authFuncionario,
-          employee: { ...funcionario, address: endereco },
+      if (confirmPassword === employeeAuth.password) {
+        await authRegisterEmployee({
+          ...employeeAuth,
+          employee: { ...employee, address: address },
         });
       } else {
         throw new Error();
       }
       successMessage("Funcionário cadastrado com sucesso!");
-      setAuthFuncionario(authRegisterModelEmployeeInitialState);
-      setFuncionario(employeeInitialState);
-      setEndereco(addressInitialState);
-      setConfirmarSenha("");
-      setOpcaoSelecionadaRole(selectionOptionsInitialState);
-      setErros([]);
+      setEmployeeAuth(authRegisterModelEmployeeInitialState);
+      setEmployee(employeeInitialState);
+      setAddress(addressInitialState);
+      setConfirmPassword("");
+      setSelectedRoleOption(selectionOptionsInitialState);
+      setErrors([]);
     } catch (erro: any) {
       errorMessage("Erro no preenchimento dos campos.");
-      if (confirmarSenha != authFuncionario.password) {
+      if (confirmPassword != employeeAuth.password) {
         errorMessage("As senhas não estão iguais.");
       }
-      saveErrors(erro, erros, setErros);
+      saveErrors(erro, errors, setErrors);
     }
   };
 
@@ -109,65 +99,65 @@ export default function CadastroFuncionario() {
       <Card title="Dados do Funcionário">
         <FormGroup label="Nome: *" htmlFor="nome">
           <input
-            value={funcionario.name}
-            onChange={(e) => setPropsFuncionario("nome", e)}
+            value={employee.name}
+            onChange={(e) => setEmployeeProps("nome", e)}
             id="nome"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="nome" />}
+          {<DisplayError errors={errors} inputName="nome" />}
         </FormGroup>
         <FormGroup label="CPF: *" htmlFor="cpf">
           <CpfInput
-            value={funcionario.cpf}
-            onChange={(e) => setPropsFuncionario("cpf", e)}
+            value={employee.cpf}
+            onChange={(e) => setEmployeeProps("cpf", e)}
           />
-          {<DisplayError errors={erros} inputName="cpf" />}
+          {<DisplayError errors={errors} inputName="cpf" />}
         </FormGroup>
         <FormGroup label="Celular: *" htmlFor="telefone">
           <PhoneInput
-            value={funcionario.phone}
-            onChange={(e) => setPropsFuncionario("telefone", e)}
+            value={employee.phone}
+            onChange={(e) => setEmployeeProps("telefone", e)}
           />
-          {<DisplayError errors={erros} inputName="telefone" />}
+          {<DisplayError errors={errors} inputName="telefone" />}
         </FormGroup>
         <FormGroup label="Login: *" htmlFor="login">
           <input
-            value={authFuncionario.login}
+            value={employeeAuth.login}
             id="email"
             onChange={(e) => setPropsAuthFuncionario("login", e)}
             type="text"
           />
-          {<DisplayError errors={erros} inputName="login" />}
-          {<DisplayError errors={erros} inputName="loginError" />}
+          {<DisplayError errors={errors} inputName="login" />}
+          {<DisplayError errors={errors} inputName="loginError" />}
         </FormGroup>
         <FormGroup label="Senha: *" htmlFor="senha">
           <input
-            value={authFuncionario.password}
+            value={employeeAuth.password}
             onChange={(e) => setPropsAuthFuncionario("senha", e)}
             id="senha"
             type="password"
           />
-          {<DisplayError errors={erros} inputName="senha" />}
+          {<DisplayError errors={errors} inputName="senha" />}
         </FormGroup>
         <FormGroup label="Confirmar senha: *" htmlFor="confirmar-senha">
           <input
-            value={confirmarSenha}
-            onChange={(e) => setConfirmarSenha(e.target.value)}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             id="confirmar-senha"
             type="password"
           />
-          {<DisplayError errors={erros} inputName="confirmarSenha" />}
+          {<DisplayError errors={errors} inputName="confirmarSenha" />}
         </FormGroup>
         <FormGroup label="Permissão no Sistema: *" htmlFor="formaDePagamento">
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
-            value={opcaoSelecionadaRole}
-            onChange={(option: any) => setOpcaoSelecionadaRole(option)}
+            value={selectedRoleOption}
+            onChange={(option: any) => setSelectedRoleOption(option)}
             options={roleSelectOptions}
             instanceId="select-divisoes"
           />
-          {<DisplayError errors={erros} inputName="role" />}
+          {<DisplayError errors={errors} inputName="role" />}
         </FormGroup>
       </Card>
       <Card title="Endereço do Funcionário">
@@ -175,50 +165,50 @@ export default function CadastroFuncionario() {
           <span className="cep-message">
             Digite o CEP para preenchimento automático do endereço.
           </span>
-          <cepInput
+          <CepInput
             id="cep"
-            value={endereco.cep}
-            onChange={(e) => setPropsEndereco("cep", e)}
+            value={address.cep}
+            onChange={(e) => setAddressProps("cep", e)}
           />
-          {<DisplayError errors={erros} inputName="cep" />}
+          {<DisplayError errors={errors} inputName="cep" />}
         </FormGroup>
         <FormGroup label="Logradouro: *" htmlFor="rua">
           <input
-            value={endereco.road}
-            onChange={(e) => setPropsEndereco("rua", e)}
+            value={address.road}
+            onChange={(e) => setAddressProps("rua", e)}
             id="rua"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="rua" />}
+          {<DisplayError errors={errors} inputName="rua" />}
         </FormGroup>
         <FormGroup label="Número: *" htmlFor="numero">
           <input
             className="input-number-form"
-            value={endereco.number}
-            onChange={(e) => setPropsEndereco("numero", e)}
+            value={address.number}
+            onChange={(e) => setAddressProps("numero", e)}
             id="numero"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={erros} inputName="numero" />}
+          {<DisplayError errors={errors} inputName="numero" />}
         </FormGroup>
         <FormGroup label="Bairro: *" htmlFor="bairro">
           <input
-            value={endereco.neighborhood}
-            onChange={(e) => setPropsEndereco("bairro", e)}
+            value={address.neighborhood}
+            onChange={(e) => setAddressProps("bairro", e)}
             id="bairro"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="bairro" />}
+          {<DisplayError errors={errors} inputName="bairro" />}
         </FormGroup>
         <FormGroup label="Cidade: *" htmlFor="cidade">
           <input
-            value={endereco.city}
-            onChange={(e) => setPropsEndereco("cidade", e)}
+            value={address.city}
+            onChange={(e) => setAddressProps("cidade", e)}
             id="cidade"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="cidade" />}
+          {<DisplayError errors={errors} inputName="cidade" />}
         </FormGroup>
       </Card>
       <div className="divBotaoCadastrar">

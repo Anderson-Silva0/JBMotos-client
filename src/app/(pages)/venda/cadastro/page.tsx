@@ -71,145 +71,133 @@ export interface ProductOfSaleRowIdProps {
   rowId: number;
 }
 
-export default function CadastroVenda() {
-  const { findAllCustomer: buscarTodosClientes } = CustomerService();
-  const { findAllProduct: buscarTodosProdutos } = ProductService();
-  const { saveSale: salvarVenda } = SaleService();
+export default function RegisterSale() {
+  const { findAllCustomer } = CustomerService();
+  const { findAllProduct } = ProductService();
+  const { saveSale } = SaleService();
 
   const [userName, setUserName] = useState<string>("");
-  const [cpfUser, setCpfUser] = useState<string>("");
+  const [userCpf, setUserCpf] = useState<string>("");
 
   useEffect(() => {
     const token = Cookies.get("login-token");
     if (token) {
       const decodedToken = decode(token) as DecodedToken;
       setUserName(decodedToken.userName);
-      setCpfUser(decodedToken.userCpf);
+      setUserCpf(decodedToken.userCpf);
     }
   }, []);
 
-  const [foiCarregado, setFoiCarregado] = useState<boolean>(false);
-  const [registrosProdutosVenda, setRegistrosProdutosVenda] = useState<
-    SelectedProductRegisterProps[]
-  >([]);
-  const [produtosSelecionados, setProdutosSelecionados] = useState<
-    SelectedProductProps[]
-  >([]);
-  const [erros, setErros] = useState<Errors[]>([]);
-  const [produtos, setProdutos] = useState<Product[]>([]);
-  const [todosProdutos, setTodosProdutos] = useState<Product[]>([]);
-  const [venda, setVenda] = useState<Sale>(SaleInitialState);
-  const [qtdLinha, setQtdLinha] = useState<number[]>([1]);
-  const [clientes, setClientes] = useState<Customer[]>([]);
-  const [valoresTotais, setValoresTotais] = useState<TotalValuesProps[]>([]);
-  const [idProdutoIdLinhaSelecionado, setIdProdutoIdLinhaSelecionado] =
-    useState<ProductIdAndRowId[]>([]);
-  const [pagamentoCartao, setPagamentoCartao] = useState<CardPayment>(
-    cardPaymentInitialState
-  );
-  const [opcaoSelecionadaParcela, setOpcaoSelecionadaParcela] =
-    useState<selectionOptions>(selectionOptionsInitialState);
-  const [opcaoSelecionadaBandeira, setOpcaoSelecionadaBandeira] =
-    useState<selectionOptions>(selectionOptionsInitialState);
-  const [taxaJuros, setTaxaJuros] = useState<number>(0);
-  const [descontoTonReais, setDescontoTonReais] = useState<number | string>(0);
-  const [valorLiquido, setValorLiquido] = useState<number | string>(0);
-  const [produtosVendaIdLinha, setProdutoVendaIdLinha] = useState<
-    ProductOfSaleRowIdProps[]
-  >([]);
-  const [valorTotalVenda, setValorTotalVenda] = useState<number>(0);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [productsOfSaleRegisters, setProductsOfSaleRegisters] = useState<SelectedProductRegisterProps[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<SelectedProductProps[]>([]);
+  const [errors, setErrors] = useState<Errors[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [sale, setSale] = useState<Sale>(SaleInitialState);
+  const [rowQuantity, setRowQuantity] = useState<number[]>([1]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [totalValues, setTotalValues] = useState<TotalValuesProps[]>([]);
+  const [selectedProductIdRowId, setSelectedProductIdRowId] = useState<ProductIdAndRowId[]>([]);
+  const [cardPayment, setCardPayment] = useState<CardPayment>(cardPaymentInitialState);
+  const [selectedInstallmentOption, setSelectedInstallmentOption] = useState<selectionOptions>(selectionOptionsInitialState);
+  const [selectedCardFlagOption, setSelectedCardFlagOption] = useState<selectionOptions>(selectionOptionsInitialState);
+  const [interestRate, setInterestRate] = useState<number>(0);
+  const [machineCardTonDiscountInReais, setMachineCardTonDiscountInReais] = useState<number | string>(0);
+  const [liquidValue, setLiquidValue] = useState<number | string>(0);
+  const [productsOfSaleRowId, setProductsOfSaleRowId] = useState<ProductOfSaleRowIdProps[]>([]);
+  const [totalSaleValue, setTotalSaleValue] = useState<number>(0);
 
-  const [opcaoSelecionadaCliente, setOpcaoSelecionadaCliente] =
-    useState<selectionOptions>(selectionOptionsInitialState);
+  const [selectedCustomerOption, setSelectedCustomerOption] = useState<selectionOptions>(selectionOptionsInitialState);
 
   const [
-    opcaoSelecionadaFormaDePagamento,
-    setOpcaoSelecionadaFormaDePagamento,
+    selectedPaymentMethodOption,
+    setSelectedPaymentMethodOption,
   ] = useState<selectionOptions>(selectionOptionsInitialState);
 
-  const definirEstadoInicialSelecaoVenda = () => {
-    setOpcaoSelecionadaCliente(selectionOptionsInitialState);
-    setOpcaoSelecionadaFormaDePagamento(selectionOptionsInitialState);
-    setVenda({ ...venda, observation: "" });
+  const setSaleSelectionInitialState = () => {
+    setSelectedCustomerOption(selectionOptionsInitialState);
+    setSelectedPaymentMethodOption(selectionOptionsInitialState);
+    setSale({ ...sale, observation: "" });
   };
 
-  const buscarTodos = async () => {
+  const findAll = async () => {
     try {
-      const todosClientesResponse = await buscarTodosClientes();
-      const todosClientes = todosClientesResponse.data;
-      const clientesAtivos = todosClientes.filter(
-        (c: Customer) => c.customerStatus === "ATIVO"
+      const allCustomersResponse = await findAllCustomer();
+      const allCustomers = allCustomersResponse.data;
+      const activeCustomers = allCustomers.filter(
+        (c: Customer) => c.customerStatus === "ACTIVE"
       );
-      setClientes(clientesAtivos);
+      setCustomers(activeCustomers);
 
-      const todosProdutosResponse = await buscarTodosProdutos();
-      setProdutos(todosProdutosResponse.data);
-      setTodosProdutos(todosProdutosResponse.data);
+      const allProductsResponse = await findAllProduct();
+      setProducts(allProductsResponse.data);
+      setAllProducts(allProductsResponse.data);
     } catch (erro: any) {
       errorMessage(erro.response.data);
     } finally {
-      setFoiCarregado(true);
+      setIsLoaded(true);
     }
   };
 
   useEffect(() => {
-    buscarTodos();
+    findAll();
   }, []);
 
   useEffect(() => {
-    setVenda({
-      ...venda,
+    setSale({
+      ...sale,
       customer: {
-        ...venda.customer,
-        cpf: String(opcaoSelecionadaCliente?.value),
+        ...sale.customer,
+        cpf: String(selectedCustomerOption?.value),
       },
-      employee: { ...venda.employee, cpf: cpfUser },
-      paymentMethod: String(opcaoSelecionadaFormaDePagamento?.value),
+      employee: { ...sale.employee, cpf: userCpf },
+      paymentMethod: String(selectedPaymentMethodOption?.value),
     });
-    setErros([]);
-  }, [opcaoSelecionadaCliente, opcaoSelecionadaFormaDePagamento]);
+    setErrors([]);
+  }, [selectedCustomerOption, selectedPaymentMethodOption]);
 
-  const definirEstadoInicialPagamentoCartao = () => {
-    setPagamentoCartao(cardPaymentInitialState);
-    setOpcaoSelecionadaParcela(selectionOptionsInitialState);
-    setOpcaoSelecionadaBandeira(selectionOptionsInitialState);
-    setTaxaJuros(0);
+  const setCardPaymentInitialState = () => {
+    setCardPayment(cardPaymentInitialState);
+    setSelectedInstallmentOption(selectionOptionsInitialState);
+    setSelectedCardFlagOption(selectionOptionsInitialState);
+    setInterestRate(0);
   };
 
-  const limparTudoAposVenda = () => {
-    definirEstadoInicialPagamentoCartao();
-    setIdProdutoIdLinhaSelecionado([]);
-    definirEstadoInicialSelecaoVenda();
-    setVenda(SaleInitialState);
-    setProdutosSelecionados([]);
-    setValoresTotais([]);
-    setQtdLinha([1]);
-    setProdutoVendaIdLinha([]);
-    buscarTodos();
-    setErros([]);
+  const clearAllAfterSale = () => {
+    setCardPaymentInitialState();
+    setSelectedProductIdRowId([]);
+    setSaleSelectionInitialState();
+    setSale(SaleInitialState);
+    setSelectedProducts([]);
+    setTotalValues([]);
+    setRowQuantity([1]);
+    setProductsOfSaleRowId([]);
+    findAll();
+    setErrors([]);
   };
 
   const submit = async () => {
-    if (produtosSelecionados.length) {
+    if (selectedProducts.length) {
       try {
-        const produtosVenda = produtosVendaIdLinha.map((item) => {
-          const produtoVenda = { ...item.productOfSale };
-          produtoVenda.product = { ...produtoVenda.product };
-          produtoVenda.product.id = produtoVenda.productId;
+        const productsOfSale = productsOfSaleRowId.map((item) => {
+          const saleProducts = { ...item.productOfSale };
+          saleProducts.product = { ...saleProducts.product };
+          saleProducts.product.id = saleProducts.productId;
 
-          return produtoVenda;
+          return saleProducts;
         });
 
-        if (opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito") {
-          await salvarVenda({ ...venda, productsOfSale: produtosVenda, cardPayment: pagamentoCartao });
+        if (selectedPaymentMethodOption.value === "Cartão de Crédito") {
+          await saveSale({ ...sale, productsOfSale: productsOfSale, cardPayment: cardPayment });
         } else {
-          await salvarVenda({ ...venda, productsOfSale: produtosVenda });
+          await saveSale({ ...sale, productsOfSale: productsOfSale });
         }
 
         successMessage("Venda realizada com sucesso!");
-        limparTudoAposVenda();
+        clearAllAfterSale();
       } catch (error: any) {
-        saveErrors(error, erros, setErros);
+        saveErrors(error, errors, setErrors);
         errorMessage("Erro no preenchimento dos campos.");
       }
     } else {
@@ -218,39 +206,39 @@ export default function CadastroVenda() {
   };
 
   useEffect(() => {
-    const definirPagamentoCartao = () => {
-      if (opcaoSelecionadaFormaDePagamento.label === "Cartão de Crédito") {
+    const setCardPaymentMethod = () => {
+      if (selectedPaymentMethodOption.label === "Cartão de Crédito") {
         if (
-          opcaoSelecionadaParcela.value ||
-          opcaoSelecionadaBandeira.value ||
-          taxaJuros
+          selectedInstallmentOption.value ||
+          selectedCardFlagOption.value ||
+          interestRate
         ) {
-          setPagamentoCartao({
-            installment: opcaoSelecionadaParcela.value,
-            flag: opcaoSelecionadaBandeira.value,
-            totalFees: taxaJuros,
+          setCardPayment({
+            installment: selectedInstallmentOption.value,
+            flag: selectedCardFlagOption.value,
+            totalFees: interestRate,
             saleId: 0,
           });
         }
       } else {
-        setPagamentoCartao(cardPaymentInitialState);
-        setOpcaoSelecionadaParcela(selectionOptionsInitialState);
-        setOpcaoSelecionadaBandeira(selectionOptionsInitialState);
-        setTaxaJuros(0);
+        setCardPayment(cardPaymentInitialState);
+        setSelectedInstallmentOption(selectionOptionsInitialState);
+        setSelectedCardFlagOption(selectionOptionsInitialState);
+        setInterestRate(0);
       }
 
-      setErros([]);
+      setErrors([]);
     };
 
-    definirPagamentoCartao();
+    setCardPaymentMethod();
   }, [
-    opcaoSelecionadaParcela,
-    opcaoSelecionadaBandeira,
-    taxaJuros,
-    opcaoSelecionadaFormaDePagamento,
+    selectedInstallmentOption,
+    selectedCardFlagOption,
+    interestRate,
+    selectedPaymentMethodOption,
   ]);
 
-  const handlerRealizarVenda = () => {
+  const handlePerformSale = () => {
     confirmDecision(
       "Confirmação de Venda",
       "Tem certeza de que deseja realizar esta venda?",
@@ -258,134 +246,134 @@ export default function CadastroVenda() {
     );
   };
 
-  const gerarMensagemAlertaProdutosAtivos = (produtosAtivos: Product[]) => {
-    let mensagem = "";
+  const generateActiveProductsAlertMessage = (activeProducts: Product[]) => {
+    let message = "";
 
-    if (todosProdutos.length > 1 && produtosAtivos.length > 1) {
-      mensagem = `Não é possível adicionar mais linhas, pois existem  
-          ${todosProdutos.length} produtos no total`;
-    } else if (todosProdutos.length > 1 && produtosAtivos.length === 1) {
-      mensagem = `Não é possível adicionar mais linhas, pois existem  
-          ${todosProdutos.length} produtos no total`;
-    } else if (todosProdutos.length === 1) {
-      mensagem = `Não é possível adicionar mais linhas, pois existe  
-          ${todosProdutos.length} produto no total, e ${produtosAtivos.length} ativo.`;
+    if (allProducts.length > 1 && activeProducts.length > 1) {
+      message = `Não é possível adicionar mais linhas, pois existem  
+          ${allProducts.length} produtos no total`;
+    } else if (allProducts.length > 1 && activeProducts.length === 1) {
+      message = `Não é possível adicionar mais linhas, pois existem  
+          ${allProducts.length} produtos no total`;
+    } else if (allProducts.length === 1) {
+      message = `Não é possível adicionar mais linhas, pois existe  
+          ${allProducts.length} produto no total, e ${activeProducts.length} ativo.`;
     }
 
     if (
-      produtosAtivos.length < todosProdutos.length &&
-      produtosAtivos.length > 1
+      activeProducts.length < allProducts.length &&
+      activeProducts.length > 1
     ) {
-      mensagem += `, mas apenas ${produtosAtivos.length} estão ativos.`;
+      message += `, mas apenas ${activeProducts.length} estão ativos.`;
     } else if (
-      produtosAtivos.length < todosProdutos.length &&
-      produtosAtivos.length == 1 &&
-      todosProdutos.length > 1
+      activeProducts.length < allProducts.length &&
+      activeProducts.length == 1 &&
+      allProducts.length > 1
     ) {
-      mensagem += `, mas apenas ${produtosAtivos.length} ativo.`;
+      message += `, mas apenas ${activeProducts.length} ativo.`;
     }
 
-    return mensagem;
+    return message;
   };
 
-  const adicionarLinha = () => {
-    const produtosAtivos = todosProdutos.filter(
-      (p) => p.productStatus === "ATIVO"
+  const addRow = () => {
+    const activeProducts = allProducts.filter(
+      (p) => p.productStatus === "ACTIVE"
     );
-    if (qtdLinha.length < produtosAtivos.length) {
+    if (rowQuantity.length < activeProducts.length) {
       const newId = Math.floor(Math.random() * 1000000);
-      setQtdLinha([...qtdLinha, newId]);
-    } else if (qtdLinha.length === produtosAtivos.length) {
-      alertMessage(gerarMensagemAlertaProdutosAtivos(produtosAtivos));
+      setRowQuantity([...rowQuantity, newId]);
+    } else if (rowQuantity.length === activeProducts.length) {
+      alertMessage(generateActiveProductsAlertMessage(activeProducts));
     }
   };
 
-  const removerLinha = () => {
-    const novasLinhas = [...qtdLinha];
-    if (qtdLinha.length > 1) {
-      novasLinhas.pop();
-      if (qtdLinha.length === idProdutoIdLinhaSelecionado.length) {
-        const produtoExcluido = idProdutoIdLinhaSelecionado.pop();
-        if (produtoExcluido) {
-          const produtoExcluidoNoPop = produtosSelecionados.filter(
-            (produto) => produto.product.id === produtoExcluido.productId
+  const removeRow = () => {
+    const newRows = [...rowQuantity];
+    if (rowQuantity.length > 1) {
+      newRows.pop();
+      if (rowQuantity.length === selectedProductIdRowId.length) {
+        const deletedProduct = selectedProductIdRowId.pop();
+        if (deletedProduct) {
+          const deletedProductInPopFunction = selectedProducts.filter(
+            (produto) => produto.product.id === deletedProduct.productId
           )[0].product;
 
-          const novosValoresTotais = valoresTotais.filter(
-            (valor) => valor.rowId !== produtoExcluido.rowId
+          const newTotalValues = totalValues.filter(
+            (valor) => valor.rowId !== deletedProduct.rowId
           );
-          setValoresTotais(novosValoresTotais);
+          setTotalValues(newTotalValues);
 
-          const indiceParaRemover = produtosVendaIdLinha.findIndex(
-            (item) => item.productOfSale.product.id === produtoExcluido.productId
+          const indexToRemove = productsOfSaleRowId.findIndex(
+            (item) => item.productOfSale.product.id === deletedProduct.productId
           );
-          if (indiceParaRemover >= 0) {
-            produtosVendaIdLinha.splice(indiceParaRemover, 1);
+          if (indexToRemove >= 0) {
+            productsOfSaleRowId.splice(indexToRemove, 1);
           }
 
-          setProdutos([...produtos, produtoExcluidoNoPop]);
+          setProducts([...products, deletedProductInPopFunction]);
         }
       }
     }
-    setQtdLinha(novasLinhas);
+    setRowQuantity(newRows);
   };
 
-  const atualizarElemento = (
-    indice: number,
-    idProduto: number,
-    idLinha: number
+  const updateElement = (
+    index: number,
+    productId: number,
+    rowId: number
   ) => {
-    setIdProdutoIdLinhaSelecionado((prevState) => {
-      const novaLista = [...prevState];
-      if (indice >= 0 && indice < novaLista.length) {
-        novaLista[indice] = { productId: idProduto, rowId: idLinha };
+    setSelectedProductIdRowId((prevState) => {
+      const newList = [...prevState];
+      if (index >= 0 && index < newList.length) {
+        newList[index] = { productId: productId, rowId: rowId };
       }
-      return novaLista;
+      return newList;
     });
   };
 
-  const atualizarIdProdutoIdLinhaSelecionado = (
-    idProduto: number,
-    idLinhaAtual: number
+  const updateSelectedProductIdRowId = (
+    productId: number,
+    currentRowId: number
   ) => {
-    const indiceIdProdutoIdLinha = idProdutoIdLinhaSelecionado.findIndex(
-      (idprodutoIdLinha) => idprodutoIdLinha.rowId === idLinhaAtual
+    const productIdRowIdIndex = selectedProductIdRowId.findIndex(
+      (productIdRowId) => productIdRowId.rowId === currentRowId
     );
 
-    if (idProdutoIdLinhaSelecionado[indiceIdProdutoIdLinha]?.rowId) {
-      atualizarElemento(indiceIdProdutoIdLinha, idProduto, idLinhaAtual);
+    if (selectedProductIdRowId[productIdRowIdIndex]?.rowId) {
+      updateElement(productIdRowIdIndex, productId, currentRowId);
     } else {
-      setIdProdutoIdLinhaSelecionado([
-        ...idProdutoIdLinhaSelecionado,
-        { productId: idProduto, rowId: idLinhaAtual },
+      setSelectedProductIdRowId([
+        ...selectedProductIdRowId,
+        { productId: productId, rowId: currentRowId },
       ]);
     }
   };
 
   useEffect(() => {
-    const totalVenda = valoresTotais.reduce(
+    const totalSale = totalValues.reduce(
       (acumulador, valor) => acumulador + valor.totalValue,
       0
     );
-    setValorTotalVenda(totalVenda);
-  }, [valoresTotais]);
+    setTotalSaleValue(totalSale);
+  }, [totalValues]);
 
   useEffect(() => {
-    setDescontoTonReais((Number(taxaJuros) / 100) * valorTotalVenda);
-    setValorLiquido(valorTotalVenda - Number(descontoTonReais));
-  }, [valorTotalVenda, taxaJuros, descontoTonReais]);
+    setMachineCardTonDiscountInReais((Number(interestRate) / 100) * totalSaleValue);
+    setLiquidValue(totalSaleValue - Number(machineCardTonDiscountInReais));
+  }, [totalSaleValue, interestRate, machineCardTonDiscountInReais]);
 
-  const obterNomeClienteSelecionado = () => {
-    let nomeClienteSelecionado = "";
-    clientes.forEach((cliente) => {
-      if (cliente.cpf === opcaoSelecionadaCliente.value) {
-        nomeClienteSelecionado = cliente.name;
+  const getSelectedCustomerName = () => {
+    let selectedCustomerName = "";
+    customers.forEach((customer) => {
+      if (customer.cpf === selectedCustomerOption.value) {
+        selectedCustomerName = customer.name;
       }
     });
-    return nomeClienteSelecionado;
+    return selectedCustomerName;
   };
 
-  if (!foiCarregado) {
+  if (!isLoaded) {
     return <LoadingLogo description="Carregando" />;
   }
 
@@ -399,14 +387,14 @@ export default function CadastroVenda() {
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
-            value={opcaoSelecionadaCliente}
-            onChange={(option: any) => setOpcaoSelecionadaCliente(option)}
-            options={clientes.map(
+            value={selectedCustomerOption}
+            onChange={(option: any) => setSelectedCustomerOption(option)}
+            options={customers.map(
               (c) => ({ label: c.cpf, value: c.cpf } as selectionOptions)
             )}
             instanceId="select-cpfCliente"
           />
-          {<DisplayError errors={erros} inputName="cpfCliente" />}
+          {<DisplayError errors={errors} inputName="cpfCliente" />}
         </FormGroup>
         <FormGroup
           label="Selecione a forma de pagamento*"
@@ -415,60 +403,60 @@ export default function CadastroVenda() {
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
-            value={opcaoSelecionadaFormaDePagamento}
+            value={selectedPaymentMethodOption}
             onChange={(option: any) =>
-              setOpcaoSelecionadaFormaDePagamento(option)
+              setSelectedPaymentMethodOption(option)
             }
             options={paymentMethods}
             instanceId="select-formaDePagamento"
           />
-          {<DisplayError errors={erros} inputName="formaDePagamento" />}
-          {opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito" && (
+          {<DisplayError errors={errors} inputName="formaDePagamento" />}
+          {selectedPaymentMethodOption.value === "Cartão de Crédito" && (
             <CreditPayment
-              errors={erros}
-              interestRate={taxaJuros}
-              setInterestRate={setTaxaJuros}
-              selectedCardFlagOption={opcaoSelecionadaBandeira}
-              setSelectedCardFlagOption={setOpcaoSelecionadaBandeira}
-              selectedInstallmentOption={opcaoSelecionadaParcela}
-              setSelectedInstallmentOption={setOpcaoSelecionadaParcela}
+              errors={errors}
+              interestRate={interestRate}
+              setInterestRate={setInterestRate}
+              selectedCardFlagOption={selectedCardFlagOption}
+              setSelectedCardFlagOption={setSelectedCardFlagOption}
+              selectedInstallmentOption={selectedInstallmentOption}
+              setSelectedInstallmentOption={setSelectedInstallmentOption}
             />
           )}
         </FormGroup>
         <FormGroup label="Observação:" htmlFor="observacao">
           <input
             maxLength={100}
-            value={venda.observation}
+            value={sale.observation}
             onChange={(e) => {
-              setErros([]);
-              setVenda({ ...venda, observation: e.target.value });
+              setErrors([]);
+              setSale({ ...sale, observation: e.target.value });
             }}
             id="observacao"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="observacao" />}
+          {<DisplayError errors={errors} inputName="observacao" />}
         </FormGroup>
       </Card>
       <SaleTable>
-        {qtdLinha.map((idLinha) => {
+        {rowQuantity.map((idLinha) => {
           return (
             <TableRow
               key={idLinha}
               rowId={idLinha}
-              products={produtos}
-              rowQuantity={qtdLinha}
+              products={products}
+              rowQuantity={rowQuantity}
               updateSelectedProductIdAndRowId={
-                atualizarIdProdutoIdLinhaSelecionado
+                updateSelectedProductIdRowId
               }
-              totalValues={valoresTotais}
-              setTotalValues={setValoresTotais}
-              setProducts={setProdutos}
-              selectedProducts={produtosSelecionados}
-              setSelectedProducts={setProdutosSelecionados}
-              saleProductsRegisters={registrosProdutosVenda}
-              setSaleProductsRegisters={setRegistrosProdutosVenda}
-              setSaleProductRowId={setProdutoVendaIdLinha}
-              saleProductRowId={produtosVendaIdLinha}
+              totalValues={totalValues}
+              setTotalValues={setTotalValues}
+              setProducts={setProducts}
+              selectedProducts={selectedProducts}
+              setSelectedProducts={setSelectedProducts}
+              saleProductsRegisters={productsOfSaleRegisters}
+              setSaleProductsRegisters={setProductsOfSaleRegisters}
+              setSaleProductRowId={setProductsOfSaleRowId}
+              saleProductRowId={productsOfSaleRowId}
             />
           );
         })}
@@ -483,45 +471,45 @@ export default function CadastroVenda() {
       >
         <div id="valor-total-venda">
           <span>Valor Bruto</span>
-          <span>{formatToBRL(valorTotalVenda)}</span>
+          <span>{formatToBRL(totalSaleValue)}</span>
         </div>
-        {opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito" && (
+        {selectedPaymentMethodOption.value === "Cartão de Crédito" && (
           <>
             <div id="valor-total-venda">
               <span style={{ color: "red" }}>Desconto Ton</span>
               <span style={{ color: "red" }}>
-                {formatToBRL(descontoTonReais)}
+                {formatToBRL(machineCardTonDiscountInReais)}
               </span>
             </div>
             <div id="valor-total-venda">
               <span>Valor Líquido</span>
-              <span>{formatToBRL(valorLiquido)}</span>
+              <span>{formatToBRL(liquidValue)}</span>
             </div>
           </>
         )}
       </div>
 
       <div className="div-botoes-line">
-        <button onClick={adicionarLinha} className="botao-add-line">
+        <button onClick={addRow} className="botao-add-line">
           <Image src={imgAdicionarLinha} width={40} height={40} alt={""} />
         </button>
-        <button onClick={removerLinha} className="botao-remove-line">
+        <button onClick={removeRow} className="botao-remove-line">
           <Image src={imgRemoverLinha} width={40} height={40} alt={""} />
         </button>
       </div>
       <div className="divBotaoCadastrar">
-        <button onClick={handlerRealizarVenda} type="submit">
+        <button onClick={handlePerformSale} type="submit">
           Realizar Venda
         </button>
         <PDFGenerator
           receiptType={ReceiptType.Budget}
-          customerName={obterNomeClienteSelecionado()}
-          customerCpf={opcaoSelecionadaCliente.value}
-          paymentMethod={opcaoSelecionadaFormaDePagamento.value}
+          customerName={getSelectedCustomerName()}
+          customerCpf={selectedCustomerOption.value}
+          paymentMethod={selectedPaymentMethodOption.value}
           employeeName={userName}
-          observation={venda.observation}
-          productOfSaleRegister={registrosProdutosVenda}
-          totalSaleValue={formatToBRL(valorTotalVenda)}
+          observation={sale.observation}
+          productOfSaleRegister={productsOfSaleRegisters}
+          totalSaleValue={formatToBRL(totalSaleValue)}
         />
       </div>
     </div>

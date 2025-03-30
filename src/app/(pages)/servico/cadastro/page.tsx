@@ -36,267 +36,254 @@ import { RepairService } from "@/services/servicoService";
 import { Save } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import Image from "next/image";
-import imgAddProduto from "@/images/icons8-add-product-66.png";
-import imgARemoveProduto from "@/images/icons8-remove-product-64.png";
+import imgAddProduct from "@/images/icons8-add-product-66.png";
+import imgRemoveProduct from "@/images/icons8-remove-product-64.png";
 import Cookies from "js-cookie";
 import { decode } from "jsonwebtoken";
 import Select from "react-select";
 import { DecodedToken } from "@/middleware";
 import { confirmDecision } from "@/components/ConfirmarDecisao";
 import LoadingLogo from "@/components/LoadingLogo";
+import { Employee } from "@/models/funcionario";
 
 export default function CadastroServico() {
   const { findAllCustomer } = CustomerService();
   const { findMotorcycleByCustomerCpf } = MotorcycleService();
-  const { saveRepair: salvarServico } = RepairService();
-  const { findAllProduct: buscarTodosProdutos } = ProductRepair();
+  const { saveRepair } = RepairService();
+  const { findAllProduct } = ProductService();
 
-  const [cpfUser, setCpfUser] = useState<string>("");
+  const [userCpf, setUserCpf] = useState<string>("");
 
   useEffect(() => {
     const token = Cookies.get("login-token");
     if (token) {
       const decodedToken = decode(token) as DecodedToken;
-      setCpfUser(decodedToken.userCpf);
+      setUserCpf(decodedToken.userCpf);
     }
   }, []);
 
-  const [foiCarregado, setFoiCarregado] = useState<boolean>(false);
-  const [servico, setServico] = useState<Repair>(repairInitialState);
-  const [motosCliente, setMotosCliente] = useState<Motorcycle[]>([]);
-  const [clientes, setClientes] = useState<Customer[]>([]);
-  const [erros, setErros] = useState<Errors[]>([]);
-  const [adicaoProduto, setAdicaoProduto] = useState<boolean>(false);
-  const [produtos, setProdutos] = useState<Product[]>([]);
-  const [todosProdutos, setTodosProdutos] = useState<Product[]>([]);
-  const [venda, setVenda] = useState<Sale>(SaleInitialState);
-  const [produtosSelecionados, setProdutosSelecionados] = useState<
-    SelectedProductProps[]
-  >([]);
-  const [pagamentoCartao, setPagamentoCartao] = useState<CardPayment>(
-    cardPaymentInitialState
-  );
-  const [opcaoSelecionadaParcela, setOpcaoSelecionadaParcela] =
-    useState<selectionOptions>(selectionOptionsInitialState);
-  const [opcaoSelecionadaBandeira, setOpcaoSelecionadaBandeira] =
-    useState<selectionOptions>(selectionOptionsInitialState);
-  const [idProdutoIdLinhaSelecionado, setIdProdutoIdLinhaSelecionado] =
-    useState<ProductIdAndRowId[]>([]);
-  const [precoServico, setPrecoServico] = useState<number>(0);
-  const [valoresTotais, setValoresTotais] = useState<TotalValuesProps[]>([]);
-  const [qtdLinha, setQtdLinha] = useState<number[]>([1]);
-  const [taxaJuros, setTaxaJuros] = useState<number>(0);
-  const [produtosVendaIdLinha, setProdutoVendaIdLinha] = useState<
-    ProductOfSaleRowIdProps[]
-  >([]);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [repair, setRepair] = useState<Repair>(repairInitialState);
+  const [customerMotorcycles, setCustomerMotorcycles] = useState<Motorcycle[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [errors, setErrors] = useState<Errors[]>([]);
+  const [productAddition, setProductAddition] = useState<boolean>(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [sale, setSale] = useState<Sale>(SaleInitialState);
+  const [selectedProducts, setSelectedProducts] = useState<SelectedProductProps[]>([]);
+  const [cardPayment, setCardPayment] = useState<CardPayment>(cardPaymentInitialState);
+  const [selectedInstallmentOption, setSelectedInstallmentOption] = useState<selectionOptions>(selectionOptionsInitialState);
+  const [selectedCardFlagOption, setSelectedCardFlagOption] = useState<selectionOptions>(selectionOptionsInitialState);
+  const [selectedProductIdRowId, setSelectedProductIdRowId] = useState<ProductIdAndRowId[]>([]);
+  const [repairPrice, setRepairPrice] = useState<number>(0);
+  const [totalValues, setTotalValues] = useState<TotalValuesProps[]>([]);
+  const [rowQuantity, setRowQuantity] = useState<number[]>([1]);
+  const [interestRate, setInterestRate] = useState<number>(0);
+  const [productsOfSaleRowId, setProductsOfSaleRowId] = useState<ProductOfSaleRowIdProps[]>([]);
 
-  const [opcaoSelecionadaCliente, setOpcaoSelecionadaCliente] =
-    useState<selectionOptions>(selectionOptionsInitialState);
+  const [selectedClientOption, setSelectedCustomerOption] = useState<selectionOptions>(selectionOptionsInitialState);
 
-  const [opcaoSelecionadaMoto, setOpcaoSelecionadaMoto] =
-    useState<selectionOptions>(selectionOptionsInitialState);
+  const [selectedMotorcycleOption, setSelectedMotorcycleOption] = useState<selectionOptions>(selectionOptionsInitialState);
 
   const [
-    opcaoSelecionadaFormaDePagamento,
-    setOpcaoSelecionadaFormaDePagamento,
+    selectedPaymentMethodOption,
+    setSelectedPaymentMethodOption,
   ] = useState<selectionOptions>(selectionOptionsInitialState);
 
-  const setPropsProdutoMoney = (
-    key: string,
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
+  const setProductMoneyProps = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value.replace(/\D/g, "")) / 100;
     const limitedValue = Math.min(value, 100000);
-    setServico({ ...servico, [key]: limitedValue });
-    setPrecoServico(limitedValue);
-    setErros([]);
+    setRepair({ ...repair, [key]: limitedValue });
+    setRepairPrice(limitedValue);
+    setErrors([]);
   };
 
-  const buscarTodos = async () => {
+  const findAll = async () => {
     try {
-      const todosClientesResponse = await findAllCustomer();
-      const todosClientes = todosClientesResponse.data;
-      const clientesAtivos = todosClientes.filter(
-        (c: Customer) => c.customerStatus === "ATIVO"
+      const allCustomersResponse = await findAllCustomer();
+      const allCustomers = allCustomersResponse.data;
+      const activeCustomers = allCustomers.filter((c: Customer) => 
+        c.customerStatus === "ATIVO"
       );
-      setClientes(clientesAtivos);
+      setCustomers(activeCustomers);
 
-      const todosProdutosResponse = await buscarTodosProdutos();
-      setProdutos(todosProdutosResponse.data);
-      setTodosProdutos(todosProdutosResponse.data);
+      const allProductsResponse = await findAllProduct();
+      setProducts(allProductsResponse.data);
+      setAllProducts(allProductsResponse.data);
     } catch (erro: any) {
       errorMessage(erro.response.data);
     } finally {
-      setFoiCarregado(true);
+      setIsLoaded(true);
     }
   };
 
   useEffect(() => {
-    buscarTodos();
+    findAll();
   }, []);
 
   useEffect(() => {
-    const buscarMotosCliente = async () => {
+    const fetchCustomerMotorcycles = async () => {
       try {
-        const motosClienteResponse = await findMotorcycleByCustomerCpf(
-          String(opcaoSelecionadaCliente.value)
+        const customerMotorcyclesResponse = await findMotorcycleByCustomerCpf(
+          String(selectedClientOption.value)
         );
-        const motosCliente = motosClienteResponse.data;
-        const motosClienteAtivas = motosCliente.filter(
-          (m: Motorcycle) => m.motorcycleStatus === "ATIVO"
+        const customerMotorcycles = customerMotorcyclesResponse.data;
+        const activeCustomerMotorcycles = customerMotorcycles.filter((m: Motorcycle) =>
+          m.motorcycleStatus === "ATIVO"
         );
-        setMotosCliente(motosClienteAtivas);
+        setCustomerMotorcycles(activeCustomerMotorcycles);
 
-        if (opcaoSelecionadaMoto.value) {
-          setOpcaoSelecionadaMoto(selectionOptionsInitialState);
+        if (selectedMotorcycleOption.value) {
+          setSelectedMotorcycleOption(selectionOptionsInitialState);
         }
       } catch (error: any) {
         errorMessage(error.response.data.error);
-        setMotosCliente([]);
-        setOpcaoSelecionadaMoto(selectionOptionsInitialState);
+        setCustomerMotorcycles([]);
+        setSelectedMotorcycleOption(selectionOptionsInitialState);
       }
     };
-    if (opcaoSelecionadaCliente.value) {
-      buscarMotosCliente();
+    if (selectedClientOption.value) {
+      fetchCustomerMotorcycles();
     }
-  }, [opcaoSelecionadaCliente]);
+  }, [selectedClientOption]);
 
   useEffect(() => {
-    let motoResult = motorcycleInitialState;
-    motoResult.id = Number(opcaoSelecionadaMoto.value);
-    setServico({
-      ...servico,
-      employeeCpf: cpfUser,
-      motorcycle: motoResult,
+    let motorcycleResult = motorcycleInitialState;
+    motorcycleResult.id = Number(selectedMotorcycleOption.value);
+    setRepair({
+      ...repair,
+      employeeCpf: userCpf,
+      motorcycle: motorcycleResult,
     });
-    setVenda({
-      ...venda,
-      cpfFuncionario: cpfUser,
-      cpfCliente: String(opcaoSelecionadaCliente.value),
-      paymentMethod: String(opcaoSelecionadaFormaDePagamento.value),
+    setSale({
+      ...sale,
+      employee: {cpf: userCpf} as Employee,
+      customer: {cpf: String(selectedClientOption.value)} as Customer,
+      paymentMethod: String(selectedPaymentMethodOption.value),
     });
-    setErros([]);
+    setErrors([]);
   }, [
-    opcaoSelecionadaCliente,
-    opcaoSelecionadaFormaDePagamento,
-    opcaoSelecionadaMoto,
+    selectedClientOption,
+    selectedPaymentMethodOption,
+    selectedMotorcycleOption,
   ]);
 
   useEffect(() => {
-    const definirPagamentoCartao = () => {
-      if (opcaoSelecionadaFormaDePagamento.label === "Cartão de Crédito") {
+    const setCardPaymentMethod = () => {
+      if (selectedPaymentMethodOption.label === "Cartão de Crédito") {
         if (
-          opcaoSelecionadaParcela.value ||
-          opcaoSelecionadaBandeira.value ||
-          taxaJuros
+          selectedInstallmentOption.value ||
+          selectedCardFlagOption.value ||
+          interestRate
         ) {
-          setPagamentoCartao({
-            installment: opcaoSelecionadaParcela.value,
-            flag: opcaoSelecionadaBandeira.value,
-            totalFees: taxaJuros,
+          setCardPayment({
+            installment: selectedInstallmentOption.value,
+            flag: selectedCardFlagOption.value,
+            totalFees: interestRate,
             saleId: 0,
           });
         }
       } else {
-        setPagamentoCartao(cardPaymentInitialState);
-        setOpcaoSelecionadaParcela(selectionOptionsInitialState);
-        setOpcaoSelecionadaBandeira(selectionOptionsInitialState);
-        setTaxaJuros(0);
+        setCardPayment(cardPaymentInitialState);
+        setSelectedInstallmentOption(selectionOptionsInitialState);
+        setSelectedCardFlagOption(selectionOptionsInitialState);
+        setInterestRate(0);
       }
 
-      setErros([]);
+      setErrors([]);
     };
 
-    definirPagamentoCartao();
+    setCardPaymentMethod();
   }, [
-    opcaoSelecionadaParcela,
-    opcaoSelecionadaBandeira,
-    taxaJuros,
-    opcaoSelecionadaFormaDePagamento,
+    selectedInstallmentOption,
+    selectedCardFlagOption,
+    interestRate,
+    selectedPaymentMethodOption,
   ]);
 
-  const definirEstadoInicialPagamentoCartao = () => {
-    setPagamentoCartao(cardPaymentInitialState);
-    setOpcaoSelecionadaParcela(selectionOptionsInitialState);
-    setOpcaoSelecionadaBandeira(selectionOptionsInitialState);
-    setTaxaJuros(0);
+  const setCardPaymentInitialState = () => {
+    setCardPayment(cardPaymentInitialState);
+    setSelectedInstallmentOption(selectionOptionsInitialState);
+    setSelectedCardFlagOption(selectionOptionsInitialState);
+    setInterestRate(0);
   };
 
-  const definirEstadoInicialSelecaoVenda = () => {
-    setOpcaoSelecionadaFormaDePagamento(selectionOptionsInitialState);
-    setVenda({ ...venda, observation: "" });
+  const setSaleSelectionInitialState = () => {
+    setSelectedPaymentMethodOption(selectionOptionsInitialState);
+    setSale({ ...sale, observation: "" });
   };
 
-  const resetarVenda = () => {
-    setAdicaoProduto(false);
-    definirEstadoInicialPagamentoCartao();
-    setIdProdutoIdLinhaSelecionado([]);
-    definirEstadoInicialSelecaoVenda();
-    setVenda(SaleInitialState);
-    setProdutosSelecionados([]);
-    setValoresTotais([]);
-    setPrecoServico(0);
-    setQtdLinha([1]);
-    buscarTodos();
-    setErros([]);
+  const resetSale = () => {
+    setProductAddition(false);
+    setCardPaymentInitialState();
+    setSelectedProductIdRowId([]);
+    setSaleSelectionInitialState();
+    setSale(SaleInitialState);
+    setSelectedProducts([]);
+    setTotalValues([]);
+    setRepairPrice(0);
+    setRowQuantity([1]);
+    findAll();
+    setErrors([]);
   };
 
-  const resetarServico = () => {
-    setServico(repairInitialState);
-    setErros([]);
-    setOpcaoSelecionadaCliente(selectionOptionsInitialState);
-    setOpcaoSelecionadaMoto(selectionOptionsInitialState);
-    setAdicaoProduto(false);
+  const resetRepair = () => {
+    setRepair(repairInitialState);
+    setErrors([]);
+    setSelectedCustomerOption(selectionOptionsInitialState);
+    setSelectedMotorcycleOption(selectionOptionsInitialState);
+    setProductAddition(false);
   };
 
   const submit = async () => {
     try {
-      const produtosVenda = produtosVendaIdLinha.map(
+      const productsOfSale = productsOfSaleRowId.map(
         (item) => item.productOfSale
       );
 
-      if (adicaoProduto) {
-        if (produtosSelecionados.length) {
-          if (venda.paymentMethod === "Cartão de Crédito") {
-            await salvarServico({
-              ...servico,
+      if (productAddition) {
+        if (selectedProducts.length) {
+          if (sale.paymentMethod === "Cartão de Crédito") {
+            await saveRepair({
+              ...repair,
               sale: {
-                ...venda,
-                cardPayment: pagamentoCartao,
-                productsOfSale: produtosVenda,
+                ...sale,
+                cardPayment: cardPayment,
+                productsOfSale: productsOfSale,
                 observation: "Venda de Serviço",
               },
             });
           } else {
-            await salvarServico({
-              ...servico,
+            await saveRepair({
+              ...repair,
               sale: {
-                ...venda,
-                productsOfSale: produtosVenda,
+                ...sale,
+                productsOfSale: productsOfSale,
                 observation: "Venda de Serviço",
               },
             });
           }
-          resetarServico();
-          resetarVenda();
+          resetRepair();
+          resetSale();
           successMessage("Serviço cadastrado com sucesso!");
         } else {
           alertMessage("Selecione algum produto.");
         }
       } else {
-        await salvarServico({ ...servico });
+        await saveRepair({ ...repair });
         successMessage("Serviço cadastrado com sucesso!");
-        resetarServico();
-        resetarVenda();
+        resetRepair();
+        resetSale();
       }
     } catch (error) {
       errorMessage("Erro no preenchimento dos campos");
-      exibeErroCampoCliente();
-      saveErrors(error, erros, setErros);
+      showCustomerFieldError();
+      saveErrors(error, errors, setErrors);
     }
   };
 
-  const handlerRealizarServico = () => {
+  const handlePerformRepair = () => {
     confirmDecision(
       "Confirmação de Serviço",
       "Tem certeza de que deseja realizar este serviço?",
@@ -304,10 +291,10 @@ export default function CadastroServico() {
     );
   };
 
-  const exibeErroCampoCliente = () => {
-    if (!opcaoSelecionadaCliente.value) {
-      setErros([
-        ...erros,
+  const showCustomerFieldError = () => {
+    if (!selectedClientOption.value) {
+      setErrors([
+        ...errors,
         {
           inputName: "cpfCliente",
           errorMessage: "O campo CPF do Cliente é obrigatório.",
@@ -316,18 +303,18 @@ export default function CadastroServico() {
     }
   };
 
-  const alternarEstadoAdicaoProduto = () => {
-    if (adicaoProduto) {
-      setAdicaoProduto(false);
-      resetarVenda();
-      setValoresTotais([]);
+  const productAdditionStateToggle = () => {
+    if (productAddition) {
+      setProductAddition(false);
+      resetSale();
+      setTotalValues([]);
     } else {
-      setAdicaoProduto(true);
-      setPrecoServico(servico.laborCost);
+      setProductAddition(true);
+      setRepairPrice(repair.laborCost);
     }
   };
 
-  if (!foiCarregado) {
+  if (!isLoaded) {
     return <LoadingLogo description="Carregando" />;
   }
 
@@ -341,24 +328,24 @@ export default function CadastroServico() {
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
-            value={opcaoSelecionadaCliente}
-            onChange={(option: any) => setOpcaoSelecionadaCliente(option)}
-            options={clientes.map(
+            value={selectedClientOption}
+            onChange={(option: any) => setSelectedCustomerOption(option)}
+            options={customers.map(
               (c) => ({ label: c.cpf, value: c.cpf } as selectionOptions)
             )}
             instanceId="select-cpfCliente"
           />
-          {<DisplayError errors={erros} inputName="cpfCliente" />}
+          {<DisplayError errors={errors} inputName="cpfCliente" />}
         </FormGroup>
 
         <FormGroup label="Selecione a Moto*" htmlFor="moto">
           <Select
-            isDisabled={!motosCliente.length}
+            isDisabled={!customerMotorcycles.length}
             styles={selectStyles}
             placeholder="Selecione..."
-            value={opcaoSelecionadaMoto}
-            onChange={(option: any) => setOpcaoSelecionadaMoto(option)}
-            options={motosCliente.map(
+            value={selectedMotorcycleOption}
+            onChange={(option: any) => setSelectedMotorcycleOption(option)}
+            options={customerMotorcycles.map(
               (m) =>
                 ({
                   label: `${m.brand} ${m.model} - [ ${m.plate} ]`,
@@ -367,44 +354,44 @@ export default function CadastroServico() {
             )}
             instanceId="select-idMoto"
           />
-          {<DisplayError errors={erros} inputName="idMoto" />}
+          {<DisplayError errors={errors} inputName="idMoto" />}
         </FormGroup>
 
         <FormGroup label="Serviços Realizados: *" htmlFor="servicosRealizados">
           <textarea
-            value={servico.repairPerformed}
+            value={repair.repairPerformed}
             onChange={(e) => {
-              setErros([]);
-              setServico({ ...servico, repairPerformed: e.target.value });
+              setErrors([]);
+              setRepair({ ...repair, repairPerformed: e.target.value });
             }}
             id="servicosRealizados"
           />
-          {<DisplayError errors={erros} inputName="servicosRealizados" />}
+          {<DisplayError errors={errors} inputName="servicosRealizados" />}
         </FormGroup>
 
         <FormGroup label="Observação: *" htmlFor="observacao">
           <input
-            value={servico.observation}
+            value={repair.observation}
             onChange={(e) => {
-              setErros([]);
-              setServico({ ...servico, observation: e.target.value });
+              setErrors([]);
+              setRepair({ ...repair, observation: e.target.value });
             }}
             id="observacao"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="observacao" />}
+          {<DisplayError errors={errors} inputName="observacao" />}
         </FormGroup>
 
         <FormGroup label="Preço de Mão de Obra: *" htmlFor="precoMaoDeObra">
           <input
-            value={formatToBRL(servico.laborCost)}
-            onChange={(e) => setPropsProdutoMoney("precoMaoDeObra", e)}
+            value={formatToBRL(repair.laborCost)}
+            onChange={(e) => setProductMoneyProps("precoMaoDeObra", e)}
             id="precoMaoDeObra"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="precoMaoDeObra" />}
+          {<DisplayError errors={errors} inputName="precoMaoDeObra" />}
         </FormGroup>
-        {adicaoProduto && (
+        {productAddition && (
           <FormGroup
             label="Selecione a forma de pagamento*"
             htmlFor="formaDePagamento"
@@ -412,75 +399,75 @@ export default function CadastroServico() {
             <Select
               styles={selectStyles}
               placeholder="Selecione..."
-              value={opcaoSelecionadaFormaDePagamento}
+              value={selectedPaymentMethodOption}
               onChange={(option: any) =>
-                setOpcaoSelecionadaFormaDePagamento(option)
+                setSelectedPaymentMethodOption(option)
               }
               options={paymentMethods}
               instanceId="select-formaDePagamento"
             />
-            {<DisplayError errors={erros} inputName="formaDePagamento" />}
-            {opcaoSelecionadaFormaDePagamento.value === "Cartão de Crédito" && (
+            {<DisplayError errors={errors} inputName="formaDePagamento" />}
+            {selectedPaymentMethodOption.value === "Cartão de Crédito" && (
               <CreditPayment
-                errors={erros}
-                interestRate={taxaJuros}
-                setInterestRate={setTaxaJuros}
-                selectedCardFlagOption={opcaoSelecionadaBandeira}
-                setSelectedCardFlagOption={setOpcaoSelecionadaBandeira}
-                selectedInstallmentOption={opcaoSelecionadaParcela}
-                setSelectedInstallmentOption={setOpcaoSelecionadaParcela}
+                errors={errors}
+                interestRate={interestRate}
+                setInterestRate={setInterestRate}
+                selectedCardFlagOption={selectedCardFlagOption}
+                setSelectedCardFlagOption={setSelectedCardFlagOption}
+                selectedInstallmentOption={selectedInstallmentOption}
+                setSelectedInstallmentOption={setSelectedInstallmentOption}
               />
             )}
           </FormGroup>
         )}
       </Card>
 
-      {adicaoProduto ? (
+      {productAddition ? (
         <button
-          onClick={alternarEstadoAdicaoProduto}
+          onClick={productAdditionStateToggle}
           title="Remover Produto"
           style={{ cursor: "pointer", border: "none", margin: "2vw" }}
         >
-          <Image src={imgARemoveProduto} width={70} height={65} alt="" />
+          <Image src={imgRemoveProduct} width={70} height={65} alt="" />
         </button>
       ) : (
         <button
-          onClick={alternarEstadoAdicaoProduto}
+          onClick={productAdditionStateToggle}
           title="Adicionar Produto"
           style={{ cursor: "pointer", border: "none", margin: "2vw 0 1vw 0" }}
         >
-          <Image src={imgAddProduto} width={70} height={60} alt="" />
+          <Image src={imgAddProduct} width={70} height={60} alt="" />
         </button>
       )}
 
-      {adicaoProduto && (
+      {productAddition && (
         <ProductRepair
-          products={produtos}
-          setProducts={setProdutos}
-          allProducts={todosProdutos}
-          rowQuantity={qtdLinha}
-          setRowQuantity={setQtdLinha}
-          repairPrice={precoServico}
-          setRepairPrice={setPrecoServico}
-          totalValues={valoresTotais}
-          setTotalValues={setValoresTotais}
-          selectedProducts={produtosSelecionados}
-          setSelectedProducts={setProdutosSelecionados}
-          selectedProductIdAndRowId={idProdutoIdLinhaSelecionado}
-          setSelectedProductIdAndRowId={setIdProdutoIdLinhaSelecionado}
-          productOfSaleRowId={produtosVendaIdLinha}
-          setProductOfSaleRowId={setProdutoVendaIdLinha}
-          interestRate={taxaJuros}
-          setInterestRate={setTaxaJuros}
-          selectedPaymentMethodOption={opcaoSelecionadaFormaDePagamento}
+          products={products}
+          setProducts={setProducts}
+          allProducts={allProducts}
+          rowQuantity={rowQuantity}
+          setRowQuantity={setRowQuantity}
+          repairPrice={repairPrice}
+          setRepairPrice={setRepairPrice}
+          totalValues={totalValues}
+          setTotalValues={setTotalValues}
+          selectedProducts={selectedProducts}
+          setSelectedProducts={setSelectedProducts}
+          selectedProductIdAndRowId={selectedProductIdRowId}
+          setSelectedProductIdAndRowId={setSelectedProductIdRowId}
+          productOfSaleRowId={productsOfSaleRowId}
+          setProductOfSaleRowId={setProductsOfSaleRowId}
+          interestRate={interestRate}
+          setInterestRate={setInterestRate}
+          selectedPaymentMethodOption={selectedPaymentMethodOption}
           setSelectedPaymentMethodOption={
-            setOpcaoSelecionadaFormaDePagamento
+            setSelectedPaymentMethodOption
           }
         />
       )}
 
       <div className="divBotaoCadastrar">
-        <button onClick={handlerRealizarServico} type="submit">
+        <button onClick={handlePerformRepair} type="submit">
           Realizar Serviço
         </button>
       </div>

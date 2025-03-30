@@ -20,104 +20,103 @@ import { ProductService } from "@/services/produtoService";
 import { ChangeEvent, useEffect, useState } from "react";
 import Select from "react-select";
 
-export default function CadastroProduto() {
-  const { saveProduct: salvarProduto } = ProductService();
+export default function RegisterProduct() {
+  const { saveProduct } = ProductService();
 
-  const { saveStock: salvarEstoque, deleteStock: deletarEstoque } = StockService();
+  const { saveStock, deleteStock } = StockService();
 
-  const { findAllSupplier: buscarTodosFornecedores } = SupplierService();
+  const { findAllSupplier } = SupplierService();
 
-  const [erros, setErros] = useState<Errors[]>([]);
+  const [errors, setErrors] = useState<Errors[]>([]);
 
-  const [estoque, setEstoque] = useState<Stock>(stockInitialState);
+  const [stock, setStock] = useState<Stock>(stockInitialState);
 
-  const [produto, setProduto] = useState<Product>(productInitialState);
+  const [product, setProduct] = useState<Product>(productInitialState);
 
-  const [fornecedores, setFornecedores] = useState<Supplier[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
 
-  const [opcaoSelecionadaFornecedor, setOpcaoSelecionadaFornecedor] =
-    useState<selectionOptions>(selectionOptionsInitialState);
+  const [selectedSupplierOption, setSelectedSupplierOption] = useState<selectionOptions>(selectionOptionsInitialState);
 
-  const setPropsProdutoMoney = (
+  const setProductMoneyProps = (
     key: string,
     e: ChangeEvent<HTMLInputElement>
   ) => {
     const value = parseFloat(e.target.value.replace(/\D/g, "")) / 100;
     const limitedValue = Math.min(value, 100000);
-    setProduto({ ...produto, [key]: limitedValue });
-    setErros([]);
+    setProduct({ ...product, [key]: limitedValue });
+    setErrors([]);
   };
 
-  const setPropsProduto = (
+  const setProductProps = (
     key: string,
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
   ) => {
-    setProduto({ ...produto, [key]: e.target.value });
-    setErros([]);
+    setProduct({ ...product, [key]: e.target.value });
+    setErrors([]);
   };
 
-  const setPropsEstoque = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setEstoque({ ...estoque, [key]: e.target.value });
-    setErros([]);
+  const setStockProps = (key: string, e: ChangeEvent<HTMLInputElement>) => {
+    setStock({ ...stock, [key]: e.target.value });
+    setErrors([]);
   };
 
   useEffect(() => {
-    const buscarFornecedores = async () => {
+    const fetchSuppliers = async () => {
       try {
-        const todosFornecedoresResponse = await buscarTodosFornecedores();
-        const todosFornecedores = todosFornecedoresResponse.data;
-        const fornecedoresAtivos = todosFornecedores.filter(
+        const allSuppliersResponse = await findAllSupplier();
+        const allSuppliers = allSuppliersResponse.data;
+        const activeSuppliers = allSuppliers.filter(
           (f: Supplier) => f.supplierStatus === "ATIVO"
         );
-        setFornecedores(fornecedoresAtivos);
+        setSuppliers(activeSuppliers);
       } catch (erro: any) {
         errorMessage(erro.response.data);
       }
     };
-    buscarFornecedores();
+    fetchSuppliers();
   }, []);
 
   useEffect(() => {
-    setProduto({
-      ...produto,
-      supplierCNPJ: String(opcaoSelecionadaFornecedor?.value),
+    setProduct({
+      ...product,
+      supplierCNPJ: String(selectedSupplierOption?.value),
     });
-    setErros([]);
-  }, [opcaoSelecionadaFornecedor]);
+    setErrors([]);
+  }, [selectedSupplierOption]);
 
-  const exibirErrosProduto = async () => {
-    if (erros.length > 0) {
-      setErros([]);
+  const showProductErrors = async () => {
+    if (errors.length > 0) {
+      setErrors([]);
     }
     try {
-      await salvarProduto(produto);
+      await saveProduct(product);
     } catch (error) {
-      saveErrors(error, erros, setErros);
+      saveErrors(error, errors, setErrors);
     }
   };
 
   const submit = async () => {
     try {
-      const responseEstoque = await salvarEstoque(estoque);
+      const stockResponse = await saveStock(stock);
       try {
-        await salvarProduto({ ...produto, idEstoque: responseEstoque.data.id });
+        await saveProduct({ ...product, stockId: stockResponse.data.id });
         successMessage("Produto cadastrado com sucesso!");
-        setProduto(productInitialState);
-        setOpcaoSelecionadaFornecedor(selectionOptionsInitialState);
-        setEstoque(stockInitialState);
-        setErros([]);
+        setProduct(productInitialState);
+        setSelectedSupplierOption(selectionOptionsInitialState);
+        setStock(stockInitialState);
+        setErrors([]);
       } catch (erro: any) {
-        erros.map(
+        errors.map(
           (e) => e.inputName === "error" && errorMessage(e.errorMessage)
         );
-        await deletarEstoque(responseEstoque.data.id);
+        await deleteStock(stockResponse.data.id);
         errorMessage("Erro no preenchimento dos campos");
-        saveErrors(erro, erros, setErros);
+        saveErrors(erro, errors, setErrors);
       }
     } catch (erro: any) {
-      await exibirErrosProduto();
+      await showProductErrors();
       errorMessage("Erro no preenchimento dos campos.");
-      saveErrors(erro, erros, setErros);
+      saveErrors(erro, errors, setErrors);
     }
   };
 
@@ -126,47 +125,47 @@ export default function CadastroProduto() {
       <Card title="Informações do Produto">
         <FormGroup label="Nome: *" htmlFor="nome">
           <input
-            value={produto.name}
-            onChange={(e) => setPropsProduto("nome", e)}
+            value={product.name}
+            onChange={(e) => setProductProps("nome", e)}
             id="nome"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="nome" />}
+          {<DisplayError errors={errors} inputName="nome" />}
         </FormGroup>
         <FormGroup label="Preço de Custo: *" htmlFor="precoCusto">
           <input
-            value={formatToBRL(produto.costPrice)}
-            onChange={(e) => setPropsProdutoMoney("precoCusto", e)}
+            value={formatToBRL(product.costPrice)}
+            onChange={(e) => setProductMoneyProps("precoCusto", e)}
             id="precoCusto"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="precoCusto" />}
+          {<DisplayError errors={errors} inputName="precoCusto" />}
         </FormGroup>
         <FormGroup label="Preço de Venda: *" htmlFor="precoVenda">
           <input
-            value={formatToBRL(produto.salePrice)}
-            onChange={(e) => setPropsProdutoMoney("precoVenda", e)}
+            value={formatToBRL(product.salePrice)}
+            onChange={(e) => setProductMoneyProps("precoVenda", e)}
             id="precoVenda"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="precoVenda" />}
+          {<DisplayError errors={errors} inputName="precoVenda" />}
         </FormGroup>
         <FormGroup label="Marca: *" htmlFor="marca">
           <input
-            value={produto.brand}
-            onChange={(e) => setPropsProduto("marca", e)}
+            value={product.brand}
+            onChange={(e) => setProductProps("marca", e)}
             id="marca"
             type="text"
           />
-          {<DisplayError errors={erros} inputName="marca" />}
+          {<DisplayError errors={errors} inputName="marca" />}
         </FormGroup>
         <FormGroup label="Selecione o Fornecedor: *" htmlFor="cnpjFornecedor">
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
-            value={opcaoSelecionadaFornecedor}
-            onChange={(option: any) => setOpcaoSelecionadaFornecedor(option)}
-            options={fornecedores.map(
+            value={selectedSupplierOption}
+            onChange={(option: any) => setSelectedSupplierOption(option)}
+            options={suppliers.map(
               (fornecedor) =>
                 ({
                   label: fornecedor.name,
@@ -175,40 +174,40 @@ export default function CadastroProduto() {
             )}
             instanceId="select-cnpjFornecedor"
           />
-          {<DisplayError errors={erros} inputName="cnpjFornecedor" />}
+          {<DisplayError errors={errors} inputName="cnpjFornecedor" />}
         </FormGroup>
         <FormGroup label="Estoque Mínimo: *" htmlFor="estoqueMinimo">
           <input
             className="input-number-form"
-            value={estoque.minStock}
-            onChange={(e) => setPropsEstoque("estoqueMinimo", e)}
+            value={stock.minStock}
+            onChange={(e) => setStockProps("estoqueMinimo", e)}
             id="estoqueMinimo"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={erros} inputName="estoqueMinimo" />}
+          {<DisplayError errors={errors} inputName="estoqueMinimo" />}
         </FormGroup>
         <FormGroup label="Estoque Máximo: *" htmlFor="estoqueMaximo">
           <input
             className="input-number-form"
-            value={estoque.maxStock}
-            onChange={(e) => setPropsEstoque("estoqueMaximo", e)}
+            value={stock.maxStock}
+            onChange={(e) => setStockProps("estoqueMaximo", e)}
             id="estoqueMaximo"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={erros} inputName="estoqueMaximo" />}
+          {<DisplayError errors={errors} inputName="estoqueMaximo" />}
         </FormGroup>
         <FormGroup label="Quantidade: *" htmlFor="quantidade">
           <input
             className="input-number-form"
-            value={estoque.quantity}
-            onChange={(e) => setPropsEstoque("quantidade", e)}
+            value={stock.quantity}
+            onChange={(e) => setStockProps("quantidade", e)}
             id="quantidade"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={erros} inputName="quantidade" />}
+          {<DisplayError errors={errors} inputName="quantidade" />}
         </FormGroup>
       </Card>
       <div className="divBotaoCadastrar">

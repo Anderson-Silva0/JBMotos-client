@@ -1,258 +1,292 @@
-'use client'
+"use client";
 
-import SupplierCard from "@/components/FornecedorCard"
-import { CnpjInput, PhoneInput } from "@/components/Input"
-import LoadingLogo from "@/components/LoadingLogo"
-import imgFornecedor from "@/images/supplier.png"
-import { parseDate } from "@/models/StringParaDate"
-import { Supplier } from "@/models/fornecedor"
-import { errorMessage } from "@/models/toast"
-import { SupplierService } from "@/services/fornecedorService"
-import { Search } from "lucide-react"
-import Image from "next/image"
-import '@/styles/card.css'
-import { useEffect, useState } from "react"
+import SupplierCard from "@/components/FornecedorCard";
+import { CnpjInput, PhoneInput } from "@/components/Input";
+import LoadingLogo from "@/components/LoadingLogo";
+import imgFornecedor from "@/images/supplier.png";
+import { parseDate } from "@/models/StringParaDate";
+import { Supplier } from "@/models/fornecedor";
+import { errorMessage } from "@/models/toast";
+import { SupplierService } from "@/services/fornecedorService";
+import { Search } from "lucide-react";
+import Image from "next/image";
+import "@/styles/card.css";
+import { useEffect, useState } from "react";
 
-export default function ListarFornecedores() {
-  const [fornecedores, setFornecedores] = useState<Supplier[]>([])
+export default function ListSuppliers() {
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
 
-  const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-  const [valorInputBuscar, setValorInputBuscar] = useState<string>('')
+  const [searchInputValue, setSearchInputValue] = useState<string>("");
 
-  const [campoSelecionado, setCampoSelecionado] = useState<string>('')
+  const [selectedField, setSelectedField] = useState<string>("");
 
-  const { filterSupplier: filtrarFornecedor } = SupplierService()
+  const { filterSupplier } = SupplierService();
 
-  const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
+  const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
-  const alternarSelecaoCheckbox = (value: string) => {
-    setValorSelecionado(value === valorSelecionado ? null : value)
-  }
+  const checkboxSelectionToggle = (value: string) => {
+    setSelectedValue(value === selectedValue ? null : value);
+  };
 
   useEffect(() => {
-    if (valorSelecionado === 'antigo') {
-      const sortedFornecedoresRecentes = [...fornecedores].sort((a: Supplier, b: Supplier) =>
-        parseDate(a.createdAt).getTime() - parseDate(b.createdAt).getTime()
-      )
-      setFornecedores(sortedFornecedoresRecentes)
-    } else if (valorSelecionado === 'recente') {
-      const sortedFornecedoresRecentes = [...fornecedores].sort((a: Supplier, b: Supplier) =>
-        parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime()
-      )
-      setFornecedores(sortedFornecedoresRecentes)
+    if (selectedValue === "antigo") {
+      const sortedRecentSuppliers = [...suppliers].sort(
+        (a: Supplier, b: Supplier) =>
+          parseDate(a.createdAt).getTime() - parseDate(b.createdAt).getTime()
+      );
+      setSuppliers(sortedRecentSuppliers);
+    } else if (selectedValue === "recente") {
+      const sortedRecentSuppliers = [...suppliers].sort(
+        (a: Supplier, b: Supplier) =>
+          parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime()
+      );
+      setSuppliers(sortedRecentSuppliers);
     }
-  }, [valorSelecionado])
+  }, [selectedValue]);
 
   useEffect(() => {
-    const buscarPorCnpj = async () => {
+    const findByCnpj = async () => {
       try {
-        const fornecedorResponse = await filtrarFornecedor(campoSelecionado, valorInputBuscar)
-        setFornecedores(fornecedorResponse.data)
+        const supplierResponse = await filterSupplier(
+          selectedField,
+          searchInputValue
+        );
+        setSuppliers(supplierResponse.data);
       } catch (error: any) {
-        errorMessage('Erro ao tentar buscar Fornecedor.')
+        errorMessage("Erro ao tentar buscar Fornecedor.");
       } finally {
-        setFoiCarregado(true)
+        setIsLoaded(true);
       }
-    }
-    buscarPorCnpj()
-  }, [valorInputBuscar, campoSelecionado])
+    };
+    findByCnpj();
+  }, [searchInputValue, selectedField]);
 
   useEffect(() => {
-    setValorInputBuscar('')
-  }, [campoSelecionado])
+    setSearchInputValue("");
+  }, [selectedField]);
 
   const handleRadioClick = (campo: string) => {
-    if (campoSelecionado === campo) {
-      setCampoSelecionado('')
+    if (selectedField === campo) {
+      setSelectedField("");
     }
-  }
+  };
 
-  if (!foiCarregado) {
-    return <LoadingLogo description='Carregando' />
+  if (!isLoaded) {
+    return <LoadingLogo description="Carregando" />;
   }
 
   return (
     <div className="div-form-container">
       <h1 className="centered-text">
-        {
-          campoSelecionado === '' ? (
-            fornecedores.length > 1 ? (
-              <>
-                <Image src={imgFornecedor} width={60} height={60} alt="" /> {fornecedores.length} Fornecedores cadastrados
-              </>
-            ) : fornecedores.length === 1 ? (
-              <>
-                <Image src={imgFornecedor} width={60} height={60} alt="" /> {fornecedores.length} Fornecedor cadastrado
-              </>
-            ) : (
-              'Nenhum Fornecedor cadastrado no sistema'
-            )
-          ) : campoSelecionado !== '' && valorInputBuscar !== '' && (
+        {selectedField === "" ? (
+          suppliers.length > 1 ? (
             <>
-              {
-                fornecedores.length === 1 ? (
-                  <strong>{fornecedores.length} Fornecedor encontrado</strong>
-                ) : fornecedores.length > 1 ? (
-                  <strong>{fornecedores.length} Fornecedores encontrados</strong>
-                ) : (
-                  'Nenhum Fornecedor encontrado'
-                )
-              }
+              <Image src={imgFornecedor} width={60} height={60} alt="" />{" "}
+              {suppliers.length} Fornecedores cadastrados
+            </>
+          ) : suppliers.length === 1 ? (
+            <>
+              <Image src={imgFornecedor} width={60} height={60} alt="" />{" "}
+              {suppliers.length} Fornecedor cadastrado
+            </>
+          ) : (
+            "Nenhum Fornecedor cadastrado no sistema"
+          )
+        ) : (
+          selectedField !== "" &&
+          searchInputValue !== "" && (
+            <>
+              {suppliers.length === 1 ? (
+                <strong>{suppliers.length} Fornecedor encontrado</strong>
+              ) : suppliers.length > 1 ? (
+                <strong>{suppliers.length} Fornecedores encontrados</strong>
+              ) : (
+                "Nenhum Fornecedor encontrado"
+              )}
             </>
           )
-        }
+        )}
       </h1>
       <div className="div-container-buscar">
         <div className="div-buscar">
           <Search size={60} strokeWidth={3} />
-          {
-            campoSelecionado === '' ? (
-              <div className="div-msg-busca">
-                <p>Selecione o filtro desejado:</p>
-              </div>
-            ) : campoSelecionado === 'nome' ? (
-              <input
-                className="input-buscar"
-                placeholder="Digite o Nome"
-                type="search"
-                onChange={(e) => setValorInputBuscar(e.target.value)}
-              />
-            ) : campoSelecionado === 'cnpj' ? (
-              <CnpjInput
-                className="input-buscar"
-                placeholder="Digite o CNPJ"
-                type="search"
-                value={valorInputBuscar}
-                onChange={(e) => setValorInputBuscar(e.target.value)}
-              />
-            ) : campoSelecionado === 'telefone' ? (
-              <PhoneInput
-                className="input-buscar"
-                placeholder="Digite o Telefone"
-                type="search"
-                value={valorInputBuscar}
-                onChange={(e) => setValorInputBuscar(e.target.value)}
-              />
-            ) : campoSelecionado === 'statusFornecedor' && (
+          {selectedField === "" ? (
+            <div className="div-msg-busca">
+              <p>Selecione o filtro desejado:</p>
+            </div>
+          ) : selectedField === "nome" ? (
+            <input
+              className="input-buscar"
+              placeholder="Digite o Nome"
+              type="search"
+              onChange={(e) => setSearchInputValue(e.target.value)}
+            />
+          ) : selectedField === "cnpj" ? (
+            <CnpjInput
+              className="input-buscar"
+              placeholder="Digite o CNPJ"
+              type="search"
+              value={searchInputValue}
+              onChange={(e) => setSearchInputValue(e.target.value)}
+            />
+          ) : selectedField === "telefone" ? (
+            <PhoneInput
+              className="input-buscar"
+              placeholder="Digite o Telefone"
+              type="search"
+              value={searchInputValue}
+              onChange={(e) => setSearchInputValue(e.target.value)}
+            />
+          ) : (
+            selectedField === "statusFornecedor" && (
               <>
-                <div style={{ marginRight: '2vw' }}>
-                  <label className="label-radio" htmlFor="opcaoStatusFornecedor1">ATIVO</label>
+                <div style={{ marginRight: "2vw" }}>
+                  <label
+                    className="label-radio"
+                    htmlFor="opcaoStatusFornecedor1"
+                  >
+                    ATIVO
+                  </label>
                   <input
                     id="opcaoStatusFornecedor1"
                     className="input-radio"
                     type="radio"
                     name="status"
-                    value={campoSelecionado}
-                    onChange={() => setValorInputBuscar('ATIVO')}
+                    value={selectedField}
+                    onChange={() => setSearchInputValue("ATIVO")}
                   />
                 </div>
                 <div>
-                  <label className="label-radio" htmlFor="opcaoStatusFornecedor2">INATIVO</label>
+                  <label
+                    className="label-radio"
+                    htmlFor="opcaoStatusFornecedor2"
+                  >
+                    INATIVO
+                  </label>
                   <input
                     id="opcaoStatusFornecedor2"
                     className="input-radio"
                     type="radio"
                     name="status"
-                    value={campoSelecionado}
-                    onChange={() => setValorInputBuscar('INATIVO')}
+                    value={selectedField}
+                    onChange={() => setSearchInputValue("INATIVO")}
                   />
                 </div>
               </>
             )
-          }
+          )}
         </div>
         <div className="div-radios">
           <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoNome">Nome</label>
+            <label className="label-radio" htmlFor="opcaoNome">
+              Nome
+            </label>
             <input
               className="input-radio"
               type="radio"
               name="opcao"
               id="opcaoNome"
-              value={campoSelecionado}
-              onChange={() => setCampoSelecionado('nome')}
-              onClick={() => handleRadioClick('nome')}
-              checked={campoSelecionado === 'nome'}
+              value={selectedField}
+              onChange={() => setSelectedField("nome")}
+              onClick={() => handleRadioClick("nome")}
+              checked={selectedField === "nome"}
             />
           </div>
           <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoCnpj">CNPJ</label>
+            <label className="label-radio" htmlFor="opcaoCnpj">
+              CNPJ
+            </label>
             <input
               className="input-radio"
               type="radio"
               name="opcao"
               id="opcaoCnpj"
-              value={campoSelecionado}
-              onChange={() => setCampoSelecionado('cnpj')}
-              onClick={() => handleRadioClick('cnpj')}
-              checked={campoSelecionado === 'cnpj'}
+              value={selectedField}
+              onChange={() => setSelectedField("cnpj")}
+              onClick={() => handleRadioClick("cnpj")}
+              checked={selectedField === "cnpj"}
             />
           </div>
           <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoTelefone">Telefone</label>
+            <label className="label-radio" htmlFor="opcaoTelefone">
+              Telefone
+            </label>
             <input
               className="input-radio"
               type="radio"
               name="opcao"
               id="opcaoTelefone"
-              value={campoSelecionado}
-              onChange={() => setCampoSelecionado('telefone')}
-              onClick={() => handleRadioClick('telefone')}
-              checked={campoSelecionado === 'telefone'}
+              value={selectedField}
+              onChange={() => setSelectedField("telefone")}
+              onClick={() => handleRadioClick("telefone")}
+              checked={selectedField === "telefone"}
             />
           </div>
           <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoStatusFornecedor">Status do Fornecedor</label>
+            <label className="label-radio" htmlFor="opcaoStatusFornecedor">
+              Status do Fornecedor
+            </label>
             <input
               className="input-radio"
               type="radio"
               name="opcao"
               id="opcaoStatusFornecedor"
-              value={campoSelecionado}
-              onChange={() => setCampoSelecionado('statusFornecedor')}
-              onClick={() => handleRadioClick('statusFornecedor')}
-              checked={campoSelecionado === 'statusFornecedor'}
+              value={selectedField}
+              onChange={() => setSelectedField("statusFornecedor")}
+              onClick={() => handleRadioClick("statusFornecedor")}
+              checked={selectedField === "statusFornecedor"}
             />
           </div>
         </div>
       </div>
       <div className="div-dupla-check">
-        <div style={{ display: 'flex', whiteSpace: 'nowrap', fontWeight: 'bolder' }}>
-          <label className="label-radio" htmlFor="recente">Mais recente</label>
+        <div
+          style={{
+            display: "flex",
+            whiteSpace: "nowrap",
+            fontWeight: "bolder",
+          }}
+        >
+          <label className="label-radio" htmlFor="recente">
+            Mais recente
+          </label>
           <input
             className="input-check"
             type="checkbox"
             name="filtroData"
             id="recente"
             value="recente"
-            checked={valorSelecionado === 'recente'}
-            onChange={() => alternarSelecaoCheckbox('recente')}
+            checked={selectedValue === "recente"}
+            onChange={() => checkboxSelectionToggle("recente")}
           />
         </div>
-        <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
-          <label className="label-radio" htmlFor="antigo">Mais antigo</label>
+        <div style={{ display: "flex", whiteSpace: "nowrap" }}>
+          <label className="label-radio" htmlFor="antigo">
+            Mais antigo
+          </label>
           <input
             className="input-check"
             type="checkbox"
             name="filtroData"
             id="antigo"
             value="antigo"
-            checked={valorSelecionado === 'antigo'}
-            onChange={() => alternarSelecaoCheckbox('antigo')}
+            checked={selectedValue === "antigo"}
+            onChange={() => checkboxSelectionToggle("antigo")}
           />
         </div>
       </div>
 
-      {fornecedores.map((fornecedor) => {
+      {suppliers.map((fornecedor) => {
         return (
           <SupplierCard
             key={fornecedor.cnpj}
             supplier={fornecedor}
-            setSupplier={setFornecedores}
+            setSupplier={setSuppliers}
           />
-        )
+        );
       })}
     </div>
-  )
+  );
 }

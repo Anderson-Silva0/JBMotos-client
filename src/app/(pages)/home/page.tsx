@@ -1,60 +1,59 @@
-'use client'
+'use client';
 
-import Cookies from 'js-cookie'
-import { useEffect, useRef, useState } from 'react'
-import { decode } from 'jsonwebtoken'
-import { DecodedToken } from '@/middleware'
-import { Chart, LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip } from 'chart.js'
-import { DailyDataChartService } from '@/services/dailyDataChartService'
-import { errorMessage } from '@/models/toast'
-import { DailyDataChart } from '@/models/dailyDataChart'
+import Cookies from 'js-cookie';
+import { useEffect, useRef, useState } from 'react';
+import { decode } from 'jsonwebtoken';
+import { DecodedToken } from '@/middleware';
+import { Chart, LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip } from 'chart.js';
+import { DailyDataChartService } from '@/services/dailyDataChartService';
+import { errorMessage } from '@/models/toast';
+import { DailyDataChart } from '@/models/dailyDataChart';
 
-Chart.register(LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip)
+Chart.register(LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip);
 
 export default function HomePage() {
 
-  const [dadosDoGrafico, setDadosDoGrafico] = useState<DailyDataChart[]>([])
-  const [userName, setUserName] = useState<string>('')
-  const chartRef = useRef<Chart | null>(null)
+  const [chartData, setChartData] = useState<DailyDataChart[]>([]);
+  const [userName, setUserName] = useState<string>('');
+  const chartRef = useRef<Chart | null>(null);
 
-  const { fetchChartData: buscarDadosDoGrafico } = DailyDataChartService()
+  const { fetchChartData } = DailyDataChartService();
 
   useEffect(() => {
-    const token = Cookies.get('login-token')
+    const token = Cookies.get('login-token');
     if (token) {
-      const decodedToken = decode(token) as DecodedToken
-      setUserName(decodedToken.userName)
+      const decodedToken = decode(token) as DecodedToken;
+      setUserName(decodedToken.userName);
     }
 
-    const buscarDadosDailyDataChart = async () => {
+    const fetchDailyDataChart = async () => {
       try {
-        const chartDataResponse = await buscarDadosDoGrafico()
-        setDadosDoGrafico(chartDataResponse.data)
+        const chartDataResponse = await fetchChartData();
+        setChartData(chartDataResponse.data);
       } catch (error: any) {
-        errorMessage('Erro ao tentar buscar dados do gráfico.')
+        errorMessage('Erro ao tentar buscar dados do gráfico.');
       }
-    }
+    };
 
-    //A request está sendo feita duas vezes aqui. Identificar a causa...
-    buscarDadosDailyDataChart()
+    fetchDailyDataChart();
 
-  }, [])
+  }, []);
 
   useEffect(() => {
-    const ctx = document.getElementById('myChart') as HTMLCanvasElement
+    const ctx = document.getElementById('myChart') as HTMLCanvasElement;
 
     if (ctx) {
       if (chartRef.current) {
-        chartRef.current.destroy()
+        chartRef.current.destroy();
       }
 
-      const labels = dadosDoGrafico.map((data) => {
+      const labels = chartData.map((data) => {
         const date = new Date(data.dataMillis);
         return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
       });
 
-      const qtdVendaData = dadosDoGrafico.map((data) => data.saleQuantity);
-      const qtdServicoData = dadosDoGrafico.map((data) => data.serviceQuantity);
+      const salesDataQuantity = chartData.map((data) => data.saleQuantity);
+      const repairDataQuantity = chartData.map((data) => data.repairQuantity);
 
       chartRef.current = new Chart(ctx, {
         type: 'line',
@@ -63,14 +62,14 @@ export default function HomePage() {
           datasets: [
             {
               label: 'Quantidade de Vendas',
-              data: qtdVendaData,
+              data: salesDataQuantity,
               borderColor: 'rgb(75, 192, 192)',
               backgroundColor: 'rgb(75, 192, 192)',
               borderWidth: 2,
             },
             {
               label: 'Quantidade de Serviços',
-              data: qtdServicoData,
+              data: repairDataQuantity,
               borderColor: 'rgb(255, 159, 64)',
               backgroundColor: 'rgb(255, 159, 64)',
               borderWidth: 2,
@@ -132,15 +131,15 @@ export default function HomePage() {
             },
           },
         },
-      })
+      });
     }
 
     return () => {
       if (chartRef.current) {
-        chartRef.current.destroy()
+        chartRef.current.destroy();
       }
-    }
-  }, [dadosDoGrafico])
+    };
+  }, [chartData]);
 
   return (
     <div style={{ textAlign: 'center', width: '100%' }}>
@@ -151,5 +150,5 @@ export default function HomePage() {
         <canvas id="myChart"></canvas>
       </div>
     </div>
-  )
+  );
 }

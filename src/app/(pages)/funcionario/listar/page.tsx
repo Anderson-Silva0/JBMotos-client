@@ -1,260 +1,296 @@
-'use client'
+"use client";
 
-import EmployeeCard from "@/components/FuncionarioCard"
-import { CpfInput, PhoneInput } from "@/components/Input"
-import LoadingLogo from "@/components/LoadingLogo"
-import imgFuncionario from "@/images/employee.png"
-import { parseDate } from "@/models/StringParaDate"
-import { Employee } from "@/models/funcionario"
-import { errorMessage } from "@/models/toast"
-import { EmployeeService } from "@/services/funcionarioService"
-import { Search } from "lucide-react"
-import Image from "next/image"
-import '@/styles/card.css'
-import { useEffect, useState } from "react"
+import EmployeeCard from "@/components/FuncionarioCard";
+import { CpfInput, PhoneInput } from "@/components/Input";
+import LoadingLogo from "@/components/LoadingLogo";
+import imgFuncionario from "@/images/employee.png";
+import { parseDate } from "@/models/StringParaDate";
+import { Employee } from "@/models/funcionario";
+import { errorMessage } from "@/models/toast";
+import { EmployeeService } from "@/services/funcionarioService";
+import { Search } from "lucide-react";
+import Image from "next/image";
+import "@/styles/card.css";
+import { useEffect, useState } from "react";
 
-export default function ListarFuncionarios() {
-  const [funcionarios, setFuncionarios] = useState<Employee[]>([])
+export default function ListEmployees() {
+  const [employees, setEmployees] = useState<Employee[]>([]);
 
-  const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-  const [valorInputBuscar, setValorInputBuscar] = useState<string>('')
+  const [searchInputValue, setSearchInputValue] = useState<string>("");
 
-  const [campoSelecionado, setCampoSelecionado] = useState<string>('')
+  const [selectedField, setSelectedField] = useState<string>("");
 
-  const { filterEmployee: filtrarFuncionario } = EmployeeService()
+  const { filterEmployee } = EmployeeService();
 
-  const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
+  const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
-  const alternarSelecaoCheckbox = (value: string) => {
-    setValorSelecionado(value === valorSelecionado ? null : value)
-  }
+  const checkboxSelectionToggle = (value: string) => {
+    setSelectedValue(value === selectedValue ? null : value);
+  };
 
   useEffect(() => {
-    if (valorSelecionado === 'antigo') {
-      const sortedFuncionariosRecentes = [...funcionarios].sort((a: Employee, b: Employee) =>
-        parseDate(a.createdAt).getTime() - parseDate(b.createdAt).getTime()
-      )
-      setFuncionarios(sortedFuncionariosRecentes)
-    } else if (valorSelecionado === 'recente') {
-      const sortedFuncionariosRecentes = [...funcionarios].sort((a: Employee, b: Employee) =>
-        parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime()
-      )
-      setFuncionarios(sortedFuncionariosRecentes)
+    if (selectedValue === "antigo") {
+      const sortedRecentEmployees = [...employees].sort(
+        (a: Employee, b: Employee) =>
+          parseDate(a.createdAt).getTime() - parseDate(b.createdAt).getTime()
+      );
+      setEmployees(sortedRecentEmployees);
+    } else if (selectedValue === "recente") {
+      const sortedRecentEmployees = [...employees].sort(
+        (a: Employee, b: Employee) =>
+          parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime()
+      );
+      setEmployees(sortedRecentEmployees);
     }
-  }, [valorSelecionado])
+  }, [selectedValue]);
 
   useEffect(() => {
-    const buscarPorCpf = async () => {
+    const findByCpf = async () => {
       try {
-        const funcionarioResponse = await filtrarFuncionario(campoSelecionado, valorInputBuscar)
-        const funcionariosList = funcionarioResponse.data as Employee[]
-        const funcionariosFilter = funcionariosList.filter(f => f.cpf !== "710.606.394-08")
-        setFuncionarios(funcionariosFilter)
+        const employeeResponse = await filterEmployee(
+          selectedField,
+          searchInputValue
+        );
+        const employeesList = employeeResponse.data as Employee[];
+        const employeesFilter = employeesList.filter(
+          (f) => f.cpf !== "710.606.394-08"
+        );
+        setEmployees(employeesFilter);
       } catch (error: any) {
-        errorMessage('Erro ao tentar buscar Funcionário.')
+        errorMessage("Erro ao tentar buscar Funcionário.");
       } finally {
-        setFoiCarregado(true)
+        setIsLoaded(true);
       }
-    }
-    buscarPorCpf()
-  }, [valorInputBuscar, campoSelecionado])
+    };
+    findByCpf();
+  }, [searchInputValue, selectedField]);
 
   useEffect(() => {
-    setValorInputBuscar('')
-  }, [campoSelecionado])
+    setSearchInputValue("");
+  }, [selectedField]);
 
   const handleRadioClick = (campo: string) => {
-    if (campoSelecionado === campo) {
-      setCampoSelecionado('')
+    if (selectedField === campo) {
+      setSelectedField("");
     }
-  }
+  };
 
-  if (!foiCarregado) {
-    return <LoadingLogo description='Carregando' />
+  if (!isLoaded) {
+    return <LoadingLogo description="Carregando" />;
   }
 
   return (
     <div className="div-form-container">
       <h1 className="centered-text">
-        {
-          campoSelecionado === '' ? (
-            funcionarios.length > 1 ? (
-              <>
-                <Image src={imgFuncionario} width={60} height={60} alt="" /> {funcionarios.length} Funcionários cadastrados
-              </>
-            ) : funcionarios.length === 1 ? (
-              <>
-                <Image src={imgFuncionario} width={60} height={60} alt="" /> {funcionarios.length} Funcionário cadastrado
-              </>
-            ) : (
-              'Nenhum Funcionário cadastrado no sistema'
-            )
-          ) : campoSelecionado !== '' && valorInputBuscar !== '' && (
+        {selectedField === "" ? (
+          employees.length > 1 ? (
             <>
-              {
-                funcionarios.length === 1 ? (
-                  <strong>{funcionarios.length} Funcionário encontrado</strong>
-                ) : funcionarios.length > 1 ? (
-                  <strong>{funcionarios.length} Funcionários encontrados</strong>
-                ) : (
-                  'Nenhum Funcionário encontrado'
-                )
-              }
+              <Image src={imgFuncionario} width={60} height={60} alt="" />{" "}
+              {employees.length} Funcionários cadastrados
+            </>
+          ) : employees.length === 1 ? (
+            <>
+              <Image src={imgFuncionario} width={60} height={60} alt="" />{" "}
+              {employees.length} Funcionário cadastrado
+            </>
+          ) : (
+            "Nenhum Funcionário cadastrado no sistema"
+          )
+        ) : (
+          selectedField !== "" &&
+          searchInputValue !== "" && (
+            <>
+              {employees.length === 1 ? (
+                <strong>{employees.length} Funcionário encontrado</strong>
+              ) : employees.length > 1 ? (
+                <strong>{employees.length} Funcionários encontrados</strong>
+              ) : (
+                "Nenhum Funcionário encontrado"
+              )}
             </>
           )
-        }
+        )}
       </h1>
       <div className="div-container-buscar">
         <div className="div-buscar">
           <Search size={60} strokeWidth={3} />
-          {
-            campoSelecionado === '' ? (
-              <div className="div-msg-busca">
-                <p>Selecione o filtro desejado:</p>
-              </div>
-            ) : campoSelecionado === 'nome' ? (
-              <input
-                className="input-buscar"
-                placeholder="Digite o Nome"
-                type="search"
-                onChange={(e) => setValorInputBuscar(e.target.value)}
-              />
-            ) : campoSelecionado === 'cpf' ? (
-              <CpfInput
-                className="input-buscar"
-                placeholder="Digite o CPF"
-                type="search"
-                value={valorInputBuscar}
-                onChange={(e) => setValorInputBuscar(e.target.value)}
-              />
-            ) : campoSelecionado === 'telefone' ? (
-              <PhoneInput
-                className="input-buscar"
-                placeholder="Digite o Telefone"
-                type="search"
-                value={valorInputBuscar}
-                onChange={(e) => setValorInputBuscar(e.target.value)}
-              />
-            ) : campoSelecionado === 'statusFuncionario' && (
+          {selectedField === "" ? (
+            <div className="div-msg-busca">
+              <p>Selecione o filtro desejado:</p>
+            </div>
+          ) : selectedField === "nome" ? (
+            <input
+              className="input-buscar"
+              placeholder="Digite o Nome"
+              type="search"
+              onChange={(e) => setSearchInputValue(e.target.value)}
+            />
+          ) : selectedField === "cpf" ? (
+            <CpfInput
+              className="input-buscar"
+              placeholder="Digite o CPF"
+              type="search"
+              value={searchInputValue}
+              onChange={(e) => setSearchInputValue(e.target.value)}
+            />
+          ) : selectedField === "telefone" ? (
+            <PhoneInput
+              className="input-buscar"
+              placeholder="Digite o Telefone"
+              type="search"
+              value={searchInputValue}
+              onChange={(e) => setSearchInputValue(e.target.value)}
+            />
+          ) : (
+            selectedField === "statusFuncionario" && (
               <>
-                <div style={{ marginRight: '2vw' }}>
-                  <label className="label-radio" htmlFor="opcaoStatusFuncionario1">ATIVO</label>
+                <div style={{ marginRight: "2vw" }}>
+                  <label
+                    className="label-radio"
+                    htmlFor="opcaoStatusFuncionario1"
+                  >
+                    ATIVO
+                  </label>
                   <input
                     id="opcaoStatusFuncionario1"
                     className="input-radio"
                     type="radio"
                     name="status"
-                    value={campoSelecionado}
-                    onChange={() => setValorInputBuscar('ATIVO')}
+                    value={selectedField}
+                    onChange={() => setSearchInputValue("ATIVO")}
                   />
                 </div>
                 <div>
-                  <label className="label-radio" htmlFor="opcaoStatusFuncionario2">INATIVO</label>
+                  <label
+                    className="label-radio"
+                    htmlFor="opcaoStatusFuncionario2"
+                  >
+                    INATIVO
+                  </label>
                   <input
                     id="opcaoStatusFuncionario2"
                     className="input-radio"
                     type="radio"
                     name="status"
-                    value={campoSelecionado}
-                    onChange={() => setValorInputBuscar('INATIVO')}
+                    value={selectedField}
+                    onChange={() => setSearchInputValue("INATIVO")}
                   />
                 </div>
               </>
             )
-          }
+          )}
         </div>
         <div className="div-radios">
           <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoNome">Nome</label>
+            <label className="label-radio" htmlFor="opcaoNome">
+              Nome
+            </label>
             <input
               className="input-radio"
               type="radio"
               name="opcao"
               id="opcaoNome"
-              value={campoSelecionado}
-              onChange={() => setCampoSelecionado('nome')}
-              onClick={() => handleRadioClick('nome')}
-              checked={campoSelecionado === 'nome'}
+              value={selectedField}
+              onChange={() => setSelectedField("nome")}
+              onClick={() => handleRadioClick("nome")}
+              checked={selectedField === "nome"}
             />
           </div>
           <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoCPF">CPF</label>
+            <label className="label-radio" htmlFor="opcaoCPF">
+              CPF
+            </label>
             <input
               className="input-radio"
               type="radio"
               name="opcao"
               id="opcaoCPF"
-              value={campoSelecionado}
-              onChange={() => setCampoSelecionado('cpf')}
-              onClick={() => handleRadioClick('cpf')}
-              checked={campoSelecionado === 'cpf'}
+              value={selectedField}
+              onChange={() => setSelectedField("cpf")}
+              onClick={() => handleRadioClick("cpf")}
+              checked={selectedField === "cpf"}
             />
           </div>
           <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoTelefone">Telefone</label>
+            <label className="label-radio" htmlFor="opcaoTelefone">
+              Telefone
+            </label>
             <input
               className="input-radio"
               type="radio"
               name="opcao"
               id="opcaoTelefone"
-              value={campoSelecionado}
-              onChange={() => setCampoSelecionado('telefone')}
-              onClick={() => handleRadioClick('telefone')}
-              checked={campoSelecionado === 'telefone'}
+              value={selectedField}
+              onChange={() => setSelectedField("telefone")}
+              onClick={() => handleRadioClick("telefone")}
+              checked={selectedField === "telefone"}
             />
           </div>
           <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoStatusFuncionario">Status do Funcionário</label>
+            <label className="label-radio" htmlFor="opcaoStatusFuncionario">
+              Status do Funcionário
+            </label>
             <input
               className="input-radio"
               type="radio"
               name="opcao"
               id="opcaoStatusFuncionario"
-              value={campoSelecionado}
-              onChange={() => setCampoSelecionado('statusFuncionario')}
-              onClick={() => handleRadioClick('statusFuncionario')}
-              checked={campoSelecionado === 'statusFuncionario'}
+              value={selectedField}
+              onChange={() => setSelectedField("statusFuncionario")}
+              onClick={() => handleRadioClick("statusFuncionario")}
+              checked={selectedField === "statusFuncionario"}
             />
           </div>
         </div>
       </div>
       <div className="div-dupla-check">
-        <div style={{ display: 'flex', whiteSpace: 'nowrap', fontWeight: 'bolder' }}>
-          <label className="label-radio" htmlFor="recente">Mais recente</label>
+        <div
+          style={{
+            display: "flex",
+            whiteSpace: "nowrap",
+            fontWeight: "bolder",
+          }}
+        >
+          <label className="label-radio" htmlFor="recente">
+            Mais recente
+          </label>
           <input
             className="input-check"
             type="checkbox"
             name="filtroData"
             id="recente"
             value="recente"
-            checked={valorSelecionado === 'recente'}
-            onChange={() => alternarSelecaoCheckbox('recente')}
+            checked={selectedValue === "recente"}
+            onChange={() => checkboxSelectionToggle("recente")}
           />
         </div>
-        <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
-          <label className="label-radio" htmlFor="antigo">Mais antigo</label>
+        <div style={{ display: "flex", whiteSpace: "nowrap" }}>
+          <label className="label-radio" htmlFor="antigo">
+            Mais antigo
+          </label>
           <input
             className="input-check"
             type="checkbox"
             name="filtroData"
             id="antigo"
             value="antigo"
-            checked={valorSelecionado === 'antigo'}
-            onChange={() => alternarSelecaoCheckbox('antigo')}
+            checked={selectedValue === "antigo"}
+            onChange={() => checkboxSelectionToggle("antigo")}
           />
         </div>
       </div>
 
-      {funcionarios.map((funcionario) => {
+      {employees.map((funcionario) => {
         return (
           <EmployeeCard
             key={funcionario.cpf}
             employee={funcionario}
-            setEmployees={setFuncionarios}
+            setEmployees={setEmployees}
           />
-        )
+        );
       })}
     </div>
-  )
+  );
 }
