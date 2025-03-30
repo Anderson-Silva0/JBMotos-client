@@ -1,192 +1,206 @@
-import { Estoque, estadoInicialEstoque } from '@/models/estoque'
-import { formatarParaReal } from '@/models/formatadorReal'
-import { Fornecedor, estadoInicialFornecedor } from '@/models/fornecedor'
-import { Produto } from '@/models/produto'
-import { mensagemErro, mensagemSucesso } from '@/models/toast'
-import { EstoqueService } from '@/services/estoqueService'
-import { FornecedorService } from '@/services/fornecedorService'
-import { ProdutoService } from '@/services/produtoService'
-import { Check, CheckSquare, Edit, X, XSquare } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import '../styles/cardListagem.css'
-import { ConfirmarDecisao } from './ConfirmarDecisao'
-import Cookies from 'js-cookie'
-import { decode } from 'jsonwebtoken'
-import { DecodedToken } from '@/middleware'
-import { ROLE } from '@/models/authRegisterModel'
+import { Stock, stockInitialState } from "@/models/estoque";
+import { formatToBRL } from "@/models/formatadorReal";
+import { Supplier, supplierInitialState } from "@/models/fornecedor";
+import { Product } from "@/models/produto";
+import { errorMessage, successMessage } from "@/models/toast";
+import { StockService } from "@/services/estoqueService";
+import { SupplierService } from "@/services/fornecedorService";
+import { ProductService } from "@/services/produtoService";
+import { Check, CheckSquare, Edit, X, XSquare } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import "../styles/cardListagem.css";
+import { confirmDecision } from "./ConfirmarDecisao";
+import Cookies from "js-cookie";
+import { decode } from "jsonwebtoken";
+import { DecodedToken } from "@/middleware";
+import { ROLE } from "@/models/authRegisterModel";
 
-interface ProdutoCardProps {
-  produto: Produto
-  setProdutos: Dispatch<SetStateAction<Produto[]>>
+interface ProductCardProps {
+  product: Product;
+  setProduct: Dispatch<SetStateAction<Product[]>>;
 }
 
-export default function ProdutoCard({ produto, setProdutos }: ProdutoCardProps) {
-  const router = useRouter()
+export default function ProdutoCard({
+  product,
+  setProduct,
+}: ProductCardProps) {
+  const router = useRouter();
 
-  const { buscarEstoquePorId } = EstoqueService()
-  const { buscarFornecedorPorCnpj } = FornecedorService()
-  const { buscarTodosProdutos, alternarStatusProduto } = ProdutoService()
+  const { findStockById } = StockService();
+  const { findSupplierByCnpj } = SupplierService();
+  const { findAllProduct, toggleStatusProduct } = ProductService();
 
-  const [estoqueState, setEstoqueState] = useState<Estoque>(estadoInicialEstoque)
-  const [fornecedorState, setFornecedorState] = useState<Fornecedor>(estadoInicialFornecedor)
-  const [userRole, setUserRole] = useState<string>('')
+  const [stockState, setStockState] = useState<Stock>(stockInitialState);
+  const [supplierState, setSupplierState] = useState<Supplier>(supplierInitialState);
+  const [userRole, setUserRole] = useState<string>("");
 
   function loadUserRole() {
-    const token = Cookies.get('login-token')
+    const token = Cookies.get("login-token");
     if (token) {
-      const decodedToken = decode(token) as DecodedToken
-      setUserRole(decodedToken.role)
+      const decodedToken = decode(token) as DecodedToken;
+      setUserRole(decodedToken.role);
     }
   }
 
   useEffect(() => {
-    async function buscar() {
+    async function search() {
       try {
-        const estoqueResponse = await buscarEstoquePorId(produto.idEstoque)
-        setEstoqueState(estoqueResponse.data)
+        const stockResponse = await findStockById(product.stockId);
+        setStockState(stockResponse.data);
 
-        const fornecedorResponse = await buscarFornecedorPorCnpj(produto.cnpjFornecedor)
-        setFornecedorState(fornecedorResponse.data)
+        const supplierResponse = await findSupplierByCnpj(product.supplierCNPJ);
+        setSupplierState(supplierResponse.data);
       } catch (error: any) {
-        mensagemErro(error.response.data)
+        errorMessage(error.response.data);
       }
     }
-    loadUserRole()
-    buscar()
-  }, [])
+    loadUserRole();
+    search();
+  }, []);
 
-  const handlerAlternar = () => {
-    if (produto.statusProduto === 'ATIVO') {
-      ConfirmarDecisao(
-        'Desativar Produto',
-        'Ao confirmar, o Produto será marcado como inativo e não poderá ser vendido ou utilizado em serviços. Deseja realmente desativar o Produto?',
+  const handlerToggle = () => {
+    if (product.productStatus === "ACTIVE") {
+      confirmDecision(
+        "Desativar Produto",
+        "Ao confirmar, o Produto será marcado como inativo e não poderá ser vendido ou utilizado em serviços. Deseja realmente desativar o Produto?",
         () => {
-          alternarStatus()
+          toggleStatus();
         }
-      )
-    } else if (produto.statusProduto === 'INATIVO') {
-      ConfirmarDecisao(
-        'Ativar Produto',
-        'Ao confirmar, o Produto será marcado como ativo e poderá ser vendido e utilizado em serviços normalmente. Deseja realmente ativar o Produto?',
+      );
+    } else if (product.productStatus === "INACTIVE") {
+      confirmDecision(
+        "Ativar Produto",
+        "Ao confirmar, o Produto será marcado como ativo e poderá ser vendido e utilizado em serviços normalmente. Deseja realmente ativar o Produto?",
         () => {
-          alternarStatus()
+          toggleStatus();
         }
-      )
+      );
     }
-  }
+  };
 
-  const alternarStatus = async () => {
+  const toggleStatus = async () => {
     try {
-      const statusResponse = await alternarStatusProduto(produto.id)
-      if (statusResponse.data === 'ATIVO') {
-        mensagemSucesso('Produto Ativado com sucesso.')
-      } else if (statusResponse.data === 'INATIVO') {
-        mensagemSucesso('Produto Desativado com sucesso.')
+      const statusResponse = await toggleStatusProduct(product.id);
+      if (statusResponse.data === "ACTIVE") {
+        successMessage("Produto Ativado com sucesso.");
+      } else if (statusResponse.data === "INACTIVE") {
+        successMessage("Produto Desativado com sucesso.");
       }
     } catch (error) {
-      mensagemErro('Erro ao tentar definir o Status do Produto.')
+      errorMessage("Erro ao tentar definir o Status do Produto.");
     }
-    await atualizarListagem()
-  }
+    await updateListing();
+  };
 
-  const atualizarListagem = async () => {
+  const updateListing = async () => {
     try {
-      const todosProdutosResponse = await buscarTodosProdutos()
-      setProdutos(todosProdutosResponse.data)
+      const allProductsResponse = await findAllProduct();
+      setProduct(allProductsResponse.data);
     } catch (error) {
-      mensagemErro('Erro ao tentar buscar todos Produtos.')
+      errorMessage("Erro ao tentar buscar todos Produtos.");
     }
-  }
+  };
 
-  const atualizar = () => {
-    router.push(`/produto/atualizar/${produto.id}`)
-  }
+  const update = () => {
+    router.push(`/product/update/${product.id}`);
+  };
 
-  const lucroProduto = Number(produto.precoVenda) - Number(produto.precoCusto)
+  const productProfit = Number(product.salePrice) - Number(product.costPrice);
 
   return (
     <div className="cardListagem-container">
       <div className="info-principal">
-        <div className='items'>
+        <div className="items">
           <span id="info-title">Produto</span>
-          <div className='div-dados'>Nome</div>
-          <div className='div-resultado'>{produto.nome}</div>
-          {userRole === ROLE.ADMIN &&
+          <div className="div-dados">Nome</div>
+          <div className="div-resultado">{product.name}</div>
+          {userRole === ROLE.ADMIN && (
             <>
-              <div className='div-dados'>Preço de Custo</div>
-              <div className='div-resultado'>{formatarParaReal(produto.precoCusto)}</div>
+              <div className="div-dados">Preço de Custo</div>
+              <div className="div-resultado">
+                {formatToBRL(product.costPrice)}
+              </div>
             </>
-          }
-          <div className='div-dados'>Preço de Venda</div>
-          <div className='div-resultado'>{formatarParaReal(produto.precoVenda)}</div>
-          {userRole === ROLE.ADMIN &&
+          )}
+          <div className="div-dados">Preço de Venda</div>
+          <div className="div-resultado">{formatToBRL(product.salePrice)}</div>
+          {userRole === ROLE.ADMIN && (
             <>
-              <div className='div-dados'>Lucro do Produto</div>
-              <div className='div-resultado'>{formatarParaReal(lucroProduto)}</div>
+              <div className="div-dados">Lucro do Produto</div>
+              <div className="div-resultado">{formatToBRL(productProfit)}</div>
             </>
-          }
-          <div className='div-dados'>Marca</div>
-          <div className='div-resultado'>{produto.marca}</div>
-          <div className='div-dados'>Fornecedor</div>
-          <div className='div-resultado'>{fornecedorState.nome}</div>
-          <div className='div-dados'>Data e Hora de Cadastro</div>
-          <div className='div-resultado'>{produto.dataHoraCadastro}</div>
+          )}
+          <div className="div-dados">Marca</div>
+          <div className="div-resultado">{product.brand}</div>
+          <div className="div-dados">Fornecedor</div>
+          <div className="div-resultado">{supplierState.name}</div>
+          <div className="div-dados">Data e Hora de Cadastro</div>
+          <div className="div-resultado">{product.createdAt}</div>
         </div>
-        <div className='items'>
+        <div className="items">
           <span id="info-title">Estoque</span>
-          <div className='div-dados'>Estoque Mínimo</div>
-          <div className='div-resultado'>{estoqueState.estoqueMinimo}</div>
-          <div className='div-dados'>Estoque Máximo</div>
-          <div className='div-resultado'>{estoqueState.estoqueMaximo}</div>
-          <div className='div-dados'>Quantidade</div>
-          <div className='div-resultado'>{estoqueState.quantidade}</div>
-          <div className='div-dados'>Status do Estoque</div>
-          <div className='div-resultado'>
-            {estoqueState.status === 'DISPONIVEL' ? (
-              <strong className="item"><span style={{ color: 'green' }}>Disponível</span></strong>
-            ) : estoqueState.status === 'INDISPONIVEL' ? (
-              <strong className="item"><span style={{ color: 'red' }}>Indisponível</span></strong>
-            ) : estoqueState.status === 'ESTOQUE_ALTO' ? (
-              <strong className="item"><span style={{ color: 'orange' }}>Estoque Alto</span></strong>
-            ) : estoqueState.status === 'ESTOQUE_BAIXO' && (
-              <strong className="item"><span style={{ color: 'darkred' }}>Estoque Baixo</span></strong>
+          <div className="div-dados">Estoque Mínimo</div>
+          <div className="div-resultado">{stockState.minStock}</div>
+          <div className="div-dados">Estoque Máximo</div>
+          <div className="div-resultado">{stockState.maxStock}</div>
+          <div className="div-dados">Quantidade</div>
+          <div className="div-resultado">{stockState.quantity}</div>
+          <div className="div-dados">Status do Estoque</div>
+          <div className="div-resultado">
+            {stockState.status === "DISPONIVEL" ? (
+              <strong className="item">
+                <span style={{ color: "green" }}>Disponível</span>
+              </strong>
+            ) : stockState.status === "INDISPONIVEL" ? (
+              <strong className="item">
+                <span style={{ color: "red" }}>Indisponível</span>
+              </strong>
+            ) : stockState.status === "ESTOQUE_ALTO" ? (
+              <strong className="item">
+                <span style={{ color: "orange" }}>Estoque Alto</span>
+              </strong>
+            ) : (
+              stockState.status === "ESTOQUE_BAIXO" && (
+                <strong className="item">
+                  <span style={{ color: "darkred" }}>Estoque Baixo</span>
+                </strong>
+              )
             )}
           </div>
 
-          <div className='div-dados'>Status do Produto</div>
-          {
-            produto.statusProduto === 'ATIVO' ? (
-              <div style={{ color: 'green' }} className='div-resultado'>
-                {produto.statusProduto}
-                <Check strokeWidth={3} />
-              </div>
-            ) : produto.statusProduto === 'INATIVO' && (
-              <div style={{ color: 'red' }} className='div-resultado'>
-                {produto.statusProduto}
+          <div className="div-dados">Status do Produto</div>
+          {product.productStatus === "ACTIVE" ? (
+            <div style={{ color: "green" }} className="div-resultado">
+              {product.productStatus}
+              <Check strokeWidth={3} />
+            </div>
+          ) : (
+            product.productStatus === "INACTIVE" && (
+              <div style={{ color: "red" }} className="div-resultado">
+                {product.productStatus}
                 <X strokeWidth={3} />
               </div>
             )
-          }
-
+          )}
         </div>
       </div>
-      <div className='icones-container'>
-        <div onClick={atualizar} title='Editar'>
-          <Edit className='icones-atualizacao-e-delecao' />
+      <div className="icones-container">
+        <div onClick={update} title="Editar">
+          <Edit className="icones-atualizacao-e-delecao" />
         </div>
-        {
-          produto.statusProduto === 'ATIVO' ? (
-            <div onClick={handlerAlternar} title='Desativar'>
-              <XSquare className='icones-atualizacao-e-delecao' />
-            </div>
-          ) : produto.statusProduto === 'INATIVO' && (
-            <div onClick={handlerAlternar} title='Ativar'>
-              <CheckSquare className='icones-atualizacao-e-delecao' />
+        {product.productStatus === "ACTIVE" ? (
+          <div onClick={handlerToggle} title="Desativar">
+            <XSquare className="icones-atualizacao-e-delecao" />
+          </div>
+        ) : (
+          product.productStatus === "INACTIVE" && (
+            <div onClick={handlerToggle} title="Ativar">
+              <CheckSquare className="icones-atualizacao-e-delecao" />
             </div>
           )
-        }
+        )}
       </div>
     </div>
-  )
+  );
 }

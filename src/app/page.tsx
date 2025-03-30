@@ -1,117 +1,131 @@
-'use client'
+"use client";
 
-import { Card } from '@/components/Card'
-import { LockIcon, User } from 'lucide-react'
-import { FormGroup } from '@/components/Form-group'
-import '@/app/globals.css'
-import { ExibeErro } from '@/components/ExibeErro'
-import { Olho } from '@/components/Olho'
-import { ChangeEvent, useState } from 'react'
-import { Erros, salvarErros } from '@/models/erros'
-import { Authentication, estadoInicialAuthentication } from '@/models/authentication'
-import { mensagemErro, mensagemSucesso } from '@/models/toast'
-import { AuthenticationService } from '@/services/authenticationService'
-import Cookies from 'js-cookie'
-import '@/styles/card.css'
-import { useRouter } from 'next/navigation'
-import LoadingLogo from '@/components/LoadingLogo'
+import { Card } from "@/components/Card";
+import { LockIcon, User } from "lucide-react";
+import { FormGroup } from "@/components/Form-group";
+import "@/app/globals.css";
+import { DisplayError } from "@/components/ExibeErro";
+import { Eye } from "@/components/Olho";
+import { ChangeEvent, useState } from "react";
+import { Errors, saveErrors } from "@/models/erros";
+import {
+  Authentication,
+  authenticationInitialState,
+} from "@/models/authentication";
+import { errorMessage, successMessage } from "@/models/toast";
+import { AuthenticationService } from "@/services/authenticationService";
+import Cookies from "js-cookie";
+import "@/styles/card.css";
+import { useRouter } from "next/navigation";
+import LoadingLogo from "@/components/LoadingLogo";
 
 export default function Login() {
+  const router = useRouter();
+  const { authLogin } = AuthenticationService();
 
-  const router = useRouter()
-  const { authLogin } = AuthenticationService()
+  const [authentication, setAuthentication] = useState<Authentication>(
+    authenticationInitialState
+  );
+  const [errors, setErrors] = useState<Errors[]>([]);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
-  const [authentication, setAuthentication] = useState<Authentication>(estadoInicialAuthentication)
-  const [erros, setErros] = useState<Erros[]>([])
-  const [estaVisivel, setEstaVisivel] = useState<boolean>(false)
-
-  let inputType = "text"
-  if (!estaVisivel) {
-    inputType = "password"
+  let inputType = "text";
+  if (!isVisible) {
+    inputType = "password";
   }
 
-  const setPropsAuthentication = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setAuthentication({ ...authentication, [key]: e.target.value })
-    setErros([])
-  }
+  const setPropsAuthentication = (
+    key: string,
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
+    setAuthentication({ ...authentication, [key]: e.target.value });
+    setErrors([]);
+  };
 
   const submit = async () => {
     try {
-      const response = await authLogin(authentication)
-      const token = response.data.token
-      Cookies.set('login-token', token)
+      const response = await authLogin(authentication);
+      const token = response.data.token;
+      Cookies.set("login-token", token);
 
-      mensagemSucesso("Login realizado com sucesso!")
-      setAuthentication(estadoInicialAuthentication)
-      setErros([])
-      router.push('/home')
-    } catch (erro: any) {
-      salvarErros(erro, erros, setErros)
-      if (erro && erro.response && erro.response.data && erro.response.data.loginError) {
-        mensagemErro(erro.response.data.loginError)
+      successMessage("Login realizado com sucesso!");
+      setAuthentication(authenticationInitialState);
+      setErrors([]);
+      router.push("/home");
+    } catch (error: any) {
+      saveErrors(error, errors, setErrors);
+      if (
+        error &&
+        error.response &&
+        error.response.data &&
+        error.response.data.loginError
+      ) {
+        errorMessage(error.response.data.loginError);
       }
-      if (erro.code && erro.code === "ERR_NETWORK") {
-        mensagemErro("Falha na comunicação com o servidor.")
+      if (error.code && error.code === "ERR_NETWORK") {
+        errorMessage("Falha na comunicação com o servidor.");
       }
     }
-  }
+  };
 
-  const hasLoginCookie = Cookies.get('login-token')
+  const hasLoginCookie = Cookies.get("login-token");
 
   if (hasLoginCookie) {
     return (
-      <div className='div-principal'>
-        <LoadingLogo descricao='Entrando' />
+      <div className="div-principal">
+        <LoadingLogo description="Entrando" />
       </div>
-    )
+    );
   }
 
   return (
-    <div className='div-principal'>
-      <div className='div-form-container-login'>
-        <Card titulo="Login">
+    <div className="div-principal">
+      <div className="div-form-container-login">
+        <Card title="Login">
           <FormGroup label="" htmlFor="login">
-            <div className='div-login-pair'>
-              <User size='8vh' strokeWidth={3} />
+            <div className="div-login-pair">
+              <User size="8vh" strokeWidth={3} />
               <input
                 value={authentication.login}
-                onChange={e => setPropsAuthentication("login", e)}
+                onChange={(e) => setPropsAuthentication("login", e)}
                 id="login"
                 placeholder="Login"
                 type="email"
               />
-              <div className='div-msg'>
-                {<ExibeErro erros={erros} nomeInput='login' />}
+              <div className="div-msg">
+                {<DisplayError errors={errors} inputName="login" />}
               </div>
             </div>
           </FormGroup>
           <FormGroup label="" htmlFor="email">
-            <div className='div-login-pair'>
-              <LockIcon size='8vh' strokeWidth={3} />
+            <div className="div-login-pair">
+              <LockIcon size="8vh" strokeWidth={3} />
               <input
-                value={authentication.senha}
-                onChange={e => setPropsAuthentication("senha", e)}
+                value={authentication.password}
+                onChange={(e) => setPropsAuthentication("senha", e)}
                 id="email"
                 placeholder="Senha"
                 type={inputType}
               />
-              <div className='div-msg'>
-                {<ExibeErro erros={erros} nomeInput='senha' />}
+              <div className="div-msg">
+                {<DisplayError errors={errors} inputName="senha" />}
               </div>
             </div>
           </FormGroup>
           <div id="olho-id">
-            <Olho estaVisivel={estaVisivel} setEstaVisivel={setEstaVisivel} isLogin={true} />
+            <Eye
+              isVisible={isVisible}
+              setIsVisible={setIsVisible}
+              isLogin={true}
+            />
           </div>
         </Card>
         <div className="divBotaoCadastrarLogin">
-          <button
-            onClick={submit}
-            type="submit">
+          <button onClick={submit} type="submit">
             Entrar
           </button>
         </div>
       </div>
     </div>
-  )
+  );
 }

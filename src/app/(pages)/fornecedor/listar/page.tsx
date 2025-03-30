@@ -1,20 +1,20 @@
 'use client'
 
-import FornecedorCard from "@/components/FornecedorCard"
-import { InputCnpj, InputTelefone } from "@/components/Input"
+import SupplierCard from "@/components/FornecedorCard"
+import { CnpjInput, PhoneInput } from "@/components/Input"
 import LoadingLogo from "@/components/LoadingLogo"
 import imgFornecedor from "@/images/supplier.png"
 import { parseDate } from "@/models/StringParaDate"
-import { Fornecedor } from "@/models/fornecedor"
-import { mensagemErro } from "@/models/toast"
-import { FornecedorService } from "@/services/fornecedorService"
+import { Supplier } from "@/models/fornecedor"
+import { errorMessage } from "@/models/toast"
+import { SupplierService } from "@/services/fornecedorService"
 import { Search } from "lucide-react"
 import Image from "next/image"
 import '@/styles/card.css'
 import { useEffect, useState } from "react"
 
 export default function ListarFornecedores() {
-  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([])
+  const [fornecedores, setFornecedores] = useState<Supplier[]>([])
 
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
 
@@ -22,7 +22,7 @@ export default function ListarFornecedores() {
 
   const [campoSelecionado, setCampoSelecionado] = useState<string>('')
 
-  const { filtrarFornecedor } = FornecedorService()
+  const { filterSupplier: filtrarFornecedor } = SupplierService()
 
   const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
 
@@ -32,13 +32,13 @@ export default function ListarFornecedores() {
 
   useEffect(() => {
     if (valorSelecionado === 'antigo') {
-      const sortedFornecedoresRecentes = [...fornecedores].sort((a: Fornecedor, b: Fornecedor) =>
-        parseDate(a.dataHoraCadastro).getTime() - parseDate(b.dataHoraCadastro).getTime()
+      const sortedFornecedoresRecentes = [...fornecedores].sort((a: Supplier, b: Supplier) =>
+        parseDate(a.createdAt).getTime() - parseDate(b.createdAt).getTime()
       )
       setFornecedores(sortedFornecedoresRecentes)
     } else if (valorSelecionado === 'recente') {
-      const sortedFornecedoresRecentes = [...fornecedores].sort((a: Fornecedor, b: Fornecedor) =>
-        parseDate(b.dataHoraCadastro).getTime() - parseDate(a.dataHoraCadastro).getTime()
+      const sortedFornecedoresRecentes = [...fornecedores].sort((a: Supplier, b: Supplier) =>
+        parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime()
       )
       setFornecedores(sortedFornecedoresRecentes)
     }
@@ -50,7 +50,7 @@ export default function ListarFornecedores() {
         const fornecedorResponse = await filtrarFornecedor(campoSelecionado, valorInputBuscar)
         setFornecedores(fornecedorResponse.data)
       } catch (error: any) {
-        mensagemErro('Erro ao tentar buscar Fornecedor.')
+        errorMessage('Erro ao tentar buscar Fornecedor.')
       } finally {
         setFoiCarregado(true)
       }
@@ -69,7 +69,7 @@ export default function ListarFornecedores() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo descricao='Carregando' />
+    return <LoadingLogo description='Carregando' />
   }
 
   return (
@@ -119,7 +119,7 @@ export default function ListarFornecedores() {
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
             ) : campoSelecionado === 'cnpj' ? (
-              <InputCnpj
+              <CnpjInput
                 className="input-buscar"
                 placeholder="Digite o CNPJ"
                 type="search"
@@ -127,7 +127,7 @@ export default function ListarFornecedores() {
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
             ) : campoSelecionado === 'telefone' ? (
-              <InputTelefone
+              <PhoneInput
                 className="input-buscar"
                 placeholder="Digite o Telefone"
                 type="search"
@@ -246,10 +246,10 @@ export default function ListarFornecedores() {
 
       {fornecedores.map((fornecedor) => {
         return (
-          <FornecedorCard
+          <SupplierCard
             key={fornecedor.cnpj}
-            fornecedor={fornecedor}
-            setFornecedores={setFornecedores}
+            supplier={fornecedor}
+            setSupplier={setFornecedores}
           />
         )
       })}

@@ -1,39 +1,39 @@
-import { ApiService } from "./apiService"
+import { CardPayment } from "@/models/pagamentoCartao";
+import { ApiService } from "./apiService";
 
-export const PagamentoCartaoService = () => {
+export const CardPaymentService = () => {
+  const url = "/card-payment";
 
-    const url = "/pagamentocartao"
+  const saveCardPayment = (data: CardPayment) => {
+    return ApiService.post(`${url}`, data);
+  };
 
-    const salvarPagamentoCartao = (dados: object) => {
-        return ApiService.post(`${url}`, dados)
-    }
+  const findAllCardPayment = () => {
+    return ApiService.get(`${url}/find-all`);
+  };
 
-    const buscarTodosPagamentosCartoes = () => {
-        return ApiService.get(`${url}/buscar-todos`)
-    }
+  const findCardPaymentById = (id: number) => {
+    return ApiService.get(`${url}/find/${id}`);
+  };
 
-    const buscarPagamentoCartaoPorId = (id: number) => {
-        return ApiService.get(`${url}/buscar/${id}`)
-    }
+  const findCardPaymentBySaleId = (saleId: number) => {
+    return ApiService.get(`${url}/find-by-sale-id/${saleId}`);
+  };
 
-    const buscarPagamentoCartaoPorIdVenda = (idVenda: number) => {
-        return ApiService.get(`${url}/buscar-por-idVenda/${idVenda}`)
-    }
+  const updateCardPayment = (id: number, data: CardPayment) => {
+    return ApiService.put(`${url}/update/${id}`, data);
+  };
 
-    const atualizarPagamentoCartao = (id: number, dados: object) => {
-        return ApiService.put(`${url}/atualizar/${id}`, dados)
-    }
+  const deleteCardPaymentById = (id: number) => {
+    return ApiService.delete(`${url}/deletar/${id}`);
+  };
 
-    const deletarPagamentoCartao = (id: number) => {
-        return ApiService.delete(`${url}/deletar/${id}`)
-    }
-
-    return {
-        salvarPagamentoCartao,
-        buscarTodosPagamentosCartoes,
-        buscarPagamentoCartaoPorId,
-        buscarPagamentoCartaoPorIdVenda,
-        atualizarPagamentoCartao,
-        deletarPagamentoCartao
-    }
-}
+  return {
+    saveCardPayment,
+    findAllCardPayment,
+    findCardPaymentById,
+    findCardPaymentBySaleId,
+    updateCardPayment,
+    deleteCardPaymentById,
+  };
+};

@@ -6,7 +6,7 @@ import { decode } from 'jsonwebtoken'
 import { DecodedToken } from '@/middleware'
 import { Chart, LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip } from 'chart.js'
 import { DailyDataChartService } from '@/services/dailyDataChartService'
-import { mensagemErro } from '@/models/toast'
+import { errorMessage } from '@/models/toast'
 import { DailyDataChart } from '@/models/dailyDataChart'
 
 Chart.register(LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip)
@@ -17,7 +17,7 @@ export default function HomePage() {
   const [userName, setUserName] = useState<string>('')
   const chartRef = useRef<Chart | null>(null)
 
-  const { buscarDadosDoGrafico } = DailyDataChartService()
+  const { fetchChartData: buscarDadosDoGrafico } = DailyDataChartService()
 
   useEffect(() => {
     const token = Cookies.get('login-token')
@@ -31,7 +31,7 @@ export default function HomePage() {
         const chartDataResponse = await buscarDadosDoGrafico()
         setDadosDoGrafico(chartDataResponse.data)
       } catch (error: any) {
-        mensagemErro('Erro ao tentar buscar dados do gráfico.')
+        errorMessage('Erro ao tentar buscar dados do gráfico.')
       }
     }
 
@@ -53,8 +53,8 @@ export default function HomePage() {
         return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
       });
 
-      const qtdVendaData = dadosDoGrafico.map((data) => data.qtdVenda);
-      const qtdServicoData = dadosDoGrafico.map((data) => data.qtdServico);
+      const qtdVendaData = dadosDoGrafico.map((data) => data.saleQuantity);
+      const qtdServicoData = dadosDoGrafico.map((data) => data.serviceQuantity);
 
       chartRef.current = new Chart(ctx, {
         type: 'line',

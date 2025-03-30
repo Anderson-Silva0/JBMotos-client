@@ -1,274 +1,331 @@
+import {
+  SelectedProductProps,
+  ProductOfSaleRowIdProps,
+  SelectedProductRegisterProps,
+  TotalValuesProps,
+} from "@/app/(pages)/venda/cadastro/page";
+import { ProductOfSale, productOfSaleInitialState} from "@/models/ProdutoVenda";
+import { Stock, stockInitialState } from "@/models/estoque";
+import { formatToBRL } from "@/models/formatadorReal";
+import { Product, productInitialState } from "@/models/produto";
+import { selectStylesSale } from "@/models/selectStyles";
+import { alertMessage } from "@/models/toast";
+import { StockService } from "@/services/estoqueService";
+import "@/styles/tabelaVenda.css";
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
+import Select from "react-select";
+import { removeProductFromBudget } from "./GeradorPDF";
 
-import { ProdutoSelecionadoProps, ProdutoVendaIdLinhaProps, 
-RegistroProdutoSelecionadoProps, ValoresTotaisProps } from "@/app/(pages)/venda/cadastro/page"
-import { ProdutoVenda, estadoInicialProdutoVenda } from "@/models/ProdutoVenda"
-import { Estoque, estadoInicialEstoque } from "@/models/estoque"
-import { formatarParaReal } from "@/models/formatadorReal"
-import { Produto, estadoInicialProduto } from '@/models/produto'
-import { selectStylesVenda } from '@/models/selectStyles'
-import { mensagemAlerta } from "@/models/toast"
-import { EstoqueService } from "@/services/estoqueService"
-import '@/styles/tabelaVenda.css'
-import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react"
-import Select from 'react-select'
-import { removerProdutoOrcamento } from "./GeradorPDF"
-
-interface LinhaTabelaProps {
-  idLinha: number
-  produtos: Produto[]
-  qtdLinha: number[]
-  valoresTotais: ValoresTotaisProps[]
-  setValoresTotais: Dispatch<SetStateAction<ValoresTotaisProps[]>>
-  atualizarIdProdutoIdLinhaSelecionado: (idProduto: number, idLinhaAtual: number) => void
-  setProdutos: Dispatch<SetStateAction<Produto[]>>
-  produtosSelecionados: ProdutoSelecionadoProps[]
-  setProdutosSelecionados: Dispatch<SetStateAction<ProdutoSelecionadoProps[]>>
-  registrosProdutosVenda: RegistroProdutoSelecionadoProps[]
-  setRegistrosProdutosVenda: Dispatch<SetStateAction<RegistroProdutoSelecionadoProps[]>>
-  setProdutoVendaIdLinha: Dispatch<SetStateAction<ProdutoVendaIdLinhaProps[]>>
-  produtoVendaIdLinha: ProdutoVendaIdLinhaProps[]
+interface TableRowProps {
+  rowId: number;
+  products: Product[];
+  rowQuantity: number[];
+  totalValues: TotalValuesProps[];
+  setTotalValues: Dispatch<SetStateAction<TotalValuesProps[]>>;
+  updateSelectedProductIdAndRowId: (
+    productId: number,
+    currentRowId: number
+  ) => void;
+  setProducts: Dispatch<SetStateAction<Product[]>>;
+  selectedProducts: SelectedProductProps[];
+  setSelectedProducts: Dispatch<SetStateAction<SelectedProductProps[]>>;
+  saleProductsRegisters: SelectedProductRegisterProps[];
+  setSaleProductsRegisters: Dispatch<
+    SetStateAction<SelectedProductRegisterProps[]>
+  >;
+  setSaleProductRowId: Dispatch<SetStateAction<ProductOfSaleRowIdProps[]>>;
+  saleProductRowId: ProductOfSaleRowIdProps[];
 }
 
-interface OpcaoSelecionadaProps {
-  label: string
-  produto: Produto
+interface SelectedOptionProps {
+  label: string;
+  product: Product;
 }
 
-const estadoInicialOpcaoSelecionada: OpcaoSelecionadaProps = {
-  label: 'Selecione...',
-  produto: estadoInicialProduto
-}
+const selectedOptionInitialState: SelectedOptionProps = {
+  label: "Selecione...",
+  product: productInitialState,
+};
 
-export function LinhaTabela(props: LinhaTabelaProps) {
+export function TableRow(props: TableRowProps) {
+  const { findStockById } = StockService();
 
-  const { buscarEstoquePorId } = EstoqueService()
-
-  const [produtoAnterior, setProdutoAnterior] = useState<ProdutoSelecionadoProps>({
-    idLinhaTabela: 0,
-    produto: estadoInicialProduto
-  })
-  const [valorTotal, setValorTotal] = useState<number>(0)
-  const [produtoVenda, setProdutoVenda] = useState<ProdutoVenda>(estadoInicialProdutoVenda)
-  const [opcaoSelecionada, setOpcaoSelecionada] = useState<OpcaoSelecionadaProps>(estadoInicialOpcaoSelecionada)
-  const [estoqueProdutoSelecionado, setEstoqueProdutoSelecionado] = useState<Estoque>(estadoInicialEstoque)
-  const [produtosAtivos, setProdutosAtivos] = useState<Produto[]>([])
-
-  useEffect(() => {
-    if (props.produtosSelecionados.length === 0) {
-      setOpcaoSelecionada(estadoInicialOpcaoSelecionada)
-      setProdutoVenda(estadoInicialProdutoVenda)
-      setEstoqueProdutoSelecionado(estadoInicialEstoque)
-      setProdutosAtivos([])
-    }
-  }, [props.produtosSelecionados])
+  const [previousProduct, setPreviousProduct] = useState<SelectedProductProps>({
+    tableRowId: 0,
+    product: productInitialState,
+  });
+  const [totalValue, setTotalValue] = useState<number>(0);
+  const [productOfSale, setProductOfSale] = useState<ProductOfSale>(
+    productOfSaleInitialState
+  );
+  const [selectedOption, setSelectedOption] = useState<SelectedOptionProps>(selectedOptionInitialState);
+  const [selectedProductStock, setSelectedProductStock] = useState<Stock>(stockInitialState);
+  const [activeProducts, setActiveProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    const buscarProdutosAtivos = () => {
-      setProdutosAtivos(props.produtos.filter(p => p.statusProduto === 'ATIVO'))
+    if (props.selectedProducts.length === 0) {
+      setSelectedOption(selectedOptionInitialState);
+      setProductOfSale(productOfSaleInitialState);
+      setSelectedProductStock(stockInitialState);
+      setActiveProducts([]);
     }
-    if (props.produtos) {
-      buscarProdutosAtivos()
-    }
-  }, [props.produtos])
+  }, [props.selectedProducts]);
 
   useEffect(() => {
-    const atualizarProdutosSelecionados = () => {
-      if (props.produtosSelecionados.length) {
-        props.produtosSelecionados.map(produtoSelecionado => {
-          if (produtoSelecionado.idLinhaTabela === props.idLinha) {
-            if (produtoAnterior.produto.id !== opcaoSelecionada.produto.id) {
-              let indice = props.produtosSelecionados.findIndex(produto => produto.idLinhaTabela === produtoSelecionado.idLinhaTabela)
-              const produtoParaDevolver = props.produtosSelecionados[indice].produto
-              if (!props.produtos.includes(produtoParaDevolver)) {
-                props.setProdutos([...props.produtos, produtoParaDevolver])
+    const fetchActiveProducts = () => {
+      setActiveProducts(
+        props.products.filter((p) => p.productStatus === "ACTIVE")
+      );
+    };
+    if (props.products) {
+      fetchActiveProducts();
+    }
+  }, [props.products]);
+
+  useEffect(() => {
+    const updateSelectedProducts = () => {
+      if (props.selectedProducts.length) {
+        props.selectedProducts.map((selectedProduct) => {
+          if (selectedProduct.tableRowId === props.rowId) {
+            if (previousProduct.product.id !== selectedOption.product.id) {
+              let index = props.selectedProducts.findIndex(
+                (product) =>
+                  product.tableRowId === selectedProduct.tableRowId
+              );
+              const productToReturn = props.selectedProducts[index].product;
+              if (!props.products.includes(productToReturn)) {
+                props.setProducts([...props.products, productToReturn]);
               }
-              const produtoExcluido = props.produtosSelecionados.splice(indice, 1)[0].produto
-              removerProdutoOrcamento(props.registrosProdutosVenda, produtoExcluido)
+              const deletedProduct = props.selectedProducts.splice(index, 1)[0].product;
+              removeProductFromBudget(
+                props.saleProductsRegisters,
+                deletedProduct
+              );
             }
           }
-        })
+        });
       }
 
-      if (produtoAnterior.produto === estadoInicialProduto || produtoAnterior.produto !== opcaoSelecionada.produto) {
-        const produtoSelecionado: ProdutoSelecionadoProps = {
-          idLinhaTabela: props.idLinha,
-          produto: opcaoSelecionada.produto
+      if (
+        previousProduct.product === productInitialState ||
+        previousProduct.product !== selectedOption.product
+      ) {
+        const selectedProduct: SelectedProductProps = {
+          tableRowId: props.rowId,
+          product: selectedOption.product,
+        };
+
+        if (!props.selectedProducts.includes(selectedProduct)) {
+          props.setSelectedProducts([
+            ...props.selectedProducts,
+            selectedProduct,
+          ]);
+          setPreviousProduct(selectedProduct);
         }
-
-        if (!props.produtosSelecionados.includes(produtoSelecionado)) {
-          props.setProdutosSelecionados([...props.produtosSelecionados, produtoSelecionado])
-          setProdutoAnterior(produtoSelecionado)
-        }
       }
-    }
+    };
 
-    if (opcaoSelecionada.produto.id) {
-      atualizarProdutosSelecionados()
+    if (selectedOption.product.id) {
+      updateSelectedProducts();
     }
-  }, [props.produtos])
-
-  useEffect(() => {
-    const removerProdutoSelecionado = () => {
-      const produtosAtualizado = props.produtos.filter(produto => produto.id !== opcaoSelecionada.produto.id)
-      props.setProdutos(produtosAtualizado)
-    }
-
-    if (opcaoSelecionada.produto.id) {
-      removerProdutoSelecionado()
-    }
-  }, [opcaoSelecionada])
+  }, [props.products]);
 
   useEffect(() => {
-    if (opcaoSelecionada.produto.id) {
-      props.atualizarIdProdutoIdLinhaSelecionado(opcaoSelecionada.produto.id, props.idLinha)
+    const removeSelectedProduct = () => {
+      const updatedProducts = props.products.filter(
+        (product) => product.id !== selectedOption.product.id
+      );
+      props.setProducts(updatedProducts);
+    };
+
+    if (selectedOption.product.id) {
+      removeSelectedProduct();
     }
-    const verificarEstoque = async () => {
-      const idEstoque = opcaoSelecionada.produto.idEstoque
-      if (idEstoque) {
-        const estoqueResponse = await buscarEstoquePorId(idEstoque)
-        setEstoqueProdutoSelecionado(estoqueResponse.data)
+  }, [selectedOption]);
+
+  useEffect(() => {
+    if (selectedOption.product.id) {
+      props.updateSelectedProductIdAndRowId(
+        selectedOption.product.id,
+        props.rowId
+      );
+    }
+    const checkStock = async () => {
+      const stockId = selectedOption.product.stockId;
+      if (stockId) {
+        const stockResponse = await findStockById(stockId);
+        setSelectedProductStock(stockResponse.data);
       }
+    };
+    if (selectedOption.product.id) {
+      checkStock();
     }
-    if (opcaoSelecionada.produto.id) {
-      verificarEstoque()
-    }
-  }, [opcaoSelecionada.produto.id])
+  }, [selectedOption.product.id]);
 
   useEffect(() => {
-    const setQuantidadeInicial = () => {
-      if (opcaoSelecionada.produto.id !== 0 && estoqueProdutoSelecionado.status !== 'INDISPONIVEL') {
-        setProdutoVenda((prevState) => ({
+    const setInitialQuantity = () => {
+      if (
+        selectedOption.product.id !== 0 &&
+        selectedProductStock.status !== "UNAVAILABLE"
+      ) {
+        setProductOfSale((prevState) => ({
           ...prevState,
-          quantidade: 1
-        }))
+          quantity: 1,
+        }));
       } else {
-        setProdutoVenda((prevState) => ({
+        setProductOfSale((prevState) => ({
           ...prevState,
-          quantidade: 0
-        }))
-        if (opcaoSelecionada.label !== 'Selecione...') {
-          mensagemAlerta(`${opcaoSelecionada.label} indisponível no estoque.`)
+          quantity: 0,
+        }));
+        if (selectedOption.label !== "Selecione...") {
+          alertMessage(`${selectedOption.label} indisponível no estoque.`);
         }
       }
-    }
-    setQuantidadeInicial()
-  }, [estoqueProdutoSelecionado])
+    };
+    setInitialQuantity();
+  }, [selectedProductStock]);
 
-  const atualizarValorTotal = (total: number) => {
-    const novoArray = props.valoresTotais.map(item => {
-      if (item.idLinha === props.idLinha) {
+  const updateTotalValue = (total: number) => {
+    const newArray = props.totalValues.map((value) => {
+      if (value.rowId === props.rowId) {
         return {
-          ...item,
-          valorTotal: total,
-        }
+          ...value,
+          totalValue: total,
+        };
       }
-      return item
-    })
-    return novoArray
-  }
+      return value;
+    });
+    return newArray;
+  };
 
   useEffect(() => {
-    const calculo = () => {
-      const total = Number(opcaoSelecionada?.produto.precoVenda) * produtoVenda.quantidade
-      setValorTotal(total)
+    const calculation = () => {
+      const total = Number(selectedOption?.product.salePrice) * productOfSale.quantity;
+      setTotalValue(total);
       if (total !== 0) {
-        if (props.valoresTotais.some(item => item.idLinha === props.idLinha)) {
-          const novoArray = atualizarValorTotal(total)
-          props.setValoresTotais(novoArray)
+        if (props.totalValues.some((value) => value.rowId === props.rowId)) {
+          const newArray = updateTotalValue(total);
+          props.setTotalValues(newArray);
         } else {
-          props.setValoresTotais([...props.valoresTotais, { valorTotal: total, idLinha: props.idLinha }])
+          props.setTotalValues([
+            ...props.totalValues,
+            { totalValue: total, rowId: props.rowId },
+          ]);
         }
       }
-    }
-    calculo()
-  }, [produtoVenda.quantidade, opcaoSelecionada?.produto.precoVenda])
+    };
+    calculation();
+  }, [productOfSale.quantity, selectedOption?.product.salePrice]);
 
-  const setPropQuantidade = (e: ChangeEvent<HTMLInputElement>) => {
-    let novoValor = Number(e.target.value)
-    if (novoValor > Number(estoqueProdutoSelecionado.quantidade) && estoqueProdutoSelecionado.status !== 'INDISPONIVEL'
+  const setQuantityProp = (e: ChangeEvent<HTMLInputElement>) => {
+    let newValue = Number(e.target.value);
+    if (
+      newValue > Number(selectedProductStock.quantity) &&
+      selectedProductStock.status !== "UNAVAILABLE"
     ) {
-      novoValor = Number(estoqueProdutoSelecionado.quantidade)
-      if (opcaoSelecionada.label !== 'Selecione...') {
-        mensagemAlerta(`Limite de estoque atingido. Máximo de ${estoqueProdutoSelecionado.quantidade}
-       unidades disponíveis para ${opcaoSelecionada.label}.`)
+      newValue = Number(selectedProductStock.quantity);
+      if (selectedOption.label !== "Selecione...") {
+        alertMessage(`Limite de estoque atingido. Máximo de ${selectedProductStock.quantity}
+       unidades disponíveis para ${selectedOption.label}.`);
       }
     }
-    if (opcaoSelecionada.produto.id) {
-      if (estoqueProdutoSelecionado.status !== 'INDISPONIVEL') {
-        setProdutoVenda({ ...produtoVenda, quantidade: novoValor < 1 ? 1 : novoValor })
+    if (selectedOption.product.id) {
+      if (selectedProductStock.status !== "UNAVAILABLE") {
+        setProductOfSale({
+          ...productOfSale,
+          quantity: newValue < 1 ? 1 : newValue,
+        });
       } else {
-        setProdutoVenda({ ...produtoVenda, quantidade: 0 })
+        setProductOfSale({ ...productOfSale, quantity: 0 });
       }
     } else {
-      setProdutoVenda({ ...produtoVenda, quantidade: novoValor < 0 ? 0 : novoValor })
+      setProductOfSale({
+        ...productOfSale,
+        quantity: newValue < 0 ? 0 : newValue,
+      });
     }
-  }
+  };
 
   useEffect(() => {
-    const addProdutosVendaList = () => {
-      const { idLinha, produtoVendaIdLinha } = props
+    const addProductsToSaleList = () => {
+      const { rowId, saleProductRowId } = props;
 
-      const novoProdutoVenda = { ...produtoVenda }
+      const newProductOfSale = { ...productOfSale };
 
-      if (!novoProdutoVenda.produto.id || novoProdutoVenda.produto.id !== opcaoSelecionada.produto.id) {
-        novoProdutoVenda.produto.id = opcaoSelecionada.produto.id
-        novoProdutoVenda.valorUnidade = opcaoSelecionada.produto.precoVenda
+      if (
+        !newProductOfSale.product.id ||
+        newProductOfSale.product.id !== selectedOption.product.id
+      ) {
+        newProductOfSale.product.id = selectedOption.product.id;
+        newProductOfSale.unitValue = selectedOption.product.salePrice;
       }
 
-      const produtoIndex = produtoVendaIdLinha.findIndex(
-        (produto) => produto.idLinha === idLinha
-      )
+      const productIndex = saleProductRowId.findIndex(
+        (product) => product.rowId === rowId
+      );
 
-      const newProdutoVendaIdLinha = [...produtoVendaIdLinha]
+      const newProductOfSaleRowId = [...saleProductRowId];
 
-      if (produtoIndex !== -1) {
-        newProdutoVendaIdLinha.splice(produtoIndex, 1, { produtoVenda: novoProdutoVenda, idLinha })
+      if (productIndex !== -1) {
+        newProductOfSaleRowId.splice(productIndex, 1, {
+          productOfSale: newProductOfSale,
+          rowId: rowId,
+        });
       } else {
-        if (novoProdutoVenda.quantidade > 0) {
-          newProdutoVendaIdLinha.push({ produtoVenda: novoProdutoVenda, idLinha })
+        if (newProductOfSale.quantity > 0) {
+          newProductOfSaleRowId.push({
+            productOfSale: newProductOfSale,
+            rowId: rowId,
+          });
         }
       }
 
-      props.setProdutoVendaIdLinha(newProdutoVendaIdLinha)
-    }
+      props.setSaleProductRowId(newProductOfSaleRowId);
+    };
 
-    addProdutosVendaList()
-  }, [produtoVenda, opcaoSelecionada])
+    addProductsToSaleList();
+  }, [productOfSale, selectedOption]);
 
   useEffect(() => {
-    props.registrosProdutosVenda.forEach(produtoVenda => {
-      if (opcaoSelecionada.produto.id === produtoVenda.idProduto) {
-        const indice = props.registrosProdutosVenda.findIndex(objeto => objeto.idProduto === produtoVenda.idProduto)
-        props.registrosProdutosVenda.splice(indice, 1)
+    props.saleProductsRegisters.forEach((productOfSale) => {
+      if (selectedOption.product.id === productOfSale.productId) {
+        const index = props.saleProductsRegisters.findIndex(
+          (object) => object.productId === productOfSale.productId
+        );
+        props.saleProductsRegisters.splice(index, 1);
       }
-    })
+    });
 
-    if (opcaoSelecionada.produto.id !== 0) {
-      props.setRegistrosProdutosVenda([
-        ...props.registrosProdutosVenda,
+    if (selectedOption.product.id !== 0) {
+      props.setSaleProductsRegisters([
+        ...props.saleProductsRegisters,
         {
-          idProduto: opcaoSelecionada.produto.id,
-          nomeProduto: opcaoSelecionada.label,
-          quantidade: produtoVenda.quantidade,
-          valorUnidade: formatarParaReal(opcaoSelecionada.produto.precoVenda),
-          valorTotal: formatarParaReal(valorTotal)
-        }
-      ])
+          productId: selectedOption.product.id,
+          productName: selectedOption.label,
+          quantity: productOfSale.quantity,
+          unitValue: formatToBRL(selectedOption.product.salePrice),
+          totalValue: formatToBRL(totalValue),
+        },
+      ]);
     }
-  }, [valorTotal])
+  }, [totalValue]);
 
   return (
     <tr>
       <td id="col-NomeProduto">
         {
-          <Select styles={selectStylesVenda}
+          <Select
+            styles={selectStylesSale}
             placeholder="Selecione..."
-            value={opcaoSelecionada}
-            onChange={(option: any) => setOpcaoSelecionada(option)}
-            options={produtosAtivos.map(produto => ({
-              label: produto.nome,
-              produto: produto
-            }) as OpcaoSelecionadaProps)}
+            value={selectedOption}
+            onChange={(option: any) => setSelectedOption(option)}
+            options={activeProducts.map(
+              (produto) =>
+                ({
+                  label: produto.name,
+                  product: produto,
+                } as SelectedOptionProps)
+            )}
             instanceId="select-idProduto"
             id="select-idProduto"
           />
@@ -276,16 +333,16 @@ export function LinhaTabela(props: LinhaTabelaProps) {
       </td>
       <td>
         <input
-          value={produtoVenda.quantidade}
-          onChange={(e) => setPropQuantidade(e)}
+          value={productOfSale.quantity}
+          onChange={(e) => setQuantityProp(e)}
           type="number"
           name="quantidade"
           id="input-number-tabela"
           onWheel={(e) => e.currentTarget.blur()}
         />
       </td>
-      <td>{formatarParaReal(Number(opcaoSelecionada.produto.precoVenda))}</td>
-      <td>{formatarParaReal(valorTotal)}</td>
+      <td>{formatToBRL(Number(selectedOption.product.salePrice))}</td>
+      <td>{formatToBRL(totalValue)}</td>
     </tr>
-  )
+  );
 }

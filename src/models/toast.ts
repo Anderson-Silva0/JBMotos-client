@@ -1,34 +1,34 @@
 import toastr from "toastr";
 
 toastr.options = {
-  "closeButton": true,
-  "debug": false,
-  "newestOnTop": false,
-  "progressBar": true,
-  "positionClass": "toast-top-right",
-  "preventDuplicates": false,
-  "showDuration": 300,
-  "hideDuration": 1000,
-  "timeOut": 12000,
-  "extendedTimeOut": 4000,
-  "showEasing": "swing",
-  "hideEasing": "linear",
-  "showMethod": "fadeIn",
-  "hideMethod": "fadeOut"
+  closeButton: true,
+  debug: false,
+  newestOnTop: false,
+  progressBar: true,
+  positionClass: "toast-top-right",
+  preventDuplicates: false,
+  showDuration: 300,
+  hideDuration: 1000,
+  timeOut: 12000,
+  extendedTimeOut: 4000,
+  showEasing: "swing",
+  hideEasing: "linear",
+  showMethod: "fadeIn",
+  hideMethod: "fadeOut",
+};
+
+export function showMessage(title: string, message: string, type: ToastrType) {
+  toastr[type](message, title);
 }
 
-export function mostrarMensagem(titulo: string, mensagem: string, tipo: ToastrType) {
-  toastr[tipo](mensagem, titulo)
+export function errorMessage(message: string) {
+  showMessage("Erro", message, "error");
 }
 
-export function mensagemErro(mensagem: string) {
-  mostrarMensagem('Erro', mensagem, 'error')
+export function successMessage(message: string) {
+  showMessage("Sucesso", message, "success");
 }
 
-export function mensagemSucesso(mensagem: string) {
-  mostrarMensagem('Sucesso', mensagem, 'success')
-}
-
-export function mensagemAlerta(mensagem: string) {
-  mostrarMensagem('Alerta', mensagem, 'warning')
+export function alertMessage(message: string) {
+  showMessage("Alerta", message, "warning");
 }

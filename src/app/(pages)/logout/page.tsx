@@ -20,7 +20,7 @@ export default function Logout() {
 
     return (
         <div>
-            <LoadingLogo descricao='Saindo' />
+            <LoadingLogo description='Saindo' />
         </div>
     )
 }

@@ -1,21 +1,21 @@
-import { Endereco } from "./endereco"
+import { Address } from "./endereco";
 
-export interface Cliente {
-    cpf: string
-    nome: string
-    email: string
-    telefone: string
-    statusCliente: string
-    endereco: Endereco | null
-    dataHoraCadastro: string
+export interface Customer {
+  cpf: string;
+  name: string;
+  email: string;
+  phone: string;
+  customerStatus: string;
+  address: Address | null;
+  createdAt: string;
 }
 
-export const estadoInicialCliente: Cliente = {
-    cpf: '',
-    nome: '',
-    email: '',
-    telefone: '',
-    statusCliente: '',
-    endereco: null,
-    dataHoraCadastro: ''
-}
+export const customerInitialState: Customer = {
+  cpf: "",
+  name: "",
+  email: "",
+  phone: "",
+  customerStatus: "",
+  address: null,
+  createdAt: "",
+};

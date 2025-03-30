@@ -1,55 +1,54 @@
-import { Venda } from "@/models/venda"
-import { ApiService } from "./apiService"
+import { Sale } from "@/models/venda";
+import { ApiService } from "./apiService";
 
-export const VendaService = () => {
+export const SaleService = () => {
+  const url = "/sale";
 
-  const url = "/venda"
+  const saveSale = (sale: Sale) => {
+    return ApiService.post(`${url}`, sale);
+  };
 
-  const salvarVenda = (venda: Venda) => {
-    return ApiService.post(`${url}`, venda)
-  }
+  const findAllSale = () => {
+    return ApiService.get(`${url}/find-all`);
+  };
 
-  const buscarTodasVendas = () => {
-    return ApiService.get(`${url}/buscar-todas`)
-  }
+  const findSaleById = (id: number) => {
+    return ApiService.get(`${url}/find/${id}`);
+  };
 
-  const buscarVendaPorId = (id: number) => {
-    return ApiService.get(`${url}/buscar/${id}`)
-  }
+  const filterSale = (fieldName: string, value: string) => {
+    return ApiService.get(`${url}/filter?${fieldName}=${value}`);
+  };
 
-  const filtrarVenda = (nomeCampo: string, valor: string) => {
-    return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
-  }
+  const updateSale = (id: number, sale: Sale) => {
+    return ApiService.put(`${url}/update/${id}`, sale);
+  };
 
-  const atualizarVenda = (id: number, venda: Venda) => {
-    return ApiService.put(`${url}/atualizar/${id}`, venda)
-  }
+  const deleteSaleById = (id: number) => {
+    return ApiService.delete(`${url}/delete/${id}`);
+  };
 
-  const deletarVenda = (id: number) => {
-    return ApiService.delete(`${url}/deletar/${id}`)
-  }
+  const saleProfit = (id: number) => {
+    return ApiService.get(`${url}/sale-profit/${id}`);
+  };
 
-  const lucroDaVenda = (id: number) => {
-    return ApiService.get(`${url}/lucro-venda/${id}`)
-  }
+  const totalSaleValue = (id: number) => {
+    return ApiService.get(`${url}/total-sale-value/${id}`);
+  };
 
-  const valorTotalDaVenda = (id: number) => {
-    return ApiService.get(`${url}/valor-total-venda/${id}`)
-  }
-
-  const buscarProdutosDaVenda = (id: number) => {
-    return ApiService.get(`${url}/produtos-do-venda/${id}`)
-  }
+  const findSaleProducts = (id: number) => {
+    return ApiService.get(`${url}/find-sale-products/${id}`);
+  };
 
   return {
-    salvarVenda,
-    buscarTodasVendas,
-    buscarVendaPorId,
-    filtrarVenda,
-    atualizarVenda,
-    deletarVenda,
-    lucroDaVenda,
-    valorTotalDaVenda,
-    buscarProdutosDaVenda
-  }
-}
+    saveSale,
+    findAllSale,
+    findSaleById,
+    filterSale,
+    updateSale,
+    deleteSaleById,
+    saleProfit,
+    totalSaleValue,
+    findSaleProducts,
+  };
+};

@@ -1,163 +1,166 @@
-'use client'
+"use client";
 
-import { Card } from '@/components/Card'
-import { ExibeErro } from '@/components/ExibeErro'
-import { FormGroup } from '@/components/Form-group'
-import { InputCep, InputTelefone } from '@/components/Input'
-import { Endereco, estadoInicialEndereco } from '@/models/endereco'
-import { Erros, salvarErros } from '@/models/erros'
-import { Funcionario, estadoInicialFuncionario } from '@/models/funcionario'
-import { mensagemErro, mensagemSucesso } from '@/models/toast'
-import { EnderecoService } from '@/services/enderecoService'
-import { FuncionarioService } from '@/services/funcionarioService'
-import { Edit3 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { Card } from "@/components/Card";
+import { DisplayError } from "@/components/ExibeErro";
+import { FormGroup } from "@/components/Form-group";
+import { CepInput, PhoneInput } from "@/components/Input";
+import { Address, addressInitialState } from "@/models/endereco";
+import { Errors, saveErrors } from "@/models/erros";
+import { Employee, employeeInitialState } from "@/models/funcionario";
+import { errorMessage, successMessage } from "@/models/toast";
+import { AddressService } from "@/services/enderecoService";
+import { EmployeeService } from "@/services/funcionarioService";
+import { Edit3 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ChangeEvent, useEffect, useState } from "react";
 
 interface AtualizarFuncionarioProps {
   params: {
-    cpfFuncionario: string
-  }
+    cpfFuncionario: string;
+  };
 }
 
-export default function AtualizarFuncionario({ params }: AtualizarFuncionarioProps) {
-  const router = useRouter()
+export default function AtualizarFuncionario({
+  params,
+}: AtualizarFuncionarioProps) {
+  const router = useRouter();
 
-  const {
-    atualizarFuncionario,
-    buscarFuncionarioPorCpf
-  } = FuncionarioService()
-  const {
-    buscarEnderecoPorId,
-    obterEnderecoPorCep
-  } = EnderecoService()
+  const { updateEmployee: atualizarFuncionario, findEmployeeByCpf: buscarFuncionarioPorCpf } =
+    EmployeeService();
+  const { findAddressById: buscarEnderecoPorId, getAddressByCep: obterEnderecoPorCep } = AddressService();
 
-  const [erros, setErros] = useState<Erros[]>([])
+  const [erros, setErros] = useState<Errors[]>([]);
 
-  const [funcionario, setFuncionario] = useState<Funcionario>(estadoInicialFuncionario)
+  const [funcionario, setFuncionario] =
+    useState<Employee>(employeeInitialState);
 
-  const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
+  const [endereco, setEndereco] = useState<Address>(addressInitialState);
 
-  const setPropsFuncionario = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setFuncionario({ ...funcionario, [key]: e.target.value })
-    setErros([])
-  }
+  const setPropsFuncionario = (
+    key: string,
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
+    setFuncionario({ ...funcionario, [key]: e.target.value });
+    setErros([]);
+  };
 
   const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setEndereco({ ...endereco, [key]: e.target.value })
+    setEndereco({ ...endereco, [key]: e.target.value });
     if (endereco.cep.length < 9 || erros) {
-      setErros([])
+      setErros([]);
     }
-  }
+  };
 
   useEffect(() => {
-    obterEnderecoPorCep(endereco, setEndereco, erros, setErros)
-  }, [endereco.cep])
+    obterEnderecoPorCep(endereco, setEndereco, erros, setErros);
+  }, [endereco.cep]);
 
   useEffect(() => {
     const buscar = async () => {
-      const funcionarioResponse = (await buscarFuncionarioPorCpf(params.cpfFuncionario)).data as Funcionario
-      setFuncionario(funcionarioResponse)
+      const funcionarioResponse = (
+        await buscarFuncionarioPorCpf(params.cpfFuncionario)
+      ).data as Employee;
+      setFuncionario(funcionarioResponse);
 
-      if (funcionarioResponse.endereco) {
-        const enderecoResponse = (await buscarEnderecoPorId(funcionarioResponse.endereco.id)).data as Endereco
-        setEndereco(enderecoResponse)
+      if (funcionarioResponse.address) {
+        const enderecoResponse = (
+          await buscarEnderecoPorId(funcionarioResponse.address.id)
+        ).data as Address;
+        setEndereco(enderecoResponse);
       }
-    }
-    buscar()
-  }, [])
+    };
+    buscar();
+  }, []);
 
   const submit = async () => {
     try {
-      await atualizarFuncionario(funcionario.cpf, { ...funcionario, endereco })
-      mensagemSucesso('Funcionário atualizado com sucesso.')
-      router.push('/funcionario/listar')
+      await atualizarFuncionario(funcionario.cpf, { ...funcionario, address: endereco });
+      successMessage("Funcionário atualizado com sucesso.");
+      router.push("/funcionario/listar");
     } catch (error: any) {
-      salvarErros(error, erros, setErros)
-      mensagemErro('Erro no preenchimento dos campos.')
+      saveErrors(error, erros, setErros);
+      errorMessage("Erro no preenchimento dos campos.");
     }
-  }
+  };
 
   return (
-    <div className='div-form-container'>
+    <div className="div-form-container">
       <h1 className="centered-text">
-        <Edit3 size='6vh' strokeWidth={3} /> Atualização de Funcionário
+        <Edit3 size="6vh" strokeWidth={3} /> Atualização de Funcionário
       </h1>
-      <Card titulo="Dados do Funcionário">
+      <Card title="Dados do Funcionário">
         <FormGroup label="Nome: *" htmlFor="nome">
           <input
-            value={funcionario.nome}
-            onChange={e => setPropsFuncionario("nome", e)}
+            value={funcionario.name}
+            onChange={(e) => setPropsFuncionario("nome", e)}
             id="nome"
             type="text"
           />
-          {<ExibeErro erros={erros} nomeInput='nome' />}
+          {<DisplayError errors={erros} inputName="nome" />}
         </FormGroup>
         <FormGroup label="Celular: *" htmlFor="telefone">
-          <InputTelefone
-            value={funcionario.telefone}
-            onChange={e => setPropsFuncionario("telefone", e)}
+          <PhoneInput
+            value={funcionario.phone}
+            onChange={(e) => setPropsFuncionario("telefone", e)}
           />
-          {<ExibeErro erros={erros} nomeInput='telefone' />}
+          {<DisplayError errors={erros} inputName="telefone" />}
         </FormGroup>
       </Card>
-      <Card titulo="Endereço do Funcionário">
+      <Card title="Endereço do Funcionário">
         <FormGroup label="CEP: *" htmlFor="cep">
           <span className="cep-message">
             Digite o CEP para preenchimento automático do endereço.
           </span>
-          <InputCep
+          <cepInput
             value={endereco.cep}
-            onChange={e => setPropsEndereco("cep", e)}
+            onChange={(e) => setPropsEndereco("cep", e)}
           />
-          {<ExibeErro erros={erros} nomeInput='cep' />}
+          {<DisplayError errors={erros} inputName="cep" />}
         </FormGroup>
         <FormGroup label="Logradouro: *" htmlFor="rua">
           <input
-            value={endereco.rua}
-            onChange={e => setPropsEndereco("rua", e)}
+            value={endereco.road}
+            onChange={(e) => setPropsEndereco("rua", e)}
             id="rua"
             type="text"
           />
-          {<ExibeErro erros={erros} nomeInput='rua' />}
+          {<DisplayError errors={erros} inputName="rua" />}
         </FormGroup>
         <FormGroup label="Número: *" htmlFor="numero">
           <input
-            className='input-number-form'
-            value={endereco.numero}
-            onChange={e => setPropsEndereco("numero", e)}
+            className="input-number-form"
+            value={endereco.number}
+            onChange={(e) => setPropsEndereco("numero", e)}
             id="numero"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<ExibeErro erros={erros} nomeInput='numero' />}
+          {<DisplayError errors={erros} inputName="numero" />}
         </FormGroup>
         <FormGroup label="Bairro: *" htmlFor="bairro">
           <input
-            value={endereco.bairro}
-            onChange={e => setPropsEndereco("bairro", e)}
+            value={endereco.neighborhood}
+            onChange={(e) => setPropsEndereco("bairro", e)}
             id="bairro"
             type="text"
           />
-          {<ExibeErro erros={erros} nomeInput='bairro' />}
+          {<DisplayError errors={erros} inputName="bairro" />}
         </FormGroup>
         <FormGroup label="Cidade: *" htmlFor="cidade">
           <input
-            value={endereco.cidade}
-            onChange={e => setPropsEndereco("cidade", e)}
+            value={endereco.city}
+            onChange={(e) => setPropsEndereco("cidade", e)}
             id="cidade"
             type="text"
           />
-          {<ExibeErro erros={erros} nomeInput='cidade' />}
+          {<DisplayError errors={erros} inputName="cidade" />}
         </FormGroup>
       </Card>
       <div className="divBotaoCadastrar">
-        <button
-          onClick={submit}
-          type="submit">
+        <button onClick={submit} type="submit">
           Atualizar Funcionário
         </button>
       </div>
     </div>
-  )
+  );
 }

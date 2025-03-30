@@ -1,24 +1,24 @@
-import { estadoInicialMoto, Moto } from "./moto"
-import { Venda } from "./venda"
+import { motorcycleInitialState, Motorcycle } from "./moto";
+import { Sale } from "./venda";
 
-export interface Servico {
-    id: number,
-    cpfFuncionario: string,
-    moto: Moto,
-    venda: Venda | null,
-    dataHoraCadastro: string,
-    servicosRealizados: string,
-    observacao: string,
-    precoMaoDeObra: number
+export interface Repair {
+  id: number;
+  employeeCpf: string;
+  motorcycle: Motorcycle;
+  sale: Sale | null;
+  createdAt: string;
+  repairPerformed: string;
+  observation: string;
+  laborCost: number;
 }
 
-export const estadoInicialServico: Servico = {
-    id: 0,
-    cpfFuncionario: '',
-    moto: estadoInicialMoto,
-    venda: null,
-    dataHoraCadastro: '',
-    servicosRealizados: '',
-    observacao: '',
-    precoMaoDeObra: 0
-}
+export const repairInitialState: Repair = {
+  id: 0,
+  employeeCpf: "",
+  motorcycle: motorcycleInitialState,
+  sale: null,
+  createdAt: "",
+  repairPerformed: "",
+  observation: "",
+  laborCost: 0,
+};

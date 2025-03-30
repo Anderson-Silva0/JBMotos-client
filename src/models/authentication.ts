@@ -1,9 +1,9 @@
 export interface Authentication {
-    login: string
-    senha: string
+  login: string;
+  password: string;
 }
 
-export const estadoInicialAuthentication: Authentication = {
-    login: '',
-    senha: ''
-}
+export const authenticationInitialState: Authentication = {
+  login: "",
+  password: "",
+};

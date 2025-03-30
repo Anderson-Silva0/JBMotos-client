@@ -1,6 +1,6 @@
-import { ReactNode } from 'react'
+import { ReactNode } from "react";
 
-export default function TabelaVenda({ children }: { children: ReactNode }) {
+export default function SaleTable({ children }: { children: ReactNode }) {
   return (
     <div className="tabela-container">
       <table>
@@ -12,10 +12,8 @@ export default function TabelaVenda({ children }: { children: ReactNode }) {
             <th>Valor Total</th>
           </tr>
         </thead>
-        <tbody>
-          {children}
-        </tbody>
+        <tbody>{children}</tbody>
       </table>
-    </div >
-  )
+    </div>
+  );
 }

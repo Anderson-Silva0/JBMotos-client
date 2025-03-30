@@ -1,14 +1,13 @@
-import { ApiService } from "./apiService"
+import { ApiService } from "./apiService";
 
 export const DailyDataChartService = () => {
+  const url = "/dailyDataChart";
 
-    const url = "/dailyDataChart"
+  const fetchChartData = () => {
+    return ApiService.get(url);
+  };
 
-    const buscarDadosDoGrafico = () => {
-        return ApiService.get(url)
-    }
-
-    return {
-        buscarDadosDoGrafico
-    }
-}
+  return {
+    fetchChartData,
+  };
+};

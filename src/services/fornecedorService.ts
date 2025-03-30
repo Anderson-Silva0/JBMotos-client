@@ -1,45 +1,44 @@
-import { Fornecedor } from "@/models/fornecedor"
-import { ApiService } from "./apiService"
+import { Supplier } from "@/models/fornecedor";
+import { ApiService } from "./apiService";
 
-export const FornecedorService = () => {
+export const SupplierService = () => {
+  const url = "/supplier";
 
-    const url = "/fornecedor"
+  const saveSupplier = (supplier: Supplier) => {
+    return ApiService.post(`${url}`, supplier);
+  };
 
-    const salvarFornecedor = (fornecedor: Fornecedor) => {
-        return ApiService.post(`${url}`, fornecedor)
-    }
+  const findAllSupplier = () => {
+    return ApiService.get(`${url}/find-all`);
+  };
 
-    const buscarTodosFornecedores = () => {
-        return ApiService.get(`${url}/buscar-todos`)
-    }
+  const findSupplierByCnpj = (cnpj: string) => {
+    return ApiService.get(`${url}/find?cnpj=${cnpj}`);
+  };
 
-    const buscarFornecedorPorCnpj = (cnpj: string) => {
-        return ApiService.get(`${url}/buscar?cnpj=${cnpj}`)
-    }
+  const filterSupplier = (fieldName: string, value: string) => {
+    return ApiService.get(`${url}/filtrar?${fieldName}=${value}`);
+  };
 
-    const filtrarFornecedor = (nomeCampo: string, valor: string) => {
-        return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
-    }
+  const toggleStatusSupplier = (cnpj: string) => {
+    return ApiService.patch(`${url}/toggle-status?cnpj=${cnpj}`);
+  };
 
-    const alternarStatusFornecedor = (cnpj: string) => {
-        return ApiService.patch(`${url}/alternar-status?cnpj=${cnpj}`)
-    }
+  const updateSupplier = (cnpj: string, supplier: Supplier) => {
+    return ApiService.put(`${url}/update?cnpj=${cnpj}`, supplier);
+  };
 
-    const atualizarFornecedor = (cnpj: string, fornecedor: Fornecedor) => {
-        return ApiService.put(`${url}/atualizar?cnpj=${cnpj}`, fornecedor)
-    }
+  const deleteSupplier = (cnpj: string) => {
+    return ApiService.delete(`${url}/delete?cnpj=${cnpj}`);
+  };
 
-    const deletarFornecedor = (cnpj: string) => {
-        return ApiService.delete(`${url}/deletar?cnpj=${cnpj}`)
-    }
-
-    return {
-        salvarFornecedor,
-        buscarTodosFornecedores,
-        buscarFornecedorPorCnpj,
-        filtrarFornecedor,
-        alternarStatusFornecedor,
-        atualizarFornecedor,
-        deletarFornecedor
-    }
-}
+  return {
+    saveSupplier,
+    findAllSupplier,
+    findSupplierByCnpj,
+    filterSupplier,
+    toggleStatusSupplier,
+    updateSupplier,
+    deleteSupplier,
+  };
+};

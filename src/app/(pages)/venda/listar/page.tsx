@@ -1,22 +1,22 @@
 'use client'
 
-import { InputCpf } from "@/components/Input"
+import { CpfInput } from "@/components/Input"
 import LoadingLogo from "@/components/LoadingLogo"
-import VendaCard from "@/components/VendaCard"
+import SaleCard from "@/components/VendaCard"
 import imgVenda from "@/images/vendas.png"
 import { parseDate } from "@/models/StringParaDate"
-import { mensagemErro } from "@/models/toast"
-import { Venda } from "@/models/venda"
-import { VendaService } from "@/services/VendaService"
+import { errorMessage } from "@/models/toast"
+import { Sale } from "@/models/venda"
+import { SaleService } from "@/services/VendaService"
 import { Search } from "lucide-react"
 import Image from "next/image"
 import '@/styles/card.css'
 import { useEffect, useState } from "react"
 
 export default function ListarVendas() {
-  const { filtrarVenda } = VendaService()
+  const { filterSale: filtrarVenda } = SaleService()
 
-  const [vendas, setVendas] = useState<Venda[]>([])
+  const [vendas, setVendas] = useState<Sale[]>([])
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
   const [valorInputBuscar, setValorInputBuscar] = useState<string>('')
   const [campoSelecionado, setCampoSelecionado] = useState<string>('')
@@ -28,13 +28,13 @@ export default function ListarVendas() {
 
   useEffect(() => {
     if (valorSelecionado === 'antiga') {
-      const sortedVendasRecentes = [...vendas].sort((a: Venda, b: Venda) =>
-        parseDate(a.dataHoraCadastro).getTime() - parseDate(b.dataHoraCadastro).getTime()
+      const sortedVendasRecentes = [...vendas].sort((a: Sale, b: Sale) =>
+        parseDate(a.createdAt).getTime() - parseDate(b.createdAt).getTime()
       )
       setVendas(sortedVendasRecentes)
     } else if (valorSelecionado === 'recente') {
-      const sortedVendasRecentes = [...vendas].sort((a: Venda, b: Venda) =>
-        parseDate(b.dataHoraCadastro).getTime() - parseDate(a.dataHoraCadastro).getTime()
+      const sortedVendasRecentes = [...vendas].sort((a: Sale, b: Sale) =>
+        parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime()
       )
       setVendas(sortedVendasRecentes)
     }
@@ -46,7 +46,7 @@ export default function ListarVendas() {
         const vendaResponse = await filtrarVenda(campoSelecionado, valorInputBuscar)
         setVendas(vendaResponse.data)
       } catch (error: any) {
-        mensagemErro('Erro ao tentar buscar Venda.')
+        errorMessage('Erro ao tentar buscar Venda.')
       } finally {
         setFoiCarregado(true)
       }
@@ -65,7 +65,7 @@ export default function ListarVendas() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo descricao='Carregando' />
+    return <LoadingLogo description='Carregando' />
   }
 
   return (
@@ -108,7 +108,7 @@ export default function ListarVendas() {
                 <p>Selecione o filtro desejado:</p>
               </div>
             ) : campoSelecionado === 'cpfCliente' ? (
-              <InputCpf
+              <CpfInput
                 className="input-buscar"
                 placeholder="Digite o CPF"
                 type="search"
@@ -116,7 +116,7 @@ export default function ListarVendas() {
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
             ) : campoSelecionado === 'cpfFuncionario' && (
-              <InputCpf
+              <CpfInput
                 className="input-buscar"
                 placeholder="Digite o CPF"
                 type="search"
@@ -184,17 +184,17 @@ export default function ListarVendas() {
 
       {vendas.map((venda) => {
         return (
-          <VendaCard
+          <SaleCard
             key={venda.id}
             id={venda.id}
-            pagamentoCartao={null}
-            produtosVenda={[]}
-            cliente={venda.cliente}
-            funcionario={venda.funcionario}
-            dataHoraCadastro={venda.dataHoraCadastro}
-            observacao={venda.observacao}
-            formaDePagamento={venda.formaDePagamento}
-            valorTotalVenda={venda.valorTotalVenda}
+            cardPayment={null}
+            productsOfSale={[]}
+            customer={venda.customer}
+            employee={venda.employee}
+            createdAt={venda.createdAt}
+            observation={venda.observation}
+            paymentMethod={venda.paymentMethod}
+            totalSaleValue={venda.totalSaleValue}
           />
         )
       })}

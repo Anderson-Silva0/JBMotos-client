@@ -1,27 +1,19 @@
-import { ProdutoVenda } from "@/models/ProdutoVenda"
-import { formatarParaReal } from "@/models/formatadorReal"
-import '@/styles/tabelaVenda.css'
+import { ProductOfSale } from "@/models/ProdutoVenda";
+import { formatToBRL } from "@/models/formatadorReal";
+import "@/styles/tabelaVenda.css";
 
-interface LinhaProdutoProps {
-    produtoVenda: ProdutoVenda
-    nome: string
+interface ProductRowProps {
+  productOfSale: ProductOfSale;
+  name: string;
 }
 
-export function LinhaProduto(props: LinhaProdutoProps) {
-    return (
-        <tr>
-            <td id="col-NomeProduto">
-                {
-                    props.nome
-                }
-            </td>
-            <td>
-                {
-                    props.produtoVenda.quantidade
-                }
-            </td>
-            <td>{formatarParaReal(props.produtoVenda.valorUnidade)}</td>
-            <td>{formatarParaReal(props.produtoVenda.valorTotal)}</td>
-        </tr>
-    )
+export function ProductRow(props: ProductRowProps) {
+  return (
+    <tr>
+      <td id="col-NomeProduto">{props.name}</td>
+      <td>{props.productOfSale.quantity}</td>
+      <td>{formatToBRL(props.productOfSale.unitValue)}</td>
+      <td>{formatToBRL(props.productOfSale.totalValue)}</td>
+    </tr>
+  );
 }

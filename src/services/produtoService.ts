@@ -1,49 +1,49 @@
-import { ApiService } from "./apiService"
+import { Product } from "@/models/produto";
+import { ApiService } from "./apiService";
 
-export const ProdutoService = () => {
+export const ProductService = () => {
+  const url = "/product";
 
-  const url = "/produto"
+  const saveProduct = (data: Product) => {
+    return ApiService.post(`${url}`, data);
+  };
 
-  const salvarProduto = (dados: object) => {
-    return ApiService.post(`${url}`, dados)
-  }
+  const findAllProduct = () => {
+    return ApiService.get(`${url}/find-all`);
+  };
 
-  const buscarTodosProdutos = () => {
-    return ApiService.get(`${url}/buscar-todos`)
-  }
+  const findProductById = (id: number) => {
+    return ApiService.get(`${url}/find/${id}`);
+  };
 
-  const buscarProdutoPorId = (id: number) => {
-    return ApiService.get(`${url}/buscar/${id}`)
-  }
+  const filterProduct = (fieldName: string, value: string) => {
+    return ApiService.get(`${url}/filter?${fieldName}=${value}`);
+  };
 
-  const filtrarProduto = (nomeCampo: string, valor: string) => {
-    return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
-  }
+  const toggleStatusProduct = (productId: number) => {
+    return ApiService.patch(`${url}/toggle-status/${productId}`);
+  };
 
-  const alternarStatusProduto = (idProduto: number) => {
-    return ApiService.patch(`${url}/alternar-status/${idProduto}`)
-  }
+  const updateProduct = (id: number, data: Product) => {
+    return ApiService.put(`${url}/update/${id}`, data);
+  };
 
-  const atualizarProduto = (id: number, dados: object) => {
-    return ApiService.put(`${url}/atualizar/${id}`, dados)
-  }
+  const deleteProductById = (id: number) => {
+    return ApiService.delete(`${url}/delete/${id}`);
+  };
 
-  const deletarProduto = (id: number) => {
-    return ApiService.delete(`${url}/deletar/${id}`)
-  }
-
-  const lucroProduto = (id: number) => {
-    return ApiService.get(`${url}/lucro-produto/${id}`)
-  }
+  const productProfit = (id: number) => {
+    return ApiService.get(`${url}/product-profit/${id}`);
+  };
 
   return {
-    salvarProduto,
-    buscarTodosProdutos,
-    buscarProdutoPorId,
-    filtrarProduto,
-    alternarStatusProduto,
-    atualizarProduto,
-    deletarProduto,
-    lucroProduto
-  }
-}
+    saveProduct,
+    findAllProduct,
+    findProductById,
+    filterProduct,
+    toggleStatusProduct,
+    updateProduct,
+    deleteProductById,
+    productProfit,
+  };
+};

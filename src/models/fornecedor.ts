@@ -1,19 +1,19 @@
-import { Endereco } from "./endereco"
+import { Address } from "./endereco";
 
-export interface Fornecedor {
-  cnpj: string
-  nome: string
-  telefone: string
-  statusFornecedor: string
-  endereco: Endereco | null
-  dataHoraCadastro: string
+export interface Supplier {
+  cnpj: string;
+  name: string;
+  phone: string;
+  supplierStatus: string;
+  address: Address | null;
+  createdAt: string;
 }
 
-export const estadoInicialFornecedor: Fornecedor = {
-  cnpj: '',
-  nome: '',
-  telefone: '',
-  statusFornecedor: '',
-  endereco: null,
-  dataHoraCadastro: ''
+export const supplierInitialState: Supplier = {
+  cnpj: "",
+  name: "",
+  phone: "",
+  supplierStatus: "",
+  address: null,
+  createdAt: "",
 };

@@ -1,44 +1,46 @@
-import { ApiService } from "./apiService"
+import { Stock } from "@/models/estoque";
+import { ApiService } from "./apiService";
 
-export const EstoqueService = () => {
+export const StockService = () => {
+  const url = "/stock";
 
-  const url = "/estoque"
+  const saveStock = (data: Stock) => {
+    return ApiService.post(`${url}`, data);
+  };
 
-  const salvarEstoque = (dados: object) => {
-    return ApiService.post(`${url}`, dados)
-  }
+  const findAllStock = () => {
+    return ApiService.get(`${url}/find-all`);
+  };
 
-  const buscarTodosEstoques = () => {
-    return ApiService.get(`${url}/buscar-todos`)
-  }
+  const findStockById = (id: number) => {
+    return ApiService.get(`${url}/find/${id}`);
+  };
 
-  const buscarEstoquePorId = (id: number) => {
-    return ApiService.get(`${url}/buscar/${id}`)
-  }
+  const updateStock = (id: number, data: Stock) => {
+    return ApiService.put(`${url}/update/${id}`, data);
+  };
 
-  const atualizarEstoque = (id: number, dados: object) => {
-    return ApiService.put(`${url}/atualizar/${id}`, dados)
-  }
+  const deleteStock = (id: number) => {
+    return ApiService.delete(`${url}/delete/${id}`);
+  };
 
-  const deletarEstoque = (id: number) => {
-    return ApiService.delete(`${url}/deletar/${id}`)
-  }
+  const addQuantity = (productId: number, productQuantity: number) => {
+    return ApiService.post(
+      `${url}/${productId}/add?quantity=${productQuantity}`
+    );
+  };
 
-  const adicionarQuantidade = (idProduto: number, qtdProduto: number) => {
-    return ApiService.post(`${url}/${idProduto}/adicionar?quantidade=${qtdProduto}`)
-  }
-
-  const valorTotalEstoque = () => {
-    return ApiService.get(`${url}/valor-total`)
-  }
+  const totalValueStock = () => {
+    return ApiService.get(`${url}/total-value`);
+  };
 
   return {
-    salvarEstoque,
-    buscarTodosEstoques,
-    buscarEstoquePorId,
-    atualizarEstoque,
-    deletarEstoque,
-    adicionarQuantidade,
-    valorTotalEstoque
-  }
-}
+    saveStock,
+    findAllStock,
+    findStockById,
+    updateStock,
+    deleteStock,
+    addQuantity,
+    totalValueStock,
+  };
+};

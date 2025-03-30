@@ -1,23 +1,33 @@
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction } from "react";
 
-export interface Erros {
-  nomeInput: string
-  mensagemErro: string
+export interface Errors {
+  inputName: string;
+  errorMessage: string;
 }
 
-export const salvarErros = (erro: any, erros: Erros[], setErros: Dispatch<SetStateAction<Erros[]>>) => {
-  if (erro.response && erro.response.data) {
-    const objErro = erro.response.data
-    const keys = Object.keys(objErro)
-    if (!objErro.error && erros.length <= 8) {
-      setErros((errosAntigos) => {
-        const novosErros = keys.map((k) => ({ nomeInput: k, mensagemErro: objErro[k] }))
-        return [...errosAntigos, ...novosErros]
-      })
+export const saveErrors = (
+  error: any,
+  errorArray: Errors[],
+  setErrorArray: Dispatch<SetStateAction<Errors[]>>
+) => {
+  if (error.response && error.response.data) {
+    const errorObject = error.response.data;
+    const keys = Object.keys(errorObject);
+    if (!errorObject.error && errorArray.length <= 8) {
+      setErrorArray((oldErrors) => {
+        const newErrors = keys.map((k) => ({
+          inputName: k,
+          errorMessage: errorObject[k],
+        }));
+        return [...oldErrors, ...newErrors];
+      });
     }
-    const erroIgnorado = "Endereço não encontrado para o Id informado."
-    if (objErro.error && objErro.error !== erroIgnorado) {
-      setErros((errosAntigos) => [...errosAntigos, { nomeInput: 'error', mensagemErro: objErro.error }])
+    const ignoredError = "Endereço não encontrado para o Id informado.";
+    if (errorObject.error && errorObject.error !== ignoredError) {
+      setErrorArray((oldErrors) => [
+        ...oldErrors,
+        { inputName: "error", errorMessage: errorObject.error },
+      ]);
     }
   }
-}
+};

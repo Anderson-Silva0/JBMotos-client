@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { decode } from 'jsonwebtoken'
-import { ROLE } from './models/authRegisterModel'
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { decode } from 'jsonwebtoken';
+import { ROLE } from './models/authRegisterModel';
 
 export interface DecodedToken {
     sub: string
@@ -13,47 +13,47 @@ export interface DecodedToken {
 
 export function middleware(request: NextRequest) {
 
-    const loginUrl = new URL('/', request.url)
-    const logoutUrl = new URL('/logout', request.url)
-    const homeUrl = new URL('/home', request.url)
+    const loginUrl = new URL('/', request.url);
+    const logoutUrl = new URL('/logout', request.url);
+    const homeUrl = new URL('/home', request.url);
 
-    const CURRENT_DATE_MILLIS = new Date().getTime()
-    const ONE_HOUR_MILLIS = 60 * 60 * 1000
+    const CURRENT_DATE_MILLIS = new Date().getTime();
+    const ONE_HOUR_MILLIS = 60 * 60 * 1000;
 
-    const token = request.cookies.get('login-token')?.value
-    let expirationDate = new Date(CURRENT_DATE_MILLIS - ONE_HOUR_MILLIS)
+    const token = request.cookies.get('login-token')?.value;
+    let expirationDate = new Date(CURRENT_DATE_MILLIS - ONE_HOUR_MILLIS);
 
-    const currentPath = request.nextUrl.pathname
-    const response = NextResponse.next()
+    const currentPath = request.nextUrl.pathname;
+    const response = NextResponse.next();
 
     if (token) {
         try {
-            const decodedToken = decode(token) as DecodedToken
-            expirationDate = new Date(decodedToken.exp * 1000)
+            const decodedToken = decode(token) as DecodedToken;
+            expirationDate = new Date(decodedToken.exp * 1000);
 
             if (CURRENT_DATE_MILLIS >= expirationDate.getTime()) {
                 if (currentPath != '/') {
-                    return NextResponse.redirect(logoutUrl)
+                    return NextResponse.redirect(logoutUrl);
                 }
-                return NextResponse.redirect(loginUrl)
+                return NextResponse.redirect(loginUrl);
             }
             if (currentPath === '/') {
-                return NextResponse.redirect(homeUrl)
+                return NextResponse.redirect(homeUrl);
             }
-            if (decodedToken.role === ROLE.OPERADOR && currentPath.startsWith('/funcionario')) {
-                return NextResponse.redirect(homeUrl)
+            if (decodedToken.role === ROLE.OPERATOR && currentPath.startsWith('/funcionario')) {
+                return NextResponse.redirect(homeUrl);
             }
         } catch (error) {
-            console.error('Token inválido ou erro ao verificar:', error)
+            console.error('Token inválido ou erro ao verificar:', error);
         }
     } else {
         if (currentPath === '/') {
-            return response
+            return response;
         }
-        return NextResponse.redirect(loginUrl)
+        return NextResponse.redirect(loginUrl);
     }
 
-    return response
+    return response;
 }
 
 export const config = {
@@ -68,4 +68,4 @@ export const config = {
         '/servico/:path*',
         '/venda/:path*'
     ],
-}
+};

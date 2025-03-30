@@ -1,39 +1,39 @@
-import { ApiService } from "./apiService"
+import { ProductOfSale } from "@/models/ProdutoVenda";
+import { ApiService } from "./apiService";
 
-export const ProdutoVendaService = () => {
+export const ProductOfSaleService = () => {
+  const url = "/product-of-sale";
 
-  const url = "/produtovenda"
+  const saveProductOfSale = (data: ProductOfSale) => {
+    return ApiService.post(`${url}`, data);
+  };
 
-  const salvarProdutoVenda = (dados: object) => {
-    return ApiService.post(`${url}`, dados)
-  }
+  const findAllProductOfSale = () => {
+    return ApiService.get(`${url}/find-all`);
+  };
 
-  const buscarTodosProdutoVenda = () => {
-    return ApiService.get(`${url}/buscar-todos`)
-  }
+  const findProductOfSaleById = (id: number) => {
+    return ApiService.get(`${url}/find/${id}`);
+  };
 
-  const buscarProdutoVendaPorId = (id: number) => {
-    return ApiService.get(`${url}/buscar/${id}`)
-  }
+  const updateProductOfSale = (id: number, data: ProductOfSale) => {
+    return ApiService.put(`${url}/update/${id}`, data);
+  };
 
-  const atualizarProdutoVenda = (id: number, dados: object) => {
-    return ApiService.put(`${url}/atualizar/${id}`, dados)
-  }
+  const deleteProductOfSaleById = (id: number) => {
+    return ApiService.delete(`${url}/delete/${id}`);
+  };
 
-  const deletarProdutoVenda = (id: number) => {
-    return ApiService.delete(`${url}/deletar/${id}`)
-  }
-
-  const buscarTodosPorIdVenda = (idVenda: number) => {
-    return ApiService.get(`${url}/produtos-venda/${idVenda}`)
-  }
+  const findAllProductOfSaleBySaleId = (saleId: number) => {
+    return ApiService.get(`${url}/products-of-sale/${saleId}`);
+  };
 
   return {
-    salvarProdutoVenda,
-    buscarTodosProdutoVenda,
-    buscarProdutoVendaPorId,
-    atualizarProdutoVenda,
-    deletarProdutoVenda,
-    buscarTodosPorIdVenda
-  }
-}
+    saveProductOfSale,
+    findAllProductOfSale,
+    findProductOfSaleById,
+    updateProductOfSale,
+    deleteProductOfSaleById,
+    findAllProductOfSaleBySaleId,
+  };
+};

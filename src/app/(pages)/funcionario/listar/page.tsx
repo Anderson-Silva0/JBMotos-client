@@ -1,20 +1,20 @@
 'use client'
 
-import FuncionarioCard from "@/components/FuncionarioCard"
-import { InputCpf, InputTelefone } from "@/components/Input"
+import EmployeeCard from "@/components/FuncionarioCard"
+import { CpfInput, PhoneInput } from "@/components/Input"
 import LoadingLogo from "@/components/LoadingLogo"
 import imgFuncionario from "@/images/employee.png"
 import { parseDate } from "@/models/StringParaDate"
-import { Funcionario } from "@/models/funcionario"
-import { mensagemErro } from "@/models/toast"
-import { FuncionarioService } from "@/services/funcionarioService"
+import { Employee } from "@/models/funcionario"
+import { errorMessage } from "@/models/toast"
+import { EmployeeService } from "@/services/funcionarioService"
 import { Search } from "lucide-react"
 import Image from "next/image"
 import '@/styles/card.css'
 import { useEffect, useState } from "react"
 
 export default function ListarFuncionarios() {
-  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([])
+  const [funcionarios, setFuncionarios] = useState<Employee[]>([])
 
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
 
@@ -22,7 +22,7 @@ export default function ListarFuncionarios() {
 
   const [campoSelecionado, setCampoSelecionado] = useState<string>('')
 
-  const { filtrarFuncionario } = FuncionarioService()
+  const { filterEmployee: filtrarFuncionario } = EmployeeService()
 
   const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
 
@@ -32,13 +32,13 @@ export default function ListarFuncionarios() {
 
   useEffect(() => {
     if (valorSelecionado === 'antigo') {
-      const sortedFuncionariosRecentes = [...funcionarios].sort((a: Funcionario, b: Funcionario) =>
-        parseDate(a.dataHoraCadastro).getTime() - parseDate(b.dataHoraCadastro).getTime()
+      const sortedFuncionariosRecentes = [...funcionarios].sort((a: Employee, b: Employee) =>
+        parseDate(a.createdAt).getTime() - parseDate(b.createdAt).getTime()
       )
       setFuncionarios(sortedFuncionariosRecentes)
     } else if (valorSelecionado === 'recente') {
-      const sortedFuncionariosRecentes = [...funcionarios].sort((a: Funcionario, b: Funcionario) =>
-        parseDate(b.dataHoraCadastro).getTime() - parseDate(a.dataHoraCadastro).getTime()
+      const sortedFuncionariosRecentes = [...funcionarios].sort((a: Employee, b: Employee) =>
+        parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime()
       )
       setFuncionarios(sortedFuncionariosRecentes)
     }
@@ -48,11 +48,11 @@ export default function ListarFuncionarios() {
     const buscarPorCpf = async () => {
       try {
         const funcionarioResponse = await filtrarFuncionario(campoSelecionado, valorInputBuscar)
-        const funcionariosList = funcionarioResponse.data as Funcionario[]
+        const funcionariosList = funcionarioResponse.data as Employee[]
         const funcionariosFilter = funcionariosList.filter(f => f.cpf !== "710.606.394-08")
         setFuncionarios(funcionariosFilter)
       } catch (error: any) {
-        mensagemErro('Erro ao tentar buscar Funcionário.')
+        errorMessage('Erro ao tentar buscar Funcionário.')
       } finally {
         setFoiCarregado(true)
       }
@@ -71,7 +71,7 @@ export default function ListarFuncionarios() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo descricao='Carregando' />
+    return <LoadingLogo description='Carregando' />
   }
 
   return (
@@ -121,7 +121,7 @@ export default function ListarFuncionarios() {
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
             ) : campoSelecionado === 'cpf' ? (
-              <InputCpf
+              <CpfInput
                 className="input-buscar"
                 placeholder="Digite o CPF"
                 type="search"
@@ -129,7 +129,7 @@ export default function ListarFuncionarios() {
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
             ) : campoSelecionado === 'telefone' ? (
-              <InputTelefone
+              <PhoneInput
                 className="input-buscar"
                 placeholder="Digite o Telefone"
                 type="search"
@@ -248,10 +248,10 @@ export default function ListarFuncionarios() {
 
       {funcionarios.map((funcionario) => {
         return (
-          <FuncionarioCard
+          <EmployeeCard
             key={funcionario.cpf}
-            funcionario={funcionario}
-            setFuncionarios={setFuncionarios}
+            employee={funcionario}
+            setEmployees={setFuncionarios}
           />
         )
       })}

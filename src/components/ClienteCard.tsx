@@ -1,139 +1,146 @@
-import { Cliente } from '@/models/cliente'
-import { mensagemErro, mensagemSucesso } from '@/models/toast'
-import { ClienteService } from '@/services/clienteService'
-import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Endereco, estadoInicialEndereco } from '../models/endereco'
-import '../styles/cardListagem.css'
-import { ConfirmarDecisao } from './ConfirmarDecisao'
+import { Customer } from "@/models/cliente";
+import { errorMessage, successMessage } from "@/models/toast";
+import { CustomerService } from "@/services/clienteService";
+import { Check, Edit, UserCheck, UserX, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Address, addressInitialState } from "../models/endereco";
+import "../styles/cardListagem.css";
+import { confirmDecision } from "./ConfirmarDecisao";
 
-interface ClienteCardProps {
-  cliente: Cliente
-  setClientes: Dispatch<SetStateAction<Cliente[]>>
+interface CustomerCardProps {
+  customer: Customer;
+  setCustomer: Dispatch<SetStateAction<Customer[]>>;
 }
 
-export default function ClienteCard({ cliente, setClientes }: ClienteCardProps) {
-  const router = useRouter()
+export default function CustomerCard({
+  customer,
+  setCustomer,
+}: CustomerCardProps) {
+  const router = useRouter();
 
-  const [enderecosState, setEnderecoState] = useState<Endereco>(estadoInicialEndereco)
+  const [addressState, setAddressState] = useState<Address>(addressInitialState);
 
-  const { buscarTodosClientes, alternarStatusCliente } = ClienteService()
+  const {
+    findAllCustomer,
+    toggleCustomerStatus,
+  } = CustomerService();
 
   useEffect(() => {
-    if (cliente.endereco) {
-      setEnderecoState(cliente.endereco)
+    if (customer.address) {
+      setAddressState(customer.address);
     }
-  }, [])
+  }, []);
 
   const handlerAlternar = () => {
-    if (cliente.statusCliente === 'ATIVO') {
-      ConfirmarDecisao(
-        'Desativar Cliente',
-        'Ao confirmar, o Cliente será marcado como inativo e suas informações ainda serão mantidas no sistema, mas ele não poderá realizar compras ou serviços e suas motos não poderão ser alvo de serviços. Deseja realmente desativar o Cliente?',
+    if (customer.customerStatus === "ACTIVE") {
+      confirmDecision(
+        "Desativar Cliente",
+        "Ao confirmar, o Cliente será marcado como inativo e suas informações ainda serão mantidas no sistema, mas ele não poderá realizar compras ou serviços e suas motos não poderão ser alvo de serviços. Deseja realmente desativar o Cliente?",
         () => {
-          alternarStatus()
+          toggleStatus();
         }
-      )
-    } else if (cliente.statusCliente === 'INATIVO') {
-      ConfirmarDecisao(
-        'Ativar Cliente',
-        'Ao confirmar, o Cliente será marcado como ativo e poderá realizar compras e serviços e suas motos poderão ser alvo de serviços normalmente. Deseja realmente ativar o Cliente?',
+      );
+    } else if (customer.customerStatus === "INACTIVE") {
+      confirmDecision(
+        "Ativar Cliente",
+        "Ao confirmar, o Cliente será marcado como ativo e poderá realizar compras e serviços e suas motos poderão ser alvo de serviços normalmente. Deseja realmente ativar o Cliente?",
         () => {
-          alternarStatus()
-        })
+          toggleStatus();
+        }
+      );
     }
-  }
+  };
 
-  const alternarStatus = async () => {
+  const toggleStatus = async () => {
     try {
-      const statusResponse = await alternarStatusCliente(cliente.cpf)
-      if (statusResponse.data === 'ATIVO') {
-        mensagemSucesso('Cliente Ativado com sucesso.')
-      } else if (statusResponse.data === 'INATIVO') {
-        mensagemSucesso('Cliente Desativado com sucesso.')
+      const statusResponse = await toggleCustomerStatus(customer.cpf);
+      if (statusResponse.data === "ACTIVE") {
+        successMessage("Cliente Ativado com sucesso.");
+      } else if (statusResponse.data === "INACTIVE") {
+        successMessage("Cliente Desativado com sucesso.");
       }
     } catch (error) {
-      mensagemErro('Erro ao tentar definir o Status do Cliente.')
+      errorMessage("Erro ao tentar definir o Status do Cliente.");
     }
-    await atualizarListagem()
-  }
+    await updateListing();
+  };
 
-  const atualizarListagem = async () => {
+  const updateListing = async () => {
     try {
-      const todosClientesResponse = await buscarTodosClientes()
-      setClientes(todosClientesResponse.data)
+      const allCustomersResponse = await findAllCustomer();
+      setCustomer(allCustomersResponse.data);
     } catch (error) {
-      mensagemErro('Erro ao tentar buscar todos Clientes.')
+      errorMessage("Erro ao tentar buscar todos Clientes.");
     }
-  }
+  };
 
-  const atualizar = () => {
-    router.push(`/cliente/atualizar/${cliente.cpf}`)
-  }
+  const update = () => {
+    router.push(`/cliente/atualizar/${customer.cpf}`);
+  };
 
   return (
     <div className="cardListagem-container">
       <div className="info-principal">
-        <div className='items'>
+        <div className="items">
           <span id="info-title">Cliente</span>
-          <div className='div-dados'>Nome</div>
-          <div className='div-resultado'>{cliente.nome}</div>
-          <div className='div-dados'>CPF</div>
-          <div className='div-resultado'>{cliente.cpf}</div>
-          <div className='div-dados'>Email</div>
-          <div className='div-resultado'>{cliente.email}</div>
-          <div className='div-dados'>Telefone</div>
-          <div className='div-resultado'>{cliente.telefone}</div>
+          <div className="div-dados">Nome</div>
+          <div className="div-resultado">{customer.name}</div>
+          <div className="div-dados">CPF</div>
+          <div className="div-resultado">{customer.cpf}</div>
+          <div className="div-dados">Email</div>
+          <div className="div-resultado">{customer.email}</div>
+          <div className="div-dados">Telefone</div>
+          <div className="div-resultado">{customer.phone}</div>
 
-          <div className='div-dados'>Status do Cliente</div>
-          {
-            cliente.statusCliente === 'ATIVO' ? (
-              <div style={{ color: 'green' }} className='div-resultado'>
-                {cliente.statusCliente}
-                <Check strokeWidth={3} />
-              </div>
-            ) : cliente.statusCliente === 'INATIVO' && (
-              <div style={{ color: 'red' }} className='div-resultado'>
-                {cliente.statusCliente}
+          <div className="div-dados">Status do Cliente</div>
+          {customer.customerStatus === "ACTIVE" ? (
+            <div style={{ color: "green" }} className="div-resultado">
+              {customer.customerStatus}
+              <Check strokeWidth={3} />
+            </div>
+          ) : (
+            customer.customerStatus === "INACTIVE" && (
+              <div style={{ color: "red" }} className="div-resultado">
+                {customer.customerStatus}
                 <X strokeWidth={3} />
               </div>
             )
-          }
+          )}
 
-          <div className='div-dados'>Data e Hora de Cadastro</div>
-          <div className='div-resultado'>{cliente.dataHoraCadastro}</div>
+          <div className="div-dados">Data e Hora de Cadastro</div>
+          <div className="div-resultado">{customer.createdAt}</div>
         </div>
-        <div className='items'>
+        <div className="items">
           <span id="info-title">Endereço</span>
-          <div className='div-dados'>Logradouro</div>
-          <div className='div-resultado'>{enderecosState.rua}</div>
-          <div className='div-dados'>CEP</div>
-          <div className='div-resultado'>{enderecosState.cep}</div>
-          <div className='div-dados'>Número</div>
-          <div className='div-resultado'>{enderecosState.numero}</div>
-          <div className='div-dados'>Bairro</div>
-          <div className='div-resultado'>{enderecosState.bairro}</div>
-          <div className='div-dados'>Cidade</div>
-          <div className='div-resultado'>{enderecosState.cidade}</div>
+          <div className="div-dados">Logradouro</div>
+          <div className="div-resultado">{addressState.road}</div>
+          <div className="div-dados">CEP</div>
+          <div className="div-resultado">{addressState.cep}</div>
+          <div className="div-dados">Número</div>
+          <div className="div-resultado">{addressState.number}</div>
+          <div className="div-dados">Bairro</div>
+          <div className="div-resultado">{addressState.neighborhood}</div>
+          <div className="div-dados">Cidade</div>
+          <div className="div-resultado">{addressState.city}</div>
         </div>
       </div>
-      <div className='icones-container'>
-        <div onClick={atualizar} title='Editar'>
-          <Edit className='icones-atualizacao-e-delecao' />
+      <div className="icones-container">
+        <div onClick={update} title="Editar">
+          <Edit className="icones-atualizacao-e-delecao" />
         </div>
-        {
-          cliente.statusCliente === 'ATIVO' ? (
-            <div onClick={handlerAlternar} title='Desativar'>
-              <UserX className='icones-atualizacao-e-delecao' />
-            </div>
-          ) : cliente.statusCliente === 'INATIVO' && (
-            <div onClick={handlerAlternar} title='Ativar'>
-              <UserCheck className='icones-atualizacao-e-delecao' />
+        {customer.customerStatus === "ACTIVE" ? (
+          <div onClick={handlerAlternar} title="Desativar">
+            <UserX className="icones-atualizacao-e-delecao" />
+          </div>
+        ) : (
+          customer.customerStatus === "INACTIVE" && (
+            <div onClick={handlerAlternar} title="Ativar">
+              <UserCheck className="icones-atualizacao-e-delecao" />
             </div>
           )
-        }
+        )}
       </div>
     </div>
-  )
+  );
 }

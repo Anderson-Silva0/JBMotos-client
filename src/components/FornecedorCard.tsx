@@ -1,151 +1,152 @@
-import { Fornecedor } from '@/models/fornecedor'
-import { mensagemErro, mensagemSucesso } from '@/models/toast'
-import { FornecedorService } from '@/services/fornecedorService'
-import { Check, Edit, UserCheck, UserX, X } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Endereco, estadoInicialEndereco } from '../models/endereco'
-import { EnderecoService } from '../services/enderecoService'
-import '../styles/cardListagem.css'
-import { ConfirmarDecisao } from './ConfirmarDecisao'
+import { Supplier } from "@/models/fornecedor";
+import { errorMessage, successMessage } from "@/models/toast";
+import { SupplierService } from "@/services/fornecedorService";
+import { Check, Edit, UserCheck, UserX, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Address, addressInitialState } from "../models/endereco";
+import { AddressService } from "../services/enderecoService";
+import "../styles/cardListagem.css";
+import { confirmDecision } from "./ConfirmarDecisao";
 
-interface FornecedorCardProps {
-  fornecedor: Fornecedor
-  setFornecedores: Dispatch<SetStateAction<Fornecedor[]>>
+interface SupplierCardProps {
+  supplier: Supplier;
+  setSupplier: Dispatch<SetStateAction<Supplier[]>>;
 }
 
-export default function FornecedorCard({ fornecedor, setFornecedores }: FornecedorCardProps) {
-  const router = useRouter()
+export default function SupplierCard({
+  supplier,
+  setSupplier,
+}: SupplierCardProps) {
+  const router = useRouter();
 
-  const {
-    buscarEnderecoPorCep
-  } = EnderecoService()
+  const { findAddressByCep } = AddressService();
+  const { findAllSupplier, toggleStatusSupplier } = SupplierService();
 
-  const { buscarTodosFornecedores, alternarStatusFornecedor } = FornecedorService()
-  const [enderecosState, setEnderecoState] = useState<Endereco>(estadoInicialEndereco)
-  const [estadoState, setEstadoState] = useState<string>("")
+  const [addressState, setAddressState] = useState<Address>(addressInitialState);
+  const [countryState, setCountryState] = useState<string>("");
 
   useEffect(() => {
-    const loadEndereco = async () => {
-      if (fornecedor.endereco) {
-        const enderecoResponse = await buscarEnderecoPorCep(fornecedor.endereco.cep)
-        setEstadoState(enderecoResponse.data.estado)
-        setEnderecoState(fornecedor.endereco)
+    const loadAddress = async () => {
+      if (supplier.address) {
+        const addressResponse = await findAddressByCep(supplier.address.cep);
+        setCountryState(addressResponse.data.estado);
+        setAddressState(supplier.address);
       }
-    }
+    };
 
-    loadEndereco()
-  }, [])
+    loadAddress();
+  }, []);
 
-  const handlerAlternar = () => {
-    if (fornecedor.statusFornecedor === 'ATIVO') {
-      ConfirmarDecisao(
-        'Desativar Fornecedor',
-        'Ao confirmar, o Fornecedor será marcado como inativo e seus produtos e informações ainda serão mantidos no sistema, mas ele não poderá fornecer produtos até que seja reativado. Deseja realmente desativar o Fornecedor?',
+  const handlerToggle = () => {
+    if (supplier.supplierStatus === "ACTIVE") {
+      confirmDecision(
+        "Desativar Fornecedor",
+        "Ao confirmar, o Fornecedor será marcado como inativo e seus produtos e informações ainda serão mantidos no sistema, mas ele não poderá fornecer produtos até que seja reativado. Deseja realmente desativar o Fornecedor?",
         () => {
-          alternarStatus()
+          toggleStatus();
         }
-      )
-    } else if (fornecedor.statusFornecedor === 'INATIVO') {
-      ConfirmarDecisao(
-        'Ativar Fornecedor',
-        'Ao confirmar, o Fornecedor será marcado como ativo e poderá fornecer produtos normalmente. Deseja realmente ativar o Fornecedor?',
+      );
+    } else if (supplier.supplierStatus === "INACTIVE") {
+      confirmDecision(
+        "Ativar Fornecedor",
+        "Ao confirmar, o Fornecedor será marcado como ativo e poderá fornecer produtos normalmente. Deseja realmente ativar o Fornecedor?",
         () => {
-          alternarStatus()
+          toggleStatus();
         }
-      )
+      );
     }
-  }
+  };
 
-  const alternarStatus = async () => {
+  const toggleStatus = async () => {
     try {
-      const statusResponse = await alternarStatusFornecedor(fornecedor.cnpj)
-      if (statusResponse.data === 'ATIVO') {
-        mensagemSucesso('Fornecedor Ativado com sucesso.')
-      } else if (statusResponse.data === 'INATIVO') {
-        mensagemSucesso('Fornecedor Desativado com sucesso.')
+      const statusResponse = await toggleStatusSupplier(supplier.cnpj);
+      if (statusResponse.data === "ACTIVE") {
+        successMessage("Fornecedor Ativado com sucesso.");
+      } else if (statusResponse.data === "INACTIVE") {
+        successMessage("Fornecedor Desativado com sucesso.");
       }
     } catch (error) {
-      mensagemErro('Erro ao tentar definir o Status do Fornecedor.')
+      errorMessage("Erro ao tentar definir o Status do Fornecedor.");
     }
-    await atualizarListagem()
-  }
+    await updateListing();
+  };
 
-  const atualizarListagem = async () => {
+  const updateListing = async () => {
     try {
-      const todosFornecedoresResponse = await buscarTodosFornecedores()
-      setFornecedores(todosFornecedoresResponse.data)
+      const allSupplierResponse = await findAllSupplier();
+      setSupplier(allSupplierResponse.data);
     } catch (error) {
-      mensagemErro('Erro ao tentar buscar todos Fornecedores.')
+      errorMessage("Erro ao tentar buscar todos Fornecedores.");
     }
-  }
+  };
 
-  const atualizar = () => {
-    router.push(`/fornecedor/atualizar/${encodeURIComponent(fornecedor.cnpj)}`)
-  }
+  const update = () => {
+    router.push(`/supplier/update/${encodeURIComponent(supplier.cnpj)}`);
+  };
 
   return (
     <div className="cardListagem-container">
       <div className="info-principal">
-        <div className='items'>
+        <div className="items">
           <span id="info-title">Fornecedor</span>
-          <div className='div-dados'>Nome</div>
-          <div className='div-resultado'>{fornecedor.nome}</div>
-          <div className='div-dados'>CNPJ</div>
-          <div className='div-resultado'>{fornecedor.cnpj}</div>
-          <div className='div-dados'>Telefone</div>
-          <div className='div-resultado'>{fornecedor.telefone}</div>
+          <div className="div-dados">Nome</div>
+          <div className="div-resultado">{supplier.name}</div>
+          <div className="div-dados">CNPJ</div>
+          <div className="div-resultado">{supplier.cnpj}</div>
+          <div className="div-dados">Telefone</div>
+          <div className="div-resultado">{supplier.phone}</div>
 
-          <div className='div-dados'>Status do Fornecedor</div>
-          {
-            fornecedor.statusFornecedor === 'ATIVO' ? (
-              <div style={{ color: 'green' }} className='div-resultado'>
-                {fornecedor.statusFornecedor}
-                <Check strokeWidth={3} />
-              </div>
-            ) : fornecedor.statusFornecedor === 'INATIVO' && (
-              <div style={{ color: 'red' }} className='div-resultado'>
-                {fornecedor.statusFornecedor}
+          <div className="div-dados">Status do Fornecedor</div>
+          {supplier.supplierStatus === "ACTIVE" ? (
+            <div style={{ color: "green" }} className="div-resultado">
+              {supplier.supplierStatus}
+              <Check strokeWidth={3} />
+            </div>
+          ) : (
+            supplier.supplierStatus === "INACTIVE" && (
+              <div style={{ color: "red" }} className="div-resultado">
+                {supplier.supplierStatus}
                 <X strokeWidth={3} />
               </div>
             )
-          }
+          )}
 
-          <div className='div-dados'>Data e Hora de Cadastro</div>
-          <div className='div-resultado'>{fornecedor.dataHoraCadastro}</div>
+          <div className="div-dados">Data e Hora de Cadastro</div>
+          <div className="div-resultado">{supplier.createdAt}</div>
         </div>
-        <div className='items'>
+        <div className="items">
           <span id="info-title">Endereço</span>
-          <div className='div-dados'>Logradouro</div>
-          <div className='div-resultado'>{enderecosState.rua}</div>
-          <div className='div-dados'>CEP</div>
-          <div className='div-resultado'>{enderecosState.cep}</div>
-          <div className='div-dados'>Número</div>
-          <div className='div-resultado'>{enderecosState.numero}</div>
-          <div className='div-dados'>Bairro</div>
-          <div className='div-resultado'>{enderecosState.bairro}</div>
-          <div className='div-dados'>Cidade</div>
-          <div className='div-resultado'>{enderecosState.cidade}</div>
-          <div className='div-dados'>Estado</div>
-          <div className='div-resultado'>{estadoState}</div>
+          <div className="div-dados">Logradouro</div>
+          <div className="div-resultado">{addressState.road}</div>
+          <div className="div-dados">CEP</div>
+          <div className="div-resultado">{addressState.cep}</div>
+          <div className="div-dados">Número</div>
+          <div className="div-resultado">{addressState.number}</div>
+          <div className="div-dados">Bairro</div>
+          <div className="div-resultado">{addressState.neighborhood}</div>
+          <div className="div-dados">Cidade</div>
+          <div className="div-resultado">{addressState.city}</div>
+          <div className="div-dados">Estado</div>
+          <div className="div-resultado">{countryState}</div>
         </div>
       </div>
-      <div className='icones-container'>
-        <div onClick={atualizar} title='Editar'>
-          <Edit className='icones-atualizacao-e-delecao' />
+      <div className="icones-container">
+        <div onClick={update} title="Editar">
+          <Edit className="icones-atualizacao-e-delecao" />
         </div>
-        {
-          fornecedor.statusFornecedor === 'ATIVO' ? (
-            <div onClick={handlerAlternar} title='Desativar'>
-              <UserX className='icones-atualizacao-e-delecao' />
-            </div>
-          ) : fornecedor.statusFornecedor === 'INATIVO' && (
-            <div onClick={handlerAlternar} title='Ativar'>
-              <UserCheck className='icones-atualizacao-e-delecao' />
+        {supplier.supplierStatus === "ACTIVE" ? (
+          <div onClick={handlerToggle} title="Desativar">
+            <UserX className="icones-atualizacao-e-delecao" />
+          </div>
+        ) : (
+          supplier.supplierStatus === "INACTIVE" && (
+            <div onClick={handlerToggle} title="Ativar">
+              <UserCheck className="icones-atualizacao-e-delecao" />
             </div>
           )
-        }
+        )}
       </div>
     </div>
-  )
+  );
 }

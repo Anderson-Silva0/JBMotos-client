@@ -1,28 +1,29 @@
-import { estadoInicialFuncionario, Funcionario } from "./funcionario"
+import { employeeInitialState, Employee } from "./funcionario";
 
 export enum ROLE {
-    SUPORTE = "SUPORTE",
-    ADMIN = "ADMIN",
-    OPERADOR = "OPERADOR"
+  SUPPORT = "SUPPORT",
+  ADMIN = "ADMIN",
+  OPERATOR = "OPERATOR",
 }
 
 export const roleSelectOptions = [
-    { label: 'Admin', value: ROLE.ADMIN },
-    { label: 'Operador', value: ROLE.OPERADOR }
-]
+  { label: "Admin", value: ROLE.ADMIN },
+  { label: "Operator", value: ROLE.OPERATOR },
+];
 
-export interface AuthRegisterModelFuncionario {
-    id: number
-    login: string
-    senha: string
-    role: string
-    funcionario: Funcionario
+export interface AuthRegisterModelEmployee {
+  id: number;
+  login: string;
+  password: string;
+  role: string;
+  employee: Employee;
 }
 
-export const estadoInicialAuthRegisterModelFuncionario: AuthRegisterModelFuncionario = {
+export const authRegisterModelEmployeeInitialState: AuthRegisterModelEmployee =
+  {
     id: 0,
-    login: '',
-    senha: '',
-    role: ROLE.OPERADOR,
-    funcionario: estadoInicialFuncionario
-}
+    login: "",
+    password: "",
+    role: ROLE.OPERATOR,
+    employee: employeeInitialState,
+  };

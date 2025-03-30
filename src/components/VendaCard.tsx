@@ -1,150 +1,152 @@
-import { RegistroProdutoSelecionadoProps } from '@/app/(pages)/venda/cadastro/page'
-import { Cliente, estadoInicialCliente } from '@/models/cliente'
-import { formatarParaReal } from '@/models/formatadorReal'
-import { Funcionario, estadoInicialFuncionario } from '@/models/funcionario'
-import { PagamentoCartao, estadoInicialPagamentoCartao } from '@/models/pagamentoCartao'
-import { mensagemErro } from '@/models/toast'
-import { Venda } from '@/models/venda'
-import { VendaService } from '@/services/VendaService'
-import '@/styles/cardListagem.css'
-import { Info } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
-import { GeradorPDF, TipoRecibo } from './GeradorPDF'
-import InfoCard from './InfoCard'
+import { SelectedProductRegisterProps } from "@/app/(pages)/venda/cadastro/page";
+import { Customer, customerInitialState } from "@/models/cliente";
+import { formatToBRL } from "@/models/formatadorReal";
+import { Employee, employeeInitialState } from "@/models/funcionario";
+import { CardPayment, cardPaymentInitialState } from "@/models/pagamentoCartao";
+import { errorMessage } from "@/models/toast";
+import { Sale } from "@/models/venda";
+import "@/styles/cardListagem.css";
+import { Info } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { PDFGenerator, ReceiptType } from "./GeradorPDF";
+import InfoCard from "./InfoCard";
 
-export default function VendaCard(venda: Venda) {
-  const router = useRouter()
+export default function SaleCard(sale: Sale) {
+  const router = useRouter();
 
-  const { valorTotalDaVenda } = VendaService()
+  const [customerState, setCustomerState] = useState<Customer>(customerInitialState);
+  const [employeeState, setEmployeeState] = useState<Employee>(employeeInitialState);
+  const [totalValue, setTotalValue] = useState<string>("");
+  const [saleProductsState, setSaleProductsState] = useState<SelectedProductRegisterProps[]>([]);
+  const [cardPayment, setCardPayment] = useState<CardPayment>(cardPaymentInitialState);
 
-  const [clienteState, setClienteState] = useState<Cliente>(estadoInicialCliente)
-  const [funcionarioState, setFuncionarioState] = useState<Funcionario>(estadoInicialFuncionario)
-  const [valorTotal, setValorTotal] = useState<string>('')
-  const [produtosVendaState, setProdutosVendaState] = useState<RegistroProdutoSelecionadoProps[]>([])
-  const [pagamentoCartao, setPagamentoCartao] = useState<PagamentoCartao>(estadoInicialPagamentoCartao)
-
-  const botaoVerProduto = useRef<HTMLButtonElement>(null)
-  const cardListagemContainer = useRef<HTMLDivElement>(null)
+  const viewProductButton = useRef<HTMLButtonElement>(null);
+  const listingCardContainer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const buscar = async () => {
+    const search = async () => {
       try {
-        setClienteState(venda.cliente)
-        setFuncionarioState(venda.funcionario)
+        setCustomerState(sale.customer);
+        setEmployeeState(sale.employee);
 
-        if (venda.pagamentoCartao && venda.formaDePagamento === "Cartão de Crédito") {
-          setPagamentoCartao(venda.pagamentoCartao)
+        if (sale.cardPayment && sale.paymentMethod === "Cartão de Crédito") {
+          setCardPayment(sale.cardPayment);
         }
       } catch (error: any) {
-        mensagemErro(error.response.data)
+        errorMessage(error.response.data);
       }
-    }
-    buscar()
-  }, [])
+    };
+    search();
+  }, []);
 
   useEffect(() => {
-    const buscar = async () => {
-      if (venda.valorTotalVenda) {
-        setValorTotal(formatarParaReal(venda.valorTotalVenda))
+    const search = async () => {
+      if (sale.totalSaleValue) {
+        setTotalValue(formatToBRL(sale.totalSaleValue));
       }
 
-      const produtosVenda = venda.produtosVenda
-      const registrosProdutosVenda = produtosVenda.map(produtoVenda => {
-        const produto = produtoVenda.produto
+      const productsOfSale = sale.productsOfSale;
+      const productsOfSaleRegisters = productsOfSale.map((saleProduct) => {
+        const product = saleProduct.product;
         return {
-          idProduto: produto.id,
-          nomeProduto: produto.nome,
-          quantidade: produtoVenda.quantidade,
-          valorUnidade: formatarParaReal(produtoVenda.valorUnidade),
-          valorTotal: formatarParaReal(produtoVenda.valorTotal)
-        } as RegistroProdutoSelecionadoProps
-      })
+          productId: product.id,
+          productName: product.name,
+          quantity: saleProduct.quantity,
+          unitValue: formatToBRL(saleProduct.unitValue),
+          totalValue: formatToBRL(saleProduct.totalValue),
+        } as SelectedProductRegisterProps;
+      });
 
-      setProdutosVendaState(registrosProdutosVenda)
+      setSaleProductsState(productsOfSaleRegisters);
+    };
+    search();
+  }, []);
+
+  const listSaleProducts = () => {
+    if (viewProductButton.current && listingCardContainer.current) {
+      listingCardContainer.current.style.cursor = "wait";
+      viewProductButton.current.style.cursor = "wait";
     }
-    buscar()
-  }, [])
 
-  const listarProdutosVenda = () => {
-    if (botaoVerProduto.current && cardListagemContainer.current) {
-      cardListagemContainer.current.style.cursor = 'wait'
-      botaoVerProduto.current.style.cursor = 'wait'
-    }
+    const currentUrl = window.location.pathname;
+    router.push(`${currentUrl}/products/${sale.id}`);
+  };
 
-    const urlAtual = window.location.pathname
-    router.push(`${urlAtual}/produtos/${venda.id}`)
-  }
-
-  const [mostrarInfo, setMostrarInfo] = useState(false)
+  const [showInfo, setShowInfo] = useState(false);
 
   const HandleOnMouseLeave = () => {
-    setMostrarInfo(false)
-  }
+    setShowInfo(false);
+  };
   const HandleOnMouseMove = () => {
-    setMostrarInfo(true)
-  }
+    setShowInfo(true);
+  };
 
   return (
-    <div ref={cardListagemContainer} className="cardListagem-container-venda">
+    <div ref={listingCardContainer} className="cardListagem-container-venda">
       <span id="info-title-venda">Detalhes da Venda</span>
-      <div className='container-items'>
-        <div className='items'>
-          <div className='div-dados'>Nome do Cliente</div>
-          <div className='div-resultado'>{clienteState.nome}</div>
-          <div className='div-dados'>CPF do Cliente</div>
-          <div className='div-resultado'>{venda.cliente.cpf}</div>
-          <div className='div-dados'>Nome do Funcionário</div>
-          <div className='div-resultado'>{funcionarioState.nome}</div>
-          <div className='div-dados'>CPF do Funcionário</div>
-          <div className='div-resultado'>{venda.funcionario.cpf}</div>
+      <div className="container-items">
+        <div className="items">
+          <div className="div-dados">Nome do Cliente</div>
+          <div className="div-resultado">{customerState.name}</div>
+          <div className="div-dados">CPF do Cliente</div>
+          <div className="div-resultado">{sale.customer.cpf}</div>
+          <div className="div-dados">Nome do Funcionário</div>
+          <div className="div-resultado">{employeeState.name}</div>
+          <div className="div-dados">CPF do Funcionário</div>
+          <div className="div-resultado">{sale.employee.cpf}</div>
         </div>
-        <div className='items'>
-          <div className='div-dados'>Data e Hora de Cadastro da Venda</div>
-          <div className='div-resultado'>{venda.dataHoraCadastro}</div>
-          <div className='div-dados' style={!venda.observacao ? { display: 'none' } : undefined}>Observação</div>
-          <div className='div-resultado'>{venda.observacao}</div>
+        <div className="items">
+          <div className="div-dados">Data e Hora de Cadastro da Venda</div>
+          <div className="div-resultado">{sale.createdAt}</div>
+          <div
+            className="div-dados"
+            style={!sale.observation ? { display: "none" } : undefined}
+          >
+            Observação
+          </div>
+          <div className="div-resultado">{sale.observation}</div>
 
-          <div className='div-dados'>Forma de Pagamento</div>
-          <div className='div-resultado'>
-            {venda.formaDePagamento}
-            {
-              venda.formaDePagamento === "Cartão de Crédito" && (
-                <div id='div-infocard'>
-                  {
-
-                    <Info
-                      className='icone-info'
-                      strokeWidth={3}
-                      onMouseMove={HandleOnMouseMove}
-                      onMouseLeave={HandleOnMouseLeave}
-                    />
-                  }
-                  {
-                    mostrarInfo && <InfoCard pagamentoCartao={pagamentoCartao} />
-                  }
-                </div>
-              )
-            }
+          <div className="div-dados">Forma de Pagamento</div>
+          <div className="div-resultado">
+            {sale.paymentMethod}
+            {sale.paymentMethod === "Cartão de Crédito" && (
+              <div id="div-infocard">
+                {
+                  <Info
+                    className="icone-info"
+                    strokeWidth={3}
+                    onMouseMove={HandleOnMouseMove}
+                    onMouseLeave={HandleOnMouseLeave}
+                  />
+                }
+                {showInfo && <InfoCard cardPayment={cardPayment} />}
+              </div>
+            )}
           </div>
         </div>
       </div>
-      <div className='botoes-container'>
-        <button ref={botaoVerProduto} id='botao-ver-produtos' type="button" onClick={listarProdutosVenda}>
+      <div className="botoes-container">
+        <button
+          ref={viewProductButton}
+          id="botao-ver-produtos"
+          type="button"
+          onClick={listSaleProducts}
+        >
           Ver Produtos
         </button>
-        <GeradorPDF
-          tipoRecibo={TipoRecibo.comprovante}
-          nomeCliente={clienteState.nome}
-          cpfCliente={venda.cliente.cpf}
-          formaPagamento={venda.formaDePagamento}
-          nomeFuncionario={funcionarioState.nome}
-          observacao={venda.observacao}
-          produtosVenda={produtosVendaState}
-          valorTotalVenda={valorTotal}
-          dataHoraVenda={venda.dataHoraCadastro}
+        <PDFGenerator
+          receiptType={ReceiptType.Receipt}
+          customerName={customerState.name}
+          customerCpf={sale.customer.cpf}
+          paymentMethod={sale.paymentMethod}
+          employeeName={employeeState.name}
+          observation={sale.observation}
+          productOfSaleRegister={saleProductsState}
+          totalSaleValue={totalValue}
+          saleDateTime={sale.createdAt}
         />
       </div>
     </div>
-  )
+  );
 }

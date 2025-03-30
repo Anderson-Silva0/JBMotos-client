@@ -1,40 +1,39 @@
-import { Funcionario } from "@/models/funcionario"
-import { ApiService } from "./apiService"
+import { Employee } from "@/models/funcionario";
+import { ApiService } from "./apiService";
 
-export const FuncionarioService = () => {
+export const EmployeeService = () => {
+  const url = "/employee";
 
-    const url = "/funcionario"
+  const findAllEmployee = () => {
+    return ApiService.get(`${url}/find-all`);
+  };
 
-    const buscarTodosFuncionarios = () => {
-        return ApiService.get(`${url}/buscar-todos`)
-    }
+  const findEmployeeByCpf = (cpf: string) => {
+    return ApiService.get(`${url}/find/${cpf}`);
+  };
 
-    const buscarFuncionarioPorCpf = (cpf: string) => {
-        return ApiService.get(`${url}/buscar/${cpf}`)
-    }
+  const filterEmployee = (fieldName: string, value: string) => {
+    return ApiService.get(`${url}/filter?${fieldName}=${value}`);
+  };
 
-    const filtrarFuncionario = (nomeCampo: string, valor: string) => {
-        return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
-    }
+  const toggleStatusEmployee = (cpf: string) => {
+    return ApiService.patch(`${url}/toggle-status/${cpf}`);
+  };
 
-    const alternarStatusFuncionario = (cpf: string) => {
-        return ApiService.patch(`${url}/alternar-status/${cpf}`)
-    }
+  const updateEmployee = (cpf: string, funcionario: Employee) => {
+    return ApiService.put(`${url}/update/${cpf}`, funcionario);
+  };
 
-    const atualizarFuncionario = (cpf: string, funcionario: Funcionario) => {
-        return ApiService.put(`${url}/atualizar/${cpf}`, funcionario)
-    }
+  const deleteEmployee = (cpf: string) => {
+    return ApiService.delete(`${url}/delete/${cpf}`);
+  };
 
-    const deletarFuncionario = (cpf: string) => {
-        return ApiService.delete(`${url}/deletar/${cpf}`)
-    }
-
-    return {
-        buscarTodosFuncionarios,
-        buscarFuncionarioPorCpf,
-        filtrarFuncionario,
-        alternarStatusFuncionario,
-        atualizarFuncionario,
-        deletarFuncionario
-    }
-}
+  return {
+    findAllEmployee,
+    findEmployeeByCpf,
+    filterEmployee,
+    toggleStatusEmployee,
+    updateEmployee,
+    deleteEmployee,
+  };
+};

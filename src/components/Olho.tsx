@@ -1,74 +1,73 @@
-'use client'
+"use client";
 
-import Image from "next/image"
-import { Dispatch, SetStateAction, useState } from "react"
-import imgVisivel from "@/images/olho.png"
-import imgNaoVisivel from "@/images/visivel.png"
+import Image from "next/image";
+import { Dispatch, SetStateAction, useState } from "react";
+import imgVisible from "@/images/olho.png";
+import imgNotVisible from "@/images/visivel.png";
 
-interface OlhoProp {
-  lucroVenda?: string
-  isLogin: boolean
-  estaVisivel?: boolean
-  setEstaVisivel?: Dispatch<SetStateAction<boolean>>
+interface EyeProp {
+  saleProfit?: string;
+  isLogin: boolean;
+  isVisible?: boolean;
+  setIsVisible?: Dispatch<SetStateAction<boolean>>;
 }
 
-export function Olho({ estaVisivel, setEstaVisivel, lucroVenda, isLogin }: OlhoProp) {
+export function Eye({
+  isVisible,
+  setIsVisible,
+  saleProfit,
+  isLogin,
+}: EyeProp) {
+  const [isVisibleNotLogin, setIsVisibleNotLogin] = useState<boolean>(false);
 
-  const [estaVisivelNotLogin, setEstaVisivelNotLogin] = useState<boolean>(false)
-
-  const atualizarEstadoOlhoNotLogin = () => {
-    if (estaVisivelNotLogin) {
-      setEstaVisivelNotLogin(false)
+  const updateEyeStateNotLogin = () => {
+    if (isVisibleNotLogin) {
+      setIsVisibleNotLogin(false);
     } else {
-      setEstaVisivelNotLogin(true)
+      setIsVisibleNotLogin(true);
     }
-  }
+  };
 
-  const atualizarEstadoOlho = () => {
-    if (setEstaVisivel) {
-      if (estaVisivel) {
-        setEstaVisivel(false)
+  const updateEyeState = () => {
+    if (setIsVisible) {
+      if (isVisible) {
+        setIsVisible(false);
       } else {
-        setEstaVisivel(true)
+        setIsVisible(true);
       }
     }
-  }
+  };
 
   if (isLogin) {
-    return (
-      estaVisivel ? (
-        <>
-          <div className="div-olho" onClick={atualizarEstadoOlho}>
-            <Image src={imgVisivel} width={25} height={25} alt="" />
-          </div>
-          <div className='div-resultado'>{lucroVenda}</div>
-        </>
-      ) : (
-        <>
-          <div className="div-olho" onClick={atualizarEstadoOlho}>
-            <Image src={imgNaoVisivel} width={25} height={25} alt="" />
-          </div>
-        </>
-      )
-    )
+    return isVisible ? (
+      <>
+        <div className="div-olho" onClick={updateEyeState}>
+          <Image src={imgVisible} width={25} height={25} alt="" />
+        </div>
+        <div className="div-resultado">{saleProfit}</div>
+      </>
+    ) : (
+      <>
+        <div className="div-olho" onClick={updateEyeState}>
+          <Image src={imgNotVisible} width={25} height={25} alt="" />
+        </div>
+      </>
+    );
   } else {
-    return (
-      estaVisivelNotLogin ? (
-        <div className="container-lucro">
-          <div className='div-resultado'>{lucroVenda}</div>
-          <div className="div-olho" onClick={atualizarEstadoOlhoNotLogin}>
-            <Image src={imgVisivel} width={25} height={25} alt="" />
-          </div>
+    return isVisibleNotLogin ? (
+      <div className="container-lucro">
+        <div className="div-resultado">{saleProfit}</div>
+        <div className="div-olho" onClick={updateEyeStateNotLogin}>
+          <Image src={imgVisible} width={25} height={25} alt="" />
         </div>
-      ) : (
-        <div className="container-lucro">
-          <div>• • • • • • • •</div>
-          <div className="div-olho" onClick={atualizarEstadoOlhoNotLogin}>
-            <Image src={imgNaoVisivel} width={25} height={25} alt="" />
-          </div>
+      </div>
+    ) : (
+      <div className="container-lucro">
+        <div>• • • • • • • •</div>
+        <div className="div-olho" onClick={updateEyeStateNotLogin}>
+          <Image src={imgNotVisible} width={25} height={25} alt="" />
         </div>
-      )
-    )
+      </div>
+    );
   }
-
 }

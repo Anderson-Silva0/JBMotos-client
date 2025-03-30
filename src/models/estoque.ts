@@ -1,15 +1,15 @@
-export interface Estoque {
-  id: number
-  estoqueMinimo: number | string
-  estoqueMaximo: number | string
-  quantidade: number | string
-  status: string
+export interface Stock {
+  id: number;
+  minStock: number | string;
+  maxStock: number | string;
+  quantity: number | string;
+  status: string;
 }
 
-export const estadoInicialEstoque: Estoque = {
+export const stockInitialState: Stock = {
   id: 0,
-  estoqueMinimo: '',
-  estoqueMaximo: '',
-  quantidade: '',
-  status: ''
-}
+  minStock: "",
+  maxStock: "",
+  quantity: "",
+  status: "",
+};

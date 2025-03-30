@@ -1,59 +1,59 @@
-import { ApiService } from "./apiService"
+import { Motorcycle } from "@/models/moto";
+import { ApiService } from "./apiService";
 
-export const MotoService = () => {
+export const MotorcycleService = () => {
+  const url = "/motorcycle";
 
-  const url = "/moto"
+  const saveMotorcycle = (data: Motorcycle) => {
+    return ApiService.post(`${url}`, data);
+  };
 
-  const salvarMoto = (dados: object) => {
-    return ApiService.post(`${url}`, dados)
-  }
+  const findAllMotorcycle = () => {
+    return ApiService.get(`${url}/find-all`);
+  };
 
-  const buscarTodasMotos = () => {
-    return ApiService.get(`${url}/buscar-todas`)
-  }
+  const findMotorcycleByCustomerCpf = (customerCpf: string) => {
+    return ApiService.get(`${url}/find-by-cpf/${customerCpf}`);
+  };
 
-  const buscarMotosPorCpfCliente = (cpfCliente: string) => {
-    return ApiService.get(`${url}/buscar-por-cpf/${cpfCliente}`)
-  }
+  const findMotorcycleById = (id: number) => {
+    return ApiService.get(`${url}/find-by-id/${id}`);
+  };
 
-  const buscarMotoPorId = (id: number) => {
-    return ApiService.get(`${url}/buscar-por-id/${id}`)
-  }
+  const findMotorcycleByPlate = (plate: string) => {
+    return ApiService.get(`${url}/find-by-plate/${plate}`);
+  };
 
-  const buscarMotoPorPlaca = (placa: string) => {
-    return ApiService.get(`${url}/buscar-por-placa/${placa}`)
-  }
+  const filterMotorcycle = (fieldName: string, value: string) => {
+    return ApiService.get(`${url}/filter?${fieldName}=${value}`);
+  };
 
-  const filtrarMoto = (nomeCampo: string, valor: string) => {
-    return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
-  }
+  const toggleStatusMotorcycle = (id: number | string) => {
+    return ApiService.patch(`${url}/toggle-status/${id}`);
+  };
 
-  const alternarStatusMoto = (id: number | string) => {
-    return ApiService.patch(`${url}/alternar-status/${id}`)
-  }
+  const updateMotorcycle = (id: number, data: Motorcycle) => {
+    return ApiService.put(`${url}/update/${id}`, data);
+  };
 
-  const atualizarMoto = (id: number, dados: object) => {
-    return ApiService.put(`${url}/atualizar/${id}`, dados)
-  }
+  const deleteMotorcycleById = (id: number) => {
+    return ApiService.delete(`${url}/delete-by-id/${id}`);
+  };
 
-  const deletarMotoPorId = (id: number) => {
-    return ApiService.delete(`${url}/deletar-por-id/${id}`)
-  }
-
-  const deletarMotoPorPlaca = (placa: string) => {
-    return ApiService.delete(`${url}/deletar-por-placa/${placa}`)
-  }
+  const deleteMotorcycleByPlate = (placa: string) => {
+    return ApiService.delete(`${url}/delete-by-plate/${placa}`);
+  };
 
   return {
-    salvarMoto,
-    buscarTodasMotos,
-    buscarMotosPorCpfCliente,
-    buscarMotoPorId,
-    buscarMotoPorPlaca,
-    filtrarMoto,
-    alternarStatusMoto,
-    atualizarMoto,
-    deletarMotoPorId,
-    deletarMotoPorPlaca
-  }
-}
+    saveMotorcycle,
+    findAllMotorcycle,
+    findMotorcycleByCustomerCpf,
+    findMotorcycleById,
+    findMotorcycleByPlate,
+    filterMotorcycle,
+    toggleStatusMotorcycle,
+    updateMotorcycle,
+    deleteMotorcycleById,
+    deleteMotorcycleByPlate,
+  };
+};

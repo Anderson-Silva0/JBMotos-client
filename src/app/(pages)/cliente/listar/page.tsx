@@ -1,20 +1,20 @@
 'use client'
 
-import ClienteCard from "@/components/ClienteCard"
-import { InputCpf, InputTelefone } from "@/components/Input"
+import CustomerCard from "@/components/ClienteCard"
+import { CpfInput, PhoneInput } from "@/components/Input"
 import LoadingLogo from "@/components/LoadingLogo"
 import imgCliente from "@/images/client.png"
 import { parseDate } from "@/models/StringParaDate"
-import { Cliente } from "@/models/cliente"
-import { mensagemErro } from "@/models/toast"
-import { ClienteService } from "@/services/clienteService"
+import { Customer } from "@/models/cliente"
+import { errorMessage } from "@/models/toast"
+import { CustomerService } from "@/services/clienteService"
 import { Search } from "lucide-react"
 import Image from "next/image"
 import '@/styles/card.css'
 import { useEffect, useState } from "react"
 
 export default function ListarClientes() {
-  const [clientes, setClientes] = useState<Cliente[]>([])
+  const [clientes, setClientes] = useState<Customer[]>([])
 
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
 
@@ -22,7 +22,7 @@ export default function ListarClientes() {
 
   const [campoSelecionado, setCampoSelecionado] = useState<string>('')
 
-  const { filtrarCliente } = ClienteService()
+  const { filterCustomer: filtrarCliente } = CustomerService()
 
   const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
 
@@ -32,13 +32,13 @@ export default function ListarClientes() {
 
   useEffect(() => {
     if (valorSelecionado === 'antigo') {
-      const sortedClientesRecentes = [...clientes].sort((a: Cliente, b: Cliente) =>
-        parseDate(a.dataHoraCadastro).getTime() - parseDate(b.dataHoraCadastro).getTime()
+      const sortedClientesRecentes = [...clientes].sort((a: Customer, b: Customer) =>
+        parseDate(a.createdAt).getTime() - parseDate(b.createdAt).getTime()
       )
       setClientes(sortedClientesRecentes)
     } else if (valorSelecionado === 'recente') {
-      const sortedClientesRecentes = [...clientes].sort((a: Cliente, b: Cliente) =>
-        parseDate(b.dataHoraCadastro).getTime() - parseDate(a.dataHoraCadastro).getTime()
+      const sortedClientesRecentes = [...clientes].sort((a: Customer, b: Customer) =>
+        parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime()
       )
       setClientes(sortedClientesRecentes)
     }
@@ -50,7 +50,7 @@ export default function ListarClientes() {
         const clienteResponse = await filtrarCliente(campoSelecionado, valorInputBuscar)
         setClientes(clienteResponse.data)
       } catch (error: any) {
-        mensagemErro('Erro ao tentar buscar cliente.')
+        errorMessage('Erro ao tentar buscar cliente.')
       } finally {
         setFoiCarregado(true)
       }
@@ -69,7 +69,7 @@ export default function ListarClientes() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo descricao='Carregando' />
+    return <LoadingLogo description='Carregando' />
   }
 
   return (
@@ -126,7 +126,7 @@ export default function ListarClientes() {
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
             ) : campoSelecionado === 'cpf' ? (
-              <InputCpf
+              <CpfInput
                 className="input-buscar"
                 placeholder="Digite o CPF"
                 type="search"
@@ -134,7 +134,7 @@ export default function ListarClientes() {
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
             ) : campoSelecionado === 'telefone' ? (
-              <InputTelefone
+              <PhoneInput
                 className="input-buscar"
                 placeholder="Digite o Telefone"
                 type="search"
@@ -266,10 +266,10 @@ export default function ListarClientes() {
 
       {clientes.map((cliente) => {
         return (
-          <ClienteCard
+          <CustomerCard
             key={cliente.cpf}
-            cliente={cliente}
-            setClientes={setClientes}
+            customer={cliente}
+            setCustomer={setClientes}
           />
         )
       })}

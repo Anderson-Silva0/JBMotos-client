@@ -1,24 +1,25 @@
-import React from 'react'
+import React from 'react';
 
-interface Erro {
-  nomeInput: string
-  mensagemErro: string
+interface Error {
+  inputName: string
+  errorMessage: string
 }
 
-interface ExibeErroProps {
-  erros: Erro[]
-  nomeInput: string
+interface DisplayErrorProps {
+  errors: Error[]
+  inputName: string
 }
 
-export function ExibeErro({ erros, nomeInput }: ExibeErroProps) {
-  const erroExistente = erros.find(erro => erro.nomeInput === nomeInput)
+export function DisplayError({ errors, inputName }: DisplayErrorProps) {
+  const errorExisting = errors.find(error => error.inputName === inputName);
 
-  if (erroExistente) {
+  if (errorExisting) {
     return (
       <span className="erro">
-        {erroExistente.mensagemErro}
+        {errorExisting.errorMessage}
       </span>
-    )
+    );
   }
-  return null
+
+  return null;
 }

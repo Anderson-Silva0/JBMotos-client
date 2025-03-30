@@ -1,109 +1,141 @@
-import { Cliente, estadoInicialCliente } from '@/models/cliente'
-import { formatarParaReal } from '@/models/formatadorReal'
-import { Funcionario, estadoInicialFuncionario } from '@/models/funcionario'
-import { mensagemErro } from '@/models/toast'
-import { VendaService } from '@/services/VendaService'
-import { ClienteService } from '@/services/clienteService'
-import { FuncionarioService } from '@/services/funcionarioService'
-import '@/styles/cardListagem.css'
-import { Edit, PackageSearch } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
-import { Servico } from '@/models/servico'
+import { Customer, customerInitialState } from "@/models/cliente";
+import { formatToBRL } from "@/models/formatadorReal";
+import { Employee, employeeInitialState } from "@/models/funcionario";
+import { errorMessage } from "@/models/toast";
+import { SaleService } from "@/services/VendaService";
+import { CustomerService } from "@/services/clienteService";
+import { EmployeeService } from "@/services/funcionarioService";
+import "@/styles/cardListagem.css";
+import { Edit, PackageSearch } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { Repair } from "@/models/servico";
 
-export default function ServicoCard(servico: Servico) {
-  const router = useRouter()
+export default function RepairCard(repair: Repair) {
+  const router = useRouter();
 
-  const { buscarClientePorCpf } = ClienteService()
-  const { buscarFuncionarioPorCpf } = FuncionarioService()
-  const { valorTotalDaVenda } = VendaService()
+  const { findCustomerByCpf } = CustomerService();
+  const { findEmployeeByCpf: findEmployeeByCpf } = EmployeeService();
+  const { totalSaleValue: totalSaleValue } = SaleService();
 
-  const [clienteState, setClienteState] = useState<Cliente>(estadoInicialCliente)
-  const [funcionarioState, setFuncionarioState] = useState<Funcionario>(estadoInicialFuncionario)
-  const [valorTotalVendaState, setValorTotalVendaState] = useState<string>('')
+  const [customerState, setCustomerState] = useState<Customer>(customerInitialState);
+  const [employeeState, setEmployeeState] = useState<Employee>(employeeInitialState);
+  const [totalSaleValueState, setTotalSaleValueState] = useState<string>("");
 
-  const botaoVerProduto = useRef<HTMLButtonElement>(null)
-  const cardListagemContainer = useRef<HTMLDivElement>(null)
+  const viewProductButton = useRef<HTMLButtonElement>(null);
+  const listingCardContainer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const buscar = async () => {
+    const search = async () => {
       try {
-        const clienteResponse = await buscarClientePorCpf(servico.moto.cpfCliente)
-        setClienteState(clienteResponse.data)
+        const customerResponse = await findCustomerByCpf(
+          repair.motorcycle.customerCpf
+        );
+        setCustomerState(customerResponse.data);
 
-        const funcionarioResponse = await buscarFuncionarioPorCpf(servico.cpfFuncionario)
-        setFuncionarioState(funcionarioResponse.data)
+        const employeeResponse = await findEmployeeByCpf(
+          repair.employeeCpf
+        );
+        setEmployeeState(employeeResponse.data);
 
-        if (servico.venda) {
-          const valorTotalVendaResponse = await valorTotalDaVenda(servico.venda.id)
-          setValorTotalVendaState(valorTotalVendaResponse.data)
+        if (repair.sale) {
+          const totalSaleValueResponse = await totalSaleValue(
+            repair.sale.id
+          );
+          setTotalSaleValueState(totalSaleValueResponse.data);
         }
       } catch (error: any) {
-        mensagemErro(error.response.data)
+        errorMessage(error.response.data);
       }
-    }
-    buscar()
-  }, [])
+    };
+    search();
+  }, []);
 
-  const listarProdutosVenda = () => {
-    if (botaoVerProduto.current && cardListagemContainer.current) {
-      cardListagemContainer.current.style.cursor = 'wait'
-      botaoVerProduto.current.style.cursor = 'wait'
+  const listProductsOfSale = () => {
+    if (viewProductButton.current && listingCardContainer.current) {
+      listingCardContainer.current.style.cursor = "wait";
+      viewProductButton.current.style.cursor = "wait";
     }
 
-    if (servico.venda) {
-      router.push(`/venda/listar/produtos/${servico.venda.id}`)
+    if (repair.sale) {
+      router.push(`/sale/list/products/${repair.sale.id}`);
     }
-  }
+  };
 
   return (
     <div className="cardListagem-container-venda">
       <span id="info-title-venda">Detalhes do Serviço</span>
       {/* <div className='div-btn-edit' onClick={atualizar} title='Editar'> */}
-      <div className='div-btn-edit' title='Editar'>
-        <Edit className='icones-atualizacao-e-delecao' />
+      <div className="div-btn-edit" title="Editar">
+        <Edit className="icones-atualizacao-e-delecao" />
       </div>
-      <div className='container-items'>
-        <div className='items'>
-          <div className='div-dados'>Nome do Cliente</div>
-          <div className='div-resultado'>{clienteState.nome}</div>
-          <div className='div-dados'>CPF do Cliente</div>
-          <div className='div-resultado'>{clienteState.cpf}</div>
-          <div className='div-dados'>Nome do Funcionário</div>
-          <div className='div-resultado'>{funcionarioState.nome}</div>
-          <div className='div-dados'>CPF do Funcionário</div>
-          <div className='div-resultado'>{funcionarioState.cpf}</div>
-          <div className='div-dados'>Data e Hora de Cadastro do Serviço</div>
-          <div className='div-resultado'>{servico.dataHoraCadastro}</div>
+      <div className="container-items">
+        <div className="items">
+          <div className="div-dados">Nome do Cliente</div>
+          <div className="div-resultado">{customerState.name}</div>
+          <div className="div-dados">CPF do Cliente</div>
+          <div className="div-resultado">{customerState.cpf}</div>
+          <div className="div-dados">Nome do Funcionário</div>
+          <div className="div-resultado">{employeeState.name}</div>
+          <div className="div-dados">CPF do Funcionário</div>
+          <div className="div-resultado">{employeeState.cpf}</div>
+          <div className="div-dados">Data e Hora de Cadastro do Serviço</div>
+          <div className="div-resultado">{repair.createdAt}</div>
         </div>
-        <div className='items'>
-          <div className='div-dados'>Motocicleta</div>
-          <div className='div-resultado'>{servico.moto.marca} {servico.moto.modelo} <span style={{ fontWeight: 'bolder' }}>[ {servico.moto.placa} ]</span></div>
-          <div className='div-dados' style={!servico.observacao ? { display: 'none' } : undefined}>Observação</div>
-          <div className='div-resultado'>{servico.observacao}</div>
-          <div className='div-dados'>Preço de Mão de Obra</div>
-          <div className='div-resultado'>{formatarParaReal(servico.precoMaoDeObra)}</div>
-          <div className='div-dados'>Serviços Realizados</div>
-          <div className='div-resultado'>{servico.servicosRealizados}</div>
-          {
-            servico.venda && (
-              <>
-                <div className='div-dados' style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div>
-                    Preço da Venda
-                  </div>
-                  <div title='Ver Produtos da Venda' onClick={listarProdutosVenda}>
-                    <PackageSearch width={30} height={30} style={{ cursor: 'pointer' }} />
-                  </div>
+        <div className="items">
+          <div className="div-dados">Motocicleta</div>
+          <div className="div-resultado">
+            {repair.motorcycle.brand} {repair.motorcycle.model}{" "}
+            <span style={{ fontWeight: "bolder" }}>
+              [ {repair.motorcycle.plate} ]
+            </span>
+          </div>
+          <div
+            className="div-dados"
+            style={!repair.observation ? { display: "none" } : undefined}
+          >
+            Observação
+          </div>
+          <div className="div-resultado">{repair.observation}</div>
+          <div className="div-dados">Preço de Mão de Obra</div>
+          <div className="div-resultado">
+            {formatToBRL(repair.laborCost)}
+          </div>
+          <div className="div-dados">Serviços Realizados</div>
+          <div className="div-resultado">{repair.repairPerformed}</div>
+          {repair.sale && (
+            <>
+              <div
+                className="div-dados"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>Preço da Venda</div>
+                <div
+                  title="Ver Produtos da Venda"
+                  onClick={listProductsOfSale}
+                >
+                  <PackageSearch
+                    width={30}
+                    height={30}
+                    style={{ cursor: "pointer" }}
+                  />
                 </div>
-                <div className='div-resultado'>{formatarParaReal(valorTotalVendaState)}</div>
-                <div className='div-dados'>Total do Serviço</div>
-                <div className='div-resultado'>{formatarParaReal(valorTotalVendaState + servico.precoMaoDeObra)}</div>
-              </>
-            )
-          }
+              </div>
+              <div className="div-resultado">
+                {formatToBRL(totalSaleValueState)}
+              </div>
+              <div className="div-dados">Total do Serviço</div>
+              <div className="div-resultado">
+                {formatToBRL(totalSaleValueState + repair.laborCost)}
+              </div>
+            </>
+          )}
         </div>
       </div>
-    </div >
-  )
+    </div>
+  );
 }

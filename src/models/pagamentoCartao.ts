@@ -1,15 +1,15 @@
-export interface PagamentoCartao {
-    id?: number,
-    parcela: string | number,
-    bandeira: string | number,
-    totalTaxas: string | number,
-    idVenda: number
+export interface CardPayment {
+  id?: number;
+  installment: string | number;
+  flag: string | number;
+  totalFees: string | number;
+  saleId: number;
 }
 
-export const estadoInicialPagamentoCartao: PagamentoCartao = {
-    id: 0,
-    parcela: '',
-    bandeira: '',
-    totalTaxas: 0,
-    idVenda: 0
-}
+export const cardPaymentInitialState: CardPayment = {
+  id: 0,
+  installment: "",
+  flag: "",
+  totalFees: 0,
+  saleId: 0,
+};

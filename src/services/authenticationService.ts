@@ -1,21 +1,22 @@
-import { AuthRegisterModelFuncionario } from "@/models/authRegisterModel"
-import { ApiService } from "./apiService"
-import { Authentication } from "@/models/authentication"
+import { AuthRegisterModelEmployee } from "@/models/authRegisterModel";
+import { ApiService } from "./apiService";
+import { Authentication } from "@/models/authentication";
 
 export const AuthenticationService = () => {
+  const url = "/auth";
 
-    const url = "/auth"
+  const authLogin = (auth: Authentication) => {
+    return ApiService.post(`${url}/login`, auth);
+  };
 
-    const authLogin = (auth: Authentication) => {
-        return ApiService.post(`${url}/login`, auth)
-    }
+  const authRegisterEmployee = (
+    employeeAuth: AuthRegisterModelEmployee
+  ) => {
+    return ApiService.post(`${url}/save`, employeeAuth);
+  };
 
-    const authRegisterFuncionario = (authFuncionario: AuthRegisterModelFuncionario) => {
-        return ApiService.post(`${url}/cadastrar`, authFuncionario)
-    }
-
-    return {
-        authLogin,
-        authRegisterFuncionario
-    }
-}
+  return {
+    authLogin,
+    authRegisterEmployee,
+  };
+};

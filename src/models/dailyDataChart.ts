@@ -1,11 +1,11 @@
 export interface DailyDataChart {
-    dataMillis: number
-    qtdVenda: number | null
-    qtdServico: number | null
+  dataMillis: number;
+  saleQuantity: number | null;
+  serviceQuantity: number | null;
 }
 
-export const estadoInicialDailyDataChart: DailyDataChart = {
-    dataMillis: 0,
-    qtdVenda: null,
-    qtdServico: null
-}
+export const dailyDataChartInitialState: DailyDataChart = {
+  dataMillis: 0,
+  saleQuantity: null,
+  serviceQuantity: null,
+};

@@ -1,15 +1,16 @@
-export const formatarParaReal = (valor: number | string): string => {
-  return valor.toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  })
-}
+export const formatToBRL = (value: number | string): string => {
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+};
 
-export const formatarParaPercentual = (valor: number): string => {
-  valor = !valor ? 0 : valor
+export const formatToPercentage = (value: number): string => {
+  value = !value ? 0 : value;
 
-  return valor.toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).replace('R$', '%')
-}
+  return value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    })
+    .replace("R$", "%");
+};

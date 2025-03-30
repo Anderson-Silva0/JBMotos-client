@@ -1,28 +1,28 @@
-import { ProdutoVenda } from "./ProdutoVenda"
-import { Cliente, estadoInicialCliente } from "./cliente"
-import { estadoInicialFuncionario, Funcionario } from "./funcionario"
-import { PagamentoCartao } from "./pagamentoCartao"
+import { ProductOfSale } from "./ProdutoVenda";
+import { Customer, customerInitialState } from "./cliente";
+import { employeeInitialState, Employee } from "./funcionario";
+import { CardPayment } from "./pagamentoCartao";
 
-export interface Venda {
-  id: number
-  cliente: Cliente
-  funcionario: Funcionario
-  dataHoraCadastro: string
-  observacao: string
-  formaDePagamento: string
-  pagamentoCartao: PagamentoCartao | null,
-  produtosVenda: ProdutoVenda[]
-  valorTotalVenda: number
+export interface Sale {
+  id: number;
+  customer: Customer;
+  employee: Employee;
+  createdAt: string;
+  observation: string;
+  paymentMethod: string;
+  cardPayment: CardPayment | null;
+  productsOfSale: ProductOfSale[];
+  totalSaleValue: number;
 }
 
-export const estadoInicialVenda: Venda = {
+export const SaleInitialState: Sale = {
   id: 0,
-  cliente: estadoInicialCliente,
-  funcionario: estadoInicialFuncionario,
-  dataHoraCadastro: '',
-  observacao: '',
-  formaDePagamento: '',
-  pagamentoCartao: null,
-  produtosVenda: [],
-  valorTotalVenda: 0
-}
+  customer: customerInitialState,
+  employee: employeeInitialState,
+  createdAt: "",
+  observation: "",
+  paymentMethod: "",
+  cardPayment: null,
+  productsOfSale: [],
+  totalSaleValue: 0,
+};

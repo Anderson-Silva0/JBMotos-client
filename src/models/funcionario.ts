@@ -1,19 +1,19 @@
-import { Endereco } from "./endereco"
+import { Address } from "./endereco";
 
-export interface Funcionario {
-  cpf: string
-  nome: string
-  telefone: string
-  statusFuncionario: string
-  endereco: Endereco | null
-  dataHoraCadastro: string
+export interface Employee {
+  cpf: string;
+  name: string;
+  phone: string;
+  employeeStatus: string;
+  address: Address | null;
+  createdAt: string;
 }
 
-export const estadoInicialFuncionario: Funcionario = {
-  cpf: '',
-  nome: '',
-  telefone: '',
-  statusFuncionario: '',
-  endereco: null,
-  dataHoraCadastro: ''
+export const employeeInitialState: Employee = {
+  cpf: "",
+  name: "",
+  phone: "",
+  employeeStatus: "",
+  address: null,
+  createdAt: "",
 };

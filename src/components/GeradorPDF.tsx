@@ -1,175 +1,200 @@
-import { RegistroProdutoSelecionadoProps } from '@/app/(pages)/venda/cadastro/page'
-import { Produto } from '@/models/produto'
-import '@/styles/home.css'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
-import { ConfirmarDecisao } from './ConfirmarDecisao'
+import { SelectedProductRegisterProps as SelectedProductRegisterProps } from "@/app/(pages)/venda/cadastro/page";
+import { Product } from "@/models/produto";
+import "@/styles/home.css";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { confirmDecision } from "./ConfirmarDecisao";
 
-interface GeradorPDFProps {
-    tipoRecibo: TipoRecibo
-    nomeCliente: string
-    cpfCliente: string | number
-    nomeFuncionario: string | number
-    formaPagamento: string | number
-    observacao: string
-    valorTotalVenda: string
-    produtosVenda: RegistroProdutoSelecionadoProps[]
-    dataHoraVenda?: string
+interface PDFGeneratorProps {
+  receiptType: ReceiptType;
+  customerName: string;
+  customerCpf: string | number;
+  employeeName: string | number;
+  paymentMethod: string | number;
+  observation: string;
+  totalSaleValue: string;
+  productOfSaleRegister: SelectedProductRegisterProps[];
+  saleDateTime?: string;
 }
 
-enum TipoUso {
-    Titulo,
-    Texto
+enum UsageType {
+  Title,
+  Text,
 }
 
-export enum TipoRecibo {
-    Orcamento,
-    comprovante
+export enum ReceiptType {
+  Budget,
+  Receipt,
 }
 
-export const removerProdutoOrcamento = (registrosProdutosVenda: RegistroProdutoSelecionadoProps[], produtoExcluido: Produto) => {
-    const idProdutoExcluido = produtoExcluido.id
-    const indiceProduto = registrosProdutosVenda.findIndex(produto => produto.idProduto === idProdutoExcluido)
-    registrosProdutosVenda.splice(indiceProduto, 1)
-}
+export const removeProductFromBudget = (
+  saleProductsRegisters: SelectedProductRegisterProps[],
+  deletedProduct: Product
+) => {
+  const deletedProductId = deletedProduct.id;
+  const productIndex = saleProductsRegisters.findIndex(
+    (product) => product.productId === deletedProductId
+  );
+  saleProductsRegisters.splice(productIndex, 1);
+};
 
-export function GeradorPDF(props: GeradorPDFProps) {
+export function PDFGenerator(props: PDFGeneratorProps) {
+  const generatePDF = () => {
+    const doc = new jsPDF();
 
-    const gerarPDF = () => {
-        const doc = new jsPDF()
+    const getCurrentDateTime = (usageType: UsageType) => {
+      const today = new Date();
 
-        const obterDataHoraAgora = (tipoUso: TipoUso) => {
-            const hoje = new Date()
+      const day = String(today.getDate()).padStart(2, "0");
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const year = today.getFullYear();
 
-            const dia = String(hoje.getDate()).padStart(2, '0')
-            const mes = String(hoje.getMonth() + 1).padStart(2, '0')
-            const ano = hoje.getFullYear()
+      const hours = String(today.getHours()).padStart(2, "0");
+      const minutes = String(today.getMinutes()).padStart(2, "0");
+      const seconds = String(today.getSeconds()).padStart(2, "0");
 
-            const horas = String(hoje.getHours()).padStart(2, '0')
-            const minutos = String(hoje.getMinutes()).padStart(2, '0')
-            const segundos = String(hoje.getSeconds()).padStart(2, '0')
+      if (usageType === UsageType.Title) {
+        return `${day}-${month}-${year}_${hours}-${minutes}-${seconds}`;
+      } else if (usageType === UsageType.Text) {
+        return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+      }
+    };
 
-            if (tipoUso === TipoUso.Titulo) {
-                return `${dia}-${mes}-${ano}_${horas}-${minutos}-${segundos}`
-            } else if (tipoUso === TipoUso.Texto) {
-                return `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`
-            }
-        }
+    props.receiptType === ReceiptType.Budget
+      ? autoTable(doc, {
+          startY: 10,
+          tableWidth: 110,
 
-        props.tipoRecibo === TipoRecibo.Orcamento ? (
-            autoTable(doc, {
-                startY: 10,
-                tableWidth: 110,
-
-                head: [['Orçamento da JB Motos']],
-                theme: 'striped',
-                styles: { halign: 'center' },
-                margin: { horizontal: 50 },
-                headStyles: {
-                    halign: 'center',
-                    fontSize: 20,
-                }
-            })
-        ) : props.tipoRecibo === TipoRecibo.comprovante && (
-            autoTable(doc, {
-                startY: 10,
-                tableWidth: 110,
-
-                head: [['Comprovante de Venda da JB Motos']],
-                theme: 'striped',
-                styles: { halign: 'center' },
-                margin: { horizontal: 50 },
-                headStyles: {
-                    halign: 'center',
-                    fontSize: 17,
-                }
-            })
-        )
-
-        const alturaTabelaInfo = 38
-
-        autoTable(doc, {
-            startY: alturaTabelaInfo,
-            head: [['Cliente', 'CPF do Cliente', 'Funcionário', 'Forma de Pagamento', 'Observação']],
-            body: [[props.nomeCliente, props.cpfCliente, props.nomeFuncionario, props.formaPagamento, props.observacao]],
-            theme: 'striped',
-            styles: { halign: 'center' },
-            columnStyles: {
-                4: { cellWidth: 35 }
-            }
+          head: [["Orçamento da JB Motos"]],
+          theme: "striped",
+          styles: { halign: "center" },
+          margin: { horizontal: 50 },
+          headStyles: {
+            halign: "center",
+            fontSize: 20,
+          },
         })
-
-        const produtos = props.produtosVenda.map(produto => [
-            produto.nomeProduto, produto.quantidade,
-            produto.valorUnidade,
-            produto.valorTotal
-        ])
-
-        const alturaTabelaOrcamento = props.observacao.length * 0.14 + 75
-
+      : props.receiptType === ReceiptType.Receipt &&
         autoTable(doc, {
-            startY: alturaTabelaOrcamento,
-            head: [['Produto', 'Quantidade', 'Valor Unidade', 'Valor Total']],
-            body: produtos,
-            theme: 'grid',
-            styles: { halign: 'center' }
-        })
+          startY: 10,
+          tableWidth: 110,
 
-        const alturaTabelaValorTotal = alturaTabelaOrcamento + produtos.length * 7 + 30
+          head: [["Comprovante de Venda da JB Motos"]],
+          theme: "striped",
+          styles: { halign: "center" },
+          margin: { horizontal: 50 },
+          headStyles: {
+            halign: "center",
+            fontSize: 17,
+          },
+        });
 
+    const tableInfoHeight = 38;
+
+    autoTable(doc, {
+      startY: tableInfoHeight,
+      head: [
+        [
+          "Cliente",
+          "CPF do Cliente",
+          "Funcionário",
+          "Forma de Pagamento",
+          "Observação",
+        ],
+      ],
+      body: [
+        [
+          props.customerName,
+          props.customerCpf,
+          props.employeeName,
+          props.paymentMethod,
+          props.observation,
+        ],
+      ],
+      theme: "striped",
+      styles: { halign: "center" },
+      columnStyles: {
+        4: { cellWidth: 35 },
+      },
+    });
+
+    const products = props.productOfSaleRegister.map((product) => [
+      product.productName,
+      product.quantity,
+      product.unitValue,
+      product.totalValue,
+    ]);
+
+    const budgetTableHeight = props.observation.length * 0.14 + 75;
+
+    autoTable(doc, {
+      startY: budgetTableHeight,
+      head: [["Produto", "Quantidade", "Valor Unidade", "Valor Total"]],
+      body: products,
+      theme: "grid",
+      styles: { halign: "center" },
+    });
+
+    const totalValueTableHeight =
+      budgetTableHeight + products.length * 7 + 30;
+
+    autoTable(doc, {
+      startY: totalValueTableHeight,
+      tableWidth: 60,
+      head: [["Valor Total"]],
+      body: [[props.totalSaleValue]],
+      theme: "striped",
+      styles: { halign: "center" },
+      margin: { horizontal: 75 },
+    });
+
+    props.receiptType === ReceiptType.Budget
+      ? doc.text(String(getCurrentDateTime(UsageType.Text)), 79, 292)
+      : props.receiptType === ReceiptType.Receipt &&
+        props.saleDateTime &&
         autoTable(doc, {
-            startY: alturaTabelaValorTotal,
-            tableWidth: 60,
-            head: [['Valor Total']],
-            body: [[props.valorTotalVenda]],
-            theme: 'striped',
-            styles: { halign: 'center' },
-            margin: { horizontal: 75 }
-        })
+          startY: 264,
+          tableWidth: 60,
 
-        props.tipoRecibo === TipoRecibo.Orcamento ? (
-            doc.text(String(obterDataHoraAgora(TipoUso.Texto)), 79, 292)
-        ) : props.tipoRecibo === TipoRecibo.comprovante && (
-            props.dataHoraVenda && (
-                autoTable(doc, {
-                    startY: 264,
-                    tableWidth: 60,
+          head: [["Data e Hora da Venda"]],
+          body: [[props.saleDateTime]],
+          theme: "grid",
+          styles: { halign: "center", fontSize: 12, fontStyle: "bold" },
+          margin: { horizontal: 75 },
+          headStyles: {
+            halign: "center",
+            fontSize: 14,
+          },
+        });
 
-                    head: [['Data e Hora da Venda']],
-                    body: [[props.dataHoraVenda]],
-                    theme: 'grid',
-                    styles: { halign: 'center', fontSize: 12, fontStyle: 'bold' },
-                    margin: { horizontal: 75 },
-                    headStyles: {
-                        halign: 'center',
-                        fontSize: 14,
-                    }
-                })
-            )
+    props.receiptType === ReceiptType.Budget
+      ? doc.save(`orcamento_JBMotos_${getCurrentDateTime(UsageType.Title)}.pdf`)
+      : props.receiptType === ReceiptType.Receipt &&
+        doc.save(
+          `comprovante_venda_JBMotos_${getCurrentDateTime(UsageType.Title)}.pdf`
+        );
+  };
+
+  const handlerDecisao = () => {
+    props.receiptType === ReceiptType.Budget
+      ? confirmDecision(
+          "Orçamento em PDF",
+          "Tem certeza que deseja criar o orçamento em formato PDF?",
+          generatePDF
         )
+      : props.receiptType === ReceiptType.Receipt &&
+        confirmDecision(
+          "Comprovante de Venda em PDF",
+          "Tem certeza que deseja criar o comprovante de venda em formato PDF?",
+          generatePDF
+        );
+  };
 
-        props.tipoRecibo === TipoRecibo.Orcamento ? (
-            doc.save(`orcamento_JBMotos_${obterDataHoraAgora(TipoUso.Titulo)}.pdf`)
-        ) : props.tipoRecibo === TipoRecibo.comprovante && (
-            doc.save(`comprovante_venda_JBMotos_${obterDataHoraAgora(TipoUso.Titulo)}.pdf`)
-        )
-    }
-
-    const handlerDecisao = () => {
-        props.tipoRecibo === TipoRecibo.Orcamento ? (
-            ConfirmarDecisao("Orçamento em PDF", "Tem certeza que deseja criar o orçamento em formato PDF?", gerarPDF)
-        ) : props.tipoRecibo === TipoRecibo.comprovante && (
-            ConfirmarDecisao("Comprovante de Venda em PDF", "Tem certeza que deseja criar o comprovante de venda em formato PDF?", gerarPDF)
-        )
-    }
-
-    return (
-        <button className='botao-gerar-pdf' onClick={handlerDecisao}>
-            {props.tipoRecibo === TipoRecibo.Orcamento ? (
-                "PDF Orçamento"
-            ) : props.tipoRecibo === TipoRecibo.comprovante && (
-                "PDF Comprovante"
-            )}
-        </button >
-    )
+  return (
+    <button className="botao-gerar-pdf" onClick={handlerDecisao}>
+      {props.receiptType === ReceiptType.Budget
+        ? "PDF Orçamento"
+        : props.receiptType === ReceiptType.Receipt && "PDF Comprovante"}
+    </button>
+  );
 }

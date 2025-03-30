@@ -1,45 +1,44 @@
-import { Cliente } from "@/models/cliente"
-import { ApiService } from "./apiService"
+import { Customer } from "@/models/cliente";
+import { ApiService } from "./apiService";
 
-export const ClienteService = () => {
+export const CustomerService = () => {
+  const url = "/cliente";
 
-    const url = "/cliente"
+  const saveCustomer = (cliente: Customer) => {
+    return ApiService.post(`${url}`, cliente);
+  };
 
-    const salvarCliente = (cliente: Cliente) => {
-        return ApiService.post(`${url}`, cliente)
-    }
+  const findAllCustomer = () => {
+    return ApiService.get(`${url}/find-all`);
+  };
 
-    const buscarTodosClientes = () => {
-        return ApiService.get(`${url}/buscar-todos`)
-    }
+  const findCustomerByCpf = (cpf: string) => {
+    return ApiService.get(`${url}/find/${cpf}`);
+  };
 
-    const buscarClientePorCpf = (cpf: string) => {
-        return ApiService.get(`${url}/buscar/${cpf}`)
-    }
+  const filterCustomer = (fieldName: string, value: string) => {
+    return ApiService.get(`${url}/filtrar?${fieldName}=${value}`);
+  };
 
-    const filtrarCliente = (nomeCampo: string, valor: string) => {
-        return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
-    }
+  const toggleCustomerStatus = (cpf: string) => {
+    return ApiService.patch(`${url}/toggle-status/${cpf}`);
+  };
 
-    const alternarStatusCliente = (cpf: string) => {
-        return ApiService.patch(`${url}/alternar-status/${cpf}`)
-    }
+  const updateCustomer = (cpf: string, cliente: Customer) => {
+    return ApiService.put(`${url}/update/${cpf}`, cliente);
+  };
 
-    const atualizarCliente = (cpf: string, cliente: Cliente) => {
-        return ApiService.put(`${url}/atualizar/${cpf}`, cliente)
-    }
+  const deleteCustomer = (cpf: string) => {
+    return ApiService.delete(`${url}/delete/${cpf}`);
+  };
 
-    const deletarCliente = (cpf: string) => {
-        return ApiService.delete(`${url}/deletar/${cpf}`)
-    }
-
-    return {
-        salvarCliente,
-        buscarTodosClientes,
-        buscarClientePorCpf,
-        filtrarCliente,
-        alternarStatusCliente,
-        atualizarCliente,
-        deletarCliente
-    }
-}
+  return {
+    saveCustomer,
+    findAllCustomer,
+    findCustomerByCpf,
+    filterCustomer,
+    toggleCustomerStatus,
+    updateCustomer,
+    deleteCustomer,
+  };
+};

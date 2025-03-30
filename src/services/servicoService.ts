@@ -1,50 +1,49 @@
-import { Servico } from "@/models/servico"
-import { ApiService } from "./apiService"
+import { Repair } from "@/models/servico";
+import { ApiService } from "./apiService";
 
-export const ServicoService = () => {
+export const RepairService = () => {
+  const url = "/repair";
 
-    const url = "/servico"
+  const saveRepair = (servico: Repair) => {
+    return ApiService.post(`${url}`, servico);
+  };
 
-    const salvarServico = (servico: Servico) => {
-        return ApiService.post(`${url}`, servico)
-    }
+  const findAllRepair = () => {
+    return ApiService.get(`${url}/find-all`);
+  };
 
-    const buscarTodosServicos = () => {
-        return ApiService.get(`${url}/buscar-todos`)
-    }
+  const findRepairById = (id: number) => {
+    return ApiService.get(`${url}/find/${id}`);
+  };
 
-    const buscarServicoPorId = (id: number) => {
-        return ApiService.get(`${url}/buscar/${id}`)
-    }
+  const findRepairBySaleId = (saleId: number) => {
+    return ApiService.get(`${url}/find-by-sale-id/${saleId}`);
+  };
 
-    const buscarServicoPorIdVenda = (idVenda: number) => {
-        return ApiService.get(`${url}/buscar-por-venda/${idVenda}`)
-    }
+  const findRepairByCpfEmployee = (employeeCpf: string) => {
+    return ApiService.get(`${url}/find-by-employeeCpf/${employeeCpf}`);
+  };
 
-    const buscarServicoPorCpfFuncionario = (cpfFuncionario: string) => {
-        return ApiService.get(`${url}/buscar-por-cpfFuncionario/${cpfFuncionario}`)
-    }
+  const updateRepair = (id: number, repair: Repair) => {
+    return ApiService.put(`${url}/update/${id}`, repair);
+  };
 
-    const atualizarServico = (id: number, servico: Servico) => {
-        return ApiService.put(`${url}/atualizar/${id}`, servico)
-    }
+  const filterRepair = (fieldName: string, value: string) => {
+    return ApiService.get(`${url}/filter?${fieldName}=${value}`);
+  };
 
-    const filtrarServico = (nomeCampo: string, valor: string) => {
-        return ApiService.get(`${url}/filtrar?${nomeCampo}=${valor}`)
-    }
+  const deleteRepair = (id: number) => {
+    return ApiService.delete(`${url}/delete/${id}`);
+  };
 
-    const deletarServico = (id: number) => {
-        return ApiService.delete(`${url}/deletar/${id}`)
-    }
-
-    return {
-        salvarServico,
-        buscarTodosServicos,
-        buscarServicoPorId,
-        filtrarServico,
-        buscarServicoPorIdVenda,
-        buscarServicoPorCpfFuncionario,
-        atualizarServico,
-        deletarServico
-    }
-}
+  return {
+    saveRepair,
+    findAllRepair,
+    findRepairById,
+    filterRepair,
+    findRepairBySaleId,
+    findRepairByCpfEmployee,
+    updateRepair,
+    deleteRepair,
+  };
+};

@@ -1,151 +1,162 @@
-'use client'
+"use client";
 
-import { Card } from "@/components/Card"
-import { ExibeErro } from "@/components/ExibeErro"
-import { FormGroup } from "@/components/Form-group"
-import { InputCep, InputCpf, InputTelefone } from "@/components/Input"
-import { AuthRegisterModelFuncionario, estadoInicialAuthRegisterModelFuncionario, ROLE, roleSelectOptions } from "@/models/authRegisterModel"
-import { Endereco, estadoInicialEndereco } from "@/models/endereco"
-import { Erros, salvarErros } from "@/models/erros"
-import { estadoInicialFuncionario, Funcionario } from "@/models/funcionario"
-import { estadoInicialOpcoesSelecoes, OpcoesSelecoes } from "@/models/Selecoes"
-import { selectStyles } from "@/models/selectStyles"
-import { mensagemErro, mensagemSucesso } from "@/models/toast"
-import { AuthenticationService } from "@/services/authenticationService"
-import { EnderecoService } from "@/services/enderecoService"
-import { Save } from 'lucide-react'
-import { ChangeEvent, useEffect, useState, } from "react"
-import Select from 'react-select'
+import { Card } from "@/components/Card";
+import { DisplayError } from "@/components/ExibeErro";
+import { FormGroup } from "@/components/Form-group";
+import { CepInput, CpfInput, PhoneInput } from "@/components/Input";
+import {
+  AuthRegisterModelEmployee,
+  authRegisterModelEmployeeInitialState,
+  ROLE,
+  roleSelectOptions,
+} from "@/models/authRegisterModel";
+import { Address, addressInitialState } from "@/models/endereco";
+import { Errors, saveErrors } from "@/models/erros";
+import { employeeInitialState, Employee } from "@/models/funcionario";
+import {
+  selectionOptionsInitialState,
+  selectionOptions,
+} from "@/models/Selecoes";
+import { selectStyles } from "@/models/selectStyles";
+import { errorMessage, successMessage } from "@/models/toast";
+import { AuthenticationService } from "@/services/authenticationService";
+import { AddressService } from "@/services/enderecoService";
+import { Save } from "lucide-react";
+import { ChangeEvent, useEffect, useState } from "react";
+import Select from "react-select";
 
 export default function CadastroFuncionario() {
+  const { authRegisterEmployee: authRegisterFuncionario } = AuthenticationService();
+  const { getAddressByCep: obterEnderecoPorCep } = AddressService();
 
-  const {
-    authRegisterFuncionario
-  } = AuthenticationService()
-  const {
-    obterEnderecoPorCep
-  } = EnderecoService()
+  const [erros, setErros] = useState<Errors[]>([]);
+  const [authFuncionario, setAuthFuncionario] =
+    useState<AuthRegisterModelEmployee>(authRegisterModelEmployeeInitialState);
+  const [funcionario, setFuncionario] =
+    useState<Employee>(employeeInitialState);
+  const [endereco, setEndereco] = useState<Address>(addressInitialState);
+  const [confirmarSenha, setConfirmarSenha] = useState<string>("");
 
-  const [erros, setErros] = useState<Erros[]>([])
-  const [authFuncionario, setAuthFuncionario] = useState<AuthRegisterModelFuncionario>(estadoInicialAuthRegisterModelFuncionario)
-  const [funcionario, setFuncionario] = useState<Funcionario>(estadoInicialFuncionario)
-  const [endereco, setEndereco] = useState<Endereco>(estadoInicialEndereco)
-  const [confirmarSenha, setConfirmarSenha] = useState<string>('')
+  const [opcaoSelecionadaRole, setOpcaoSelecionadaRole] =
+    useState<selectionOptions>(selectionOptionsInitialState);
 
-  const [opcaoSelecionadaRole,
-    setOpcaoSelecionadaRole
-  ] = useState<OpcoesSelecoes>(estadoInicialOpcoesSelecoes)
+  const setPropsAuthFuncionario = (
+    key: string,
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
+    setAuthFuncionario({ ...authFuncionario, [key]: e.target.value });
+    setErros([]);
+  };
 
-  const setPropsAuthFuncionario = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setAuthFuncionario({ ...authFuncionario, [key]: e.target.value })
-    setErros([])
-  }
-
-  const setPropsFuncionario = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setFuncionario({ ...funcionario, [key]: e.target.value })
-    setErros([])
-  }
+  const setPropsFuncionario = (
+    key: string,
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
+    setFuncionario({ ...funcionario, [key]: e.target.value });
+    setErros([]);
+  };
 
   const setPropsEndereco = (key: string, e: ChangeEvent<HTMLInputElement>) => {
-    setEndereco({ ...endereco, [key]: e.target.value })
+    setEndereco({ ...endereco, [key]: e.target.value });
     if (endereco.cep.length < 9 || key) {
-      setErros([])
+      setErros([]);
     }
-  }
+  };
 
   useEffect(() => {
-    obterEnderecoPorCep(endereco, setEndereco, erros, setErros)
-  }, [endereco.cep])
+    obterEnderecoPorCep(endereco, setEndereco, erros, setErros);
+  }, [endereco.cep]);
 
   useEffect(() => {
-    setAuthFuncionario(
-      {
-        ...authFuncionario,
-        role: String(opcaoSelecionadaRole?.value)
-      }
-    )
-    setErros([])
-  }, [opcaoSelecionadaRole])
+    setAuthFuncionario({
+      ...authFuncionario,
+      role: String(opcaoSelecionadaRole?.value),
+    });
+    setErros([]);
+  }, [opcaoSelecionadaRole]);
 
   const submit = async () => {
     try {
-      if (confirmarSenha === authFuncionario.senha) {
-        await authRegisterFuncionario({ ...authFuncionario, funcionario: { ...funcionario, endereco } })
+      if (confirmarSenha === authFuncionario.password) {
+        await authRegisterFuncionario({
+          ...authFuncionario,
+          employee: { ...funcionario, address: endereco },
+        });
       } else {
-        throw new Error()
+        throw new Error();
       }
-      mensagemSucesso("Funcionário cadastrado com sucesso!")
-      setAuthFuncionario(estadoInicialAuthRegisterModelFuncionario)
-      setFuncionario(estadoInicialFuncionario)
-      setEndereco(estadoInicialEndereco)
-      setConfirmarSenha('')
-      setOpcaoSelecionadaRole(estadoInicialOpcoesSelecoes)
-      setErros([])
+      successMessage("Funcionário cadastrado com sucesso!");
+      setAuthFuncionario(authRegisterModelEmployeeInitialState);
+      setFuncionario(employeeInitialState);
+      setEndereco(addressInitialState);
+      setConfirmarSenha("");
+      setOpcaoSelecionadaRole(selectionOptionsInitialState);
+      setErros([]);
     } catch (erro: any) {
-      mensagemErro('Erro no preenchimento dos campos.')
-      if (confirmarSenha != authFuncionario.senha) {
-        mensagemErro("As senhas não estão iguais.")
+      errorMessage("Erro no preenchimento dos campos.");
+      if (confirmarSenha != authFuncionario.password) {
+        errorMessage("As senhas não estão iguais.");
       }
-      salvarErros(erro, erros, setErros)
+      saveErrors(erro, erros, setErros);
     }
-  }
+  };
 
   return (
-    <div className='div-form-container'>
+    <div className="div-form-container">
       <h1 className="centered-text">
-        <Save size='6vh' strokeWidth={3} /> Cadastro de Funcionário
+        <Save size="6vh" strokeWidth={3} /> Cadastro de Funcionário
       </h1>
-      <Card titulo="Dados do Funcionário">
+      <Card title="Dados do Funcionário">
         <FormGroup label="Nome: *" htmlFor="nome">
           <input
-            value={funcionario.nome}
-            onChange={e => setPropsFuncionario("nome", e)}
+            value={funcionario.name}
+            onChange={(e) => setPropsFuncionario("nome", e)}
             id="nome"
             type="text"
           />
-          {<ExibeErro erros={erros} nomeInput='nome' />}
+          {<DisplayError errors={erros} inputName="nome" />}
         </FormGroup>
         <FormGroup label="CPF: *" htmlFor="cpf">
-          <InputCpf
+          <CpfInput
             value={funcionario.cpf}
-            onChange={e => setPropsFuncionario("cpf", e)}
+            onChange={(e) => setPropsFuncionario("cpf", e)}
           />
-          {<ExibeErro erros={erros} nomeInput='cpf' />}
+          {<DisplayError errors={erros} inputName="cpf" />}
         </FormGroup>
         <FormGroup label="Celular: *" htmlFor="telefone">
-          <InputTelefone
-            value={funcionario.telefone}
-            onChange={e => setPropsFuncionario("telefone", e)}
+          <PhoneInput
+            value={funcionario.phone}
+            onChange={(e) => setPropsFuncionario("telefone", e)}
           />
-          {<ExibeErro erros={erros} nomeInput='telefone' />}
+          {<DisplayError errors={erros} inputName="telefone" />}
         </FormGroup>
         <FormGroup label="Login: *" htmlFor="login">
           <input
             value={authFuncionario.login}
             id="email"
-            onChange={e => setPropsAuthFuncionario("login", e)}
+            onChange={(e) => setPropsAuthFuncionario("login", e)}
             type="text"
           />
-          {<ExibeErro erros={erros} nomeInput='login' />}
-          {<ExibeErro erros={erros} nomeInput='loginError' />}
+          {<DisplayError errors={erros} inputName="login" />}
+          {<DisplayError errors={erros} inputName="loginError" />}
         </FormGroup>
         <FormGroup label="Senha: *" htmlFor="senha">
           <input
-            value={authFuncionario.senha}
-            onChange={e => setPropsAuthFuncionario("senha", e)}
+            value={authFuncionario.password}
+            onChange={(e) => setPropsAuthFuncionario("senha", e)}
             id="senha"
             type="password"
           />
-          {<ExibeErro erros={erros} nomeInput='senha' />}
+          {<DisplayError errors={erros} inputName="senha" />}
         </FormGroup>
         <FormGroup label="Confirmar senha: *" htmlFor="confirmar-senha">
           <input
             value={confirmarSenha}
-            onChange={e => setConfirmarSenha(e.target.value)}
+            onChange={(e) => setConfirmarSenha(e.target.value)}
             id="confirmar-senha"
             type="password"
           />
-          {<ExibeErro erros={erros} nomeInput='confirmarSenha' />}
+          {<DisplayError errors={erros} inputName="confirmarSenha" />}
         </FormGroup>
         <FormGroup label="Permissão no Sistema: *" htmlFor="formaDePagamento">
           <Select
@@ -156,67 +167,65 @@ export default function CadastroFuncionario() {
             options={roleSelectOptions}
             instanceId="select-divisoes"
           />
-          {<ExibeErro erros={erros} nomeInput='role' />}
+          {<DisplayError errors={erros} inputName="role" />}
         </FormGroup>
       </Card>
-      <Card titulo="Endereço do Funcionário">
+      <Card title="Endereço do Funcionário">
         <FormGroup label="CEP: *" htmlFor="cep">
           <span className="cep-message">
             Digite o CEP para preenchimento automático do endereço.
           </span>
-          <InputCep
-            id='cep'
+          <cepInput
+            id="cep"
             value={endereco.cep}
-            onChange={e => setPropsEndereco("cep", e)}
+            onChange={(e) => setPropsEndereco("cep", e)}
           />
-          {<ExibeErro erros={erros} nomeInput='cep' />}
+          {<DisplayError errors={erros} inputName="cep" />}
         </FormGroup>
         <FormGroup label="Logradouro: *" htmlFor="rua">
           <input
-            value={endereco.rua}
-            onChange={e => setPropsEndereco("rua", e)}
+            value={endereco.road}
+            onChange={(e) => setPropsEndereco("rua", e)}
             id="rua"
             type="text"
           />
-          {<ExibeErro erros={erros} nomeInput='rua' />}
+          {<DisplayError errors={erros} inputName="rua" />}
         </FormGroup>
         <FormGroup label="Número: *" htmlFor="numero">
           <input
-            className='input-number-form'
-            value={endereco.numero}
-            onChange={e => setPropsEndereco("numero", e)}
+            className="input-number-form"
+            value={endereco.number}
+            onChange={(e) => setPropsEndereco("numero", e)}
             id="numero"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<ExibeErro erros={erros} nomeInput='numero' />}
+          {<DisplayError errors={erros} inputName="numero" />}
         </FormGroup>
         <FormGroup label="Bairro: *" htmlFor="bairro">
           <input
-            value={endereco.bairro}
-            onChange={e => setPropsEndereco("bairro", e)}
+            value={endereco.neighborhood}
+            onChange={(e) => setPropsEndereco("bairro", e)}
             id="bairro"
             type="text"
           />
-          {<ExibeErro erros={erros} nomeInput='bairro' />}
+          {<DisplayError errors={erros} inputName="bairro" />}
         </FormGroup>
         <FormGroup label="Cidade: *" htmlFor="cidade">
           <input
-            value={endereco.cidade}
-            onChange={e => setPropsEndereco("cidade", e)}
+            value={endereco.city}
+            onChange={(e) => setPropsEndereco("cidade", e)}
             id="cidade"
             type="text"
           />
-          {<ExibeErro erros={erros} nomeInput='cidade' />}
+          {<DisplayError errors={erros} inputName="cidade" />}
         </FormGroup>
       </Card>
       <div className="divBotaoCadastrar">
-        <button
-          onClick={submit}
-          type="submit">
+        <button onClick={submit} type="submit">
           Cadastrar Funcionário
         </button>
       </div>
     </div>
-  )
+  );
 }

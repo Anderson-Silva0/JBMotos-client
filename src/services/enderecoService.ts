@@ -1,118 +1,134 @@
-import { Endereco } from "@/models/endereco"
-import { Erros } from "@/models/erros"
-import { mensagemErro } from "@/models/toast"
-import axios from "axios"
-import { Dispatch, SetStateAction } from "react"
-import { ApiService } from "./apiService"
+import { Address } from "@/models/endereco";
+import { Errors } from "@/models/erros";
+import { errorMessage } from "@/models/toast";
+import axios from "axios";
+import { Dispatch, SetStateAction } from "react";
+import { ApiService } from "./apiService";
 
-export const EnderecoService = () => {
+export const AddressService = () => {
+  const url = "/address";
 
-    const url = "/endereco"
+  const saveAddress = (data: Address) => {
+    return ApiService.post(`${url}`, data);
+  };
 
-    const salvarEndereco = (dados: object) => {
-        return ApiService.post(`${url}`, dados)
+  const findAllAddress = () => {
+    return ApiService.get(`${url}/find-all`);
+  };
+
+  const findAddressById = (id: number) => {
+    return ApiService.get(`${url}/find/${id}`);
+  };
+
+  const updateAddress = (id: number, dados: Address) => {
+    return ApiService.put(`${url}/update/${id}`, dados);
+  };
+
+  const deleteAddress = (id: number) => {
+    return ApiService.delete(`${url}/delete/${id}`);
+  };
+
+  const findAddressByCep = (cep: string) => {
+    return axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+  };
+
+  const getAddressByCep = async (
+    address: Address,
+    setAddress: Dispatch<SetStateAction<Address>>,
+    errors: Errors[],
+    setErrors: Dispatch<SetStateAction<Errors[]>>
+  ) => {
+    if (
+      (address.cep.length < 9 && address.road) ||
+      address.city ||
+      address.neighborhood
+    ) {
+      setAddress({ ...address, road: "", neighborhood: "", city: "" });
     }
-
-    const buscarTodosEnderecos = () => {
-        return ApiService.get(`${url}/buscar-todos`)
-    }
-
-    const buscarEnderecoPorId = (id: number) => {
-        return ApiService.get(`${url}/buscar/${id}`)
-    }
-
-    const atualizarEndereco = (id: number, dados: object) => {
-        return ApiService.put(`${url}/atualizar/${id}`, dados)
-    }
-
-    const deletarEndereco = (id: number) => {
-        return ApiService.delete(`${url}/deletar/${id}`)
-    }
-
-    const buscarEnderecoPorCep = (cep: string) => {
-        return axios.get(`https://viacep.com.br/ws/${cep}/json/`)
-    }
-
-    const obterEnderecoPorCep = async (
-        endereco: Endereco,
-        setEndereco: Dispatch<SetStateAction<Endereco>>,
-        erros: Erros[],
-        setErros: Dispatch<SetStateAction<Erros[]>>
-    ) => {
-        if (endereco.cep.length < 9 && endereco.rua || endereco.cidade || endereco.bairro) {
-            setEndereco({ ...endereco, rua: '', bairro: '', cidade: '' })
+    const findAddress = async () => {
+      try {
+        const addressResponse = await findAddressByCep(address.cep);
+        if (addressResponse.data.erro) {
+          setErrors([
+            ...errors,
+            {
+              inputName: "cep",
+              errorMessage: "CEP inexistente. Verifique e corrija.",
+            },
+          ]);
+        } else if (addressResponse.data.uf === "PE") {
+          setAddress({
+            ...address,
+            road: addressResponse.data.logradouro,
+            neighborhood: addressResponse.data.bairro,
+            city: addressResponse.data.localidade,
+          });
+        } else {
+          setErrors([
+            ...errors,
+            {
+              inputName: "cep",
+              errorMessage: "Verifique o CEP, não é de Pernambuco.",
+            },
+          ]);
         }
-        const buscarEndereco = async () => {
-            try {
-                const enderecoResponse = await buscarEnderecoPorCep(endereco.cep)
-                if (enderecoResponse.data.erro) {
-                    setErros([...erros, {
-                        nomeInput: 'cep',
-                        mensagemErro: 'CEP inexistente. Verifique e corrija.',
-                    }])
-                } else if (enderecoResponse.data.uf === 'PE') {
-                    setEndereco({
-                        ...endereco,
-                        rua: enderecoResponse.data.logradouro,
-                        bairro: enderecoResponse.data.bairro,
-                        cidade: enderecoResponse.data.localidade
-                    })
-                } else {
-                    setErros([...erros, {
-                        nomeInput: 'cep',
-                        mensagemErro: 'Verifique o CEP, não é de Pernambuco.',
-                    }])
-                }
-            } catch (error: any) {
-                mensagemErro('Erro ao tentar buscar Endereço por CEP.')
-            }
-        }
-        if (endereco.cep.length === 9) {
-            buscarEndereco()
-        }
+      } catch (error: any) {
+        errorMessage("Erro ao tentar buscar Endereço por CEP.");
+      }
+    };
+    if (address.cep.length === 9) {
+      findAddress();
     }
+  };
 
-    const obterEnderecoPorCepTodoBrasil = async (
-        endereco: Endereco,
-        setEndereco: Dispatch<SetStateAction<Endereco>>,
-        erros: Erros[],
-        setErros: Dispatch<SetStateAction<Erros[]>>
-    ) => {
-        if (endereco.cep.length < 9 && endereco.rua || endereco.cidade || endereco.bairro) {
-            setEndereco({ ...endereco, rua: '', bairro: '', cidade: '' })
-        }
-        const buscarEndereco = async () => {
-            try {
-                const enderecoResponse = await buscarEnderecoPorCep(endereco.cep)
-                if (enderecoResponse.data.erro) {
-                    setErros([...erros, {
-                        nomeInput: 'cep',
-                        mensagemErro: 'CEP inexistente. Verifique e corrija.',
-                    }])
-                }
-                setEndereco({
-                    ...endereco,
-                    rua: enderecoResponse.data.logradouro,
-                    bairro: enderecoResponse.data.bairro,
-                    cidade: enderecoResponse.data.localidade
-                })
-            } catch (error: any) {
-                mensagemErro('Erro ao tentar buscar Endereço por CEP.')
-            }
-        }
-        if (endereco.cep.length === 9) {
-            buscarEndereco()
-        }
+  const getAddressByCepInBrazil = async (
+    address: Address,
+    setAddress: Dispatch<SetStateAction<Address>>,
+    errors: Errors[],
+    setErrors: Dispatch<SetStateAction<Errors[]>>
+  ) => {
+    if (
+      (address.cep.length < 9 && address.road) ||
+      address.city ||
+      address.neighborhood
+    ) {
+      setAddress({ ...address, road: "", neighborhood: "", city: "" });
     }
+    const findAddress = async () => {
+      try {
+        const addressResponse = await findAddressByCep(address.cep);
+        if (addressResponse.data.erro) {
+          setErrors([
+            ...errors,
+            {
+              inputName: "cep",
+              errorMessage: "CEP inexistente. Verifique e corrija.",
+            },
+          ]);
+        }
+        setAddress({
+          ...address,
+          road: addressResponse.data.logradouro,
+          neighborhood: addressResponse.data.bairro,
+          city: addressResponse.data.localidade,
+        });
+      } catch (error: any) {
+        errorMessage("Erro ao tentar buscar Endereço por CEP.");
+      }
+    };
+    if (address.cep.length === 9) {
+      findAddress();
+    }
+  };
 
-    return {
-        salvarEndereco,
-        buscarTodosEnderecos,
-        buscarEnderecoPorId,
-        atualizarEndereco,
-        deletarEndereco,
-        obterEnderecoPorCep,
-        obterEnderecoPorCepTodoBrasil,
-        buscarEnderecoPorCep
-    }
-}
+  return {
+    saveAddress,
+    findAllAddress,
+    findAddressById,
+    updateAddress,
+    deleteAddress,
+    getAddressByCep,
+    getAddressByCepInBrazil,
+    findAddressByCep,
+  };
+};

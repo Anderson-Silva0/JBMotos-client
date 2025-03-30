@@ -1,23 +1,23 @@
-export interface Produto {
-  id: number
-  nome: string
-  precoCusto: number | string
-  precoVenda: number | string
-  marca: string
-  idEstoque: number
-  cnpjFornecedor: string
-  statusProduto: string
-  dataHoraCadastro: string
+export interface Product {
+  id: number;
+  name: string;
+  costPrice: number | string;
+  salePrice: number | string;
+  brand: string;
+  stockId: number;
+  supplierCNPJ: string;
+  productStatus: string;
+  createdAt: string;
 }
 
-export const estadoInicialProduto: Produto = {
+export const productInitialState: Product = {
   id: 0,
-  nome: '',
-  precoCusto: 0,
-  precoVenda: 0,
-  marca: '',
-  idEstoque: 0,
-  cnpjFornecedor: '',
-  statusProduto: '',
-  dataHoraCadastro: ''
-}
+  name: "",
+  costPrice: 0,
+  salePrice: 0,
+  brand: "",
+  stockId: 0,
+  supplierCNPJ: "",
+  productStatus: "",
+  createdAt: "",
+};

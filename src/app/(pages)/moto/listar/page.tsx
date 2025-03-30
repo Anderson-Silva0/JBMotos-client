@@ -1,20 +1,20 @@
 'use client'
 
-import { InputCpf, InputPlaca } from "@/components/Input"
+import { CpfInput, PlateInput } from "@/components/Input"
 import LoadingLogo from "@/components/LoadingLogo"
-import MotoCard from "@/components/MotoCard"
+import MotorcycleCard from "@/components/MotoCard"
 import imgMoto from "@/images/moto.png"
 import { parseDate } from "@/models/StringParaDate"
-import { Moto } from "@/models/moto"
-import { mensagemErro } from "@/models/toast"
-import { MotoService } from "@/services/motoService"
+import { Motorcycle } from "@/models/moto"
+import { errorMessage } from "@/models/toast"
+import { MotorcycleService } from "@/services/motoService"
 import { Search } from "lucide-react"
 import Image from "next/image"
 import '@/styles/card.css'
 import { useEffect, useState } from "react"
 
 export default function ListarMotos() {
-  const [motos, setMotos] = useState<Moto[]>([])
+  const [motos, setMotos] = useState<Motorcycle[]>([])
 
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
 
@@ -22,7 +22,7 @@ export default function ListarMotos() {
 
   const [campoSelecionado, setCampoSelecionado] = useState<string>('')
 
-  const { filtrarMoto } = MotoService()
+  const { filterMotorcycle: filtrarMoto } = MotorcycleService()
 
   const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
 
@@ -32,13 +32,13 @@ export default function ListarMotos() {
 
   useEffect(() => {
     if (valorSelecionado === 'antiga') {
-      const sortedProdutosRecentes = [...motos].sort((a: Moto, b: Moto) =>
-        parseDate(a.dataHoraCadastro).getTime() - parseDate(b.dataHoraCadastro).getTime()
+      const sortedProdutosRecentes = [...motos].sort((a: Motorcycle, b: Motorcycle) =>
+        parseDate(a.createdAt).getTime() - parseDate(b.createdAt).getTime()
       )
       setMotos(sortedProdutosRecentes)
     } else if (valorSelecionado === 'recente') {
-      const sortedProdutosRecentes = [...motos].sort((a: Moto, b: Moto) =>
-        parseDate(b.dataHoraCadastro).getTime() - parseDate(a.dataHoraCadastro).getTime()
+      const sortedProdutosRecentes = [...motos].sort((a: Motorcycle, b: Motorcycle) =>
+        parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime()
       )
       setMotos(sortedProdutosRecentes)
     }
@@ -50,7 +50,7 @@ export default function ListarMotos() {
         const motoResponse = await filtrarMoto(campoSelecionado, valorInputBuscar)
         setMotos(motoResponse.data)
       } catch (error: any) {
-        mensagemErro('Erro ao tentar buscar Moto.')
+        errorMessage('Erro ao tentar buscar Moto.')
       } finally {
         setFoiCarregado(true)
       }
@@ -69,7 +69,7 @@ export default function ListarMotos() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo descricao='Carregando' />
+    return <LoadingLogo description='Carregando' />
   }
 
   return (
@@ -112,7 +112,7 @@ export default function ListarMotos() {
                 <p>Selecione o filtro desejado:</p>
               </div>
             ) : campoSelecionado === 'placa' ? (
-              <InputPlaca
+              <PlateInput
                 className="input-buscar"
                 placeholder="Digite a Placa"
                 type="search"
@@ -134,7 +134,7 @@ export default function ListarMotos() {
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
             ) : campoSelecionado === 'cpfCliente' ? (
-              <InputCpf
+              <CpfInput
                 className="input-buscar"
                 placeholder="Digite o CPF do Cliente"
                 type="search"
@@ -266,10 +266,10 @@ export default function ListarMotos() {
 
       {motos.map((moto) => {
         return (
-          <MotoCard
+          <MotorcycleCard
             key={moto.id}
-            moto={moto}
-            setMotos={setMotos}
+            motorcycle={moto}
+            setMotorcycle={setMotos}
           />
         )
       })}

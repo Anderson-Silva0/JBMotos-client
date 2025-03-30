@@ -4,16 +4,16 @@ import LoadingLogo from "@/components/LoadingLogo"
 import ProdutoCard from "@/components/ProdutoCard"
 import imgProduto from '@/images/checklist.png'
 import { parseDate } from "@/models/StringParaDate"
-import { Produto } from "@/models/produto"
-import { mensagemErro } from "@/models/toast"
-import { ProdutoService } from "@/services/produtoService"
+import { Product } from "@/models/produto"
+import { errorMessage } from "@/models/toast"
+import { ProductService } from "@/services/produtoService"
 import { Search } from "lucide-react"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import '@/styles/card.css'
 
 export default function ListarProdutos() {
-  const [produtos, setProdutos] = useState<Produto[]>([])
+  const [produtos, setProdutos] = useState<Product[]>([])
 
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
 
@@ -21,7 +21,7 @@ export default function ListarProdutos() {
 
   const [campoSelecionado, setCampoSelecionado] = useState<string>('')
 
-  const { filtrarProduto } = ProdutoService()
+  const { filterProduct: filtrarProduto } = ProductService()
 
   const [valorSelecionado, setValorSelecionado] = useState<string | null>(null)
 
@@ -31,13 +31,13 @@ export default function ListarProdutos() {
 
   useEffect(() => {
     if (valorSelecionado === 'antigo') {
-      const sortedProdutosRecentes = [...produtos].sort((a: Produto, b: Produto) =>
-        parseDate(a.dataHoraCadastro).getTime() - parseDate(b.dataHoraCadastro).getTime()
+      const sortedProdutosRecentes = [...produtos].sort((a: Product, b: Product) =>
+        parseDate(a.createdAt).getTime() - parseDate(b.createdAt).getTime()
       )
       setProdutos(sortedProdutosRecentes)
     } else if (valorSelecionado === 'recente') {
-      const sortedProdutosRecentes = [...produtos].sort((a: Produto, b: Produto) =>
-        parseDate(b.dataHoraCadastro).getTime() - parseDate(a.dataHoraCadastro).getTime()
+      const sortedProdutosRecentes = [...produtos].sort((a: Product, b: Product) =>
+        parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime()
       )
       setProdutos(sortedProdutosRecentes)
     }
@@ -49,7 +49,7 @@ export default function ListarProdutos() {
         const produtoResponse = await filtrarProduto(campoSelecionado, valorInputBuscar)
         setProdutos(produtoResponse.data)
       } catch (error: any) {
-        mensagemErro('Erro ao tentar buscar Produto.')
+        errorMessage('Erro ao tentar buscar Produto.')
       } finally {
         setFoiCarregado(true)
       }
@@ -68,7 +68,7 @@ export default function ListarProdutos() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo descricao='Carregando' />
+    return <LoadingLogo description='Carregando' />
   }
 
   return (
@@ -225,8 +225,8 @@ export default function ListarProdutos() {
         return (
           <ProdutoCard
             key={produto.id}
-            produto={produto}
-            setProdutos={setProdutos}
+            product={produto}
+            setProduct={setProdutos}
           />
         )
       })}

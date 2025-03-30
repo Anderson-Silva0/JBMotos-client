@@ -1,17 +1,17 @@
-export interface Endereco {
+export interface Address {
     id: number,
-    rua: string,
+    road: string,
     cep: string,
-    numero: number | string,
-    bairro: string,
-    cidade: string
+    number: number | string,
+    neighborhood: string,
+    city: string
 }
 
-export const estadoInicialEndereco: Endereco = {
+export const addressInitialState: Address = {
     id: 0,
-    rua: '',
+    road: '',
     cep: '',
-    numero: '',
-    bairro: '',
-    cidade: ''
+    number: '',
+    neighborhood: '',
+    city: ''
 }

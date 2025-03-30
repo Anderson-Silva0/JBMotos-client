@@ -1,22 +1,22 @@
 'use client'
 
-import { InputCpf, InputPlaca } from "@/components/Input"
+import { CpfInput, PlateInput } from "@/components/Input"
 import LoadingLogo from "@/components/LoadingLogo"
-import ServicoCard from "@/components/ServicoCard"
+import RepairCard from "@/components/ServicoCard"
 import imgVenda from "@/images/vendas.png"
-import { Servico } from "@/models/servico"
+import { Repair } from "@/models/servico"
 import { parseDate } from "@/models/StringParaDate"
-import { mensagemErro } from "@/models/toast"
-import { ServicoService } from "@/services/servicoService"
+import { errorMessage } from "@/models/toast"
+import { RepairService } from "@/services/servicoService"
 import { Search } from "lucide-react"
 import Image from "next/image"
 import '@/styles/card.css'
 import { useEffect, useState } from "react"
 
 export default function ListarServicos() {
-  const { filtrarServico } = ServicoService()
+  const { filterRepair: filtrarServico } = RepairService()
 
-  const [servicos, setServicos] = useState<Servico[]>([])
+  const [servicos, setServicos] = useState<Repair[]>([])
   const [foiCarregado, setFoiCarregado] = useState<boolean>(false)
   const [valorInputBuscar, setValorInputBuscar] = useState<string>('')
   const [campoSelecionado, setCampoSelecionado] = useState<string>('')
@@ -28,13 +28,13 @@ export default function ListarServicos() {
 
   useEffect(() => {
     if (valorSelecionado === 'antiga') {
-      const sortedVendasRecentes = [...servicos].sort((a: Servico, b: Servico) =>
-        parseDate(a.dataHoraCadastro).getTime() - parseDate(b.dataHoraCadastro).getTime()
+      const sortedVendasRecentes = [...servicos].sort((a: Repair, b: Repair) =>
+        parseDate(a.createdAt).getTime() - parseDate(b.createdAt).getTime()
       )
       setServicos(sortedVendasRecentes)
     } else if (valorSelecionado === 'recente') {
-      const sortedVendasRecentes = [...servicos].sort((a: Servico, b: Servico) =>
-        parseDate(b.dataHoraCadastro).getTime() - parseDate(a.dataHoraCadastro).getTime()
+      const sortedVendasRecentes = [...servicos].sort((a: Repair, b: Repair) =>
+        parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime()
       )
       setServicos(sortedVendasRecentes)
     }
@@ -46,7 +46,7 @@ export default function ListarServicos() {
         const servicoResponse = await filtrarServico(campoSelecionado, valorInputBuscar)
         setServicos(servicoResponse.data)
       } catch (error: any) {
-        mensagemErro('Erro ao tentar buscar Serviço.')
+        errorMessage('Erro ao tentar buscar Serviço.')
       } finally {
         setFoiCarregado(true)
       }
@@ -65,7 +65,7 @@ export default function ListarServicos() {
   }
 
   if (!foiCarregado) {
-    return <LoadingLogo descricao='Carregando' />
+    return <LoadingLogo description='Carregando' />
   }
 
   return (
@@ -108,7 +108,7 @@ export default function ListarServicos() {
                 <p>Selecione o filtro desejado:</p>
               </div>
             ) : campoSelecionado === 'cpfCliente' ? (
-              <InputCpf
+              <CpfInput
                 className="input-buscar"
                 placeholder="Digite o CPF"
                 type="search"
@@ -116,7 +116,7 @@ export default function ListarServicos() {
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
             ) : campoSelecionado === 'cpfFuncionario' ? (
-              <InputCpf
+              <CpfInput
                 className="input-buscar"
                 placeholder="Digite o CPF"
                 type="search"
@@ -124,7 +124,7 @@ export default function ListarServicos() {
                 onChange={(e) => setValorInputBuscar(e.target.value)}
               />
             ) : campoSelecionado === 'placa' ? (
-              <InputPlaca
+              <PlateInput
                 className="input-buscar"
                 placeholder="Digite o Placa"
                 type="search"
@@ -226,15 +226,15 @@ export default function ListarServicos() {
 
       {servicos.map((servico) => {
         return (
-          <ServicoCard key={servico.id}
+          <RepairCard key={servico.id}
             id={servico.id}
-            cpfFuncionario={servico.cpfFuncionario}
-            dataHoraCadastro={servico.dataHoraCadastro}
-            observacao={servico.observacao}
-            precoMaoDeObra={servico.precoMaoDeObra}
-            servicosRealizados={servico.servicosRealizados}
-            venda={servico.venda}
-            moto={servico.moto}
+            employeeCpf={servico.employeeCpf}
+            createdAt={servico.createdAt}
+            observation={servico.observation}
+            laborCost={servico.laborCost}
+            repairPerformed={servico.repairPerformed}
+            sale={servico.sale}
+            motorcycle={servico.motorcycle}
           />
         )
       })}
