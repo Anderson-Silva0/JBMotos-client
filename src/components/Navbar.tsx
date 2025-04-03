@@ -3,7 +3,7 @@
 import Logo from "@/images/LogoJB.png";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import "../styles/navbar.css";
+import "@/styles/navbar.css";
 import Dropdown from "./Dropdown";
 import { LogOut } from "lucide-react";
 import Cookies from "js-cookie";
@@ -28,8 +28,8 @@ export default function NavBar() {
     loadUserRole();
 
     const mobileMenu = document.querySelector(".mobile-menu") as HTMLElement;
-    const navList = document.querySelector(".nav-listar") as HTMLElement;
-    const navLinks = document.querySelectorAll(".nav-listar li");
+    const navList = document.querySelector(".nav-list") as HTMLElement;
+    const navLinks = document.querySelectorAll(".nav-list li");
 
     const animateLinks = () => {
       Array.from(navLinks).forEach((link: any, index: number) => {
@@ -68,7 +68,7 @@ export default function NavBar() {
             <div className="line2"></div>
             <div className="line3"></div>
           </div>
-          <ul className="nav-listar">
+          <ul className="nav-list">
             <li>
               <a href="/">Home</a>
             </li>
@@ -78,7 +78,7 @@ export default function NavBar() {
                 componentClicked={clickedComponent}
                 setComponentClicked={setClickedComponent}
               >
-                <a href="/cliente/cadastrar">Cadastrar</a>
+                <a href="/cliente/cadastro">Cadastrar</a>
                 <a href="/cliente/listar">Listar</a>
               </Dropdown>
             </li>
@@ -89,7 +89,7 @@ export default function NavBar() {
                   componentClicked={clickedComponent}
                   setComponentClicked={setClickedComponent}
                 >
-                  <a href="/funcionario/cadastrar">Cadastrar</a>
+                  <a href="/funcionario/cadastro">Cadastrar</a>
                   <a href="/funcionario/listar">Listar</a>
                 </Dropdown>
               </li>
@@ -100,7 +100,7 @@ export default function NavBar() {
                 componentClicked={clickedComponent}
                 setComponentClicked={setClickedComponent}
               >
-                <a href="/fornecedor/cadastrar">Cadastrar</a>
+                <a href="/fornecedor/cadastro">Cadastrar</a>
                 <a href="/fornecedor/listar">Listar</a>
               </Dropdown>
             </li>
@@ -110,7 +110,7 @@ export default function NavBar() {
                 componentClicked={clickedComponent}
                 setComponentClicked={setClickedComponent}
               >
-                <a href="/produto/cadastrar">Cadastrar</a>
+                <a href="/produto/cadastro">Cadastrar</a>
                 <a href="/produto/listar">Listar</a>
               </Dropdown>
             </li>
@@ -120,7 +120,7 @@ export default function NavBar() {
                 componentClicked={clickedComponent}
                 setComponentClicked={setClickedComponent}
               >
-                <a href="/venda/cadastrar">Realizar</a>
+                <a href="/venda/cadastro">Realizar</a>
                 <a href="/venda/listar">Listar</a>
               </Dropdown>
             </li>
@@ -130,7 +130,7 @@ export default function NavBar() {
                 componentClicked={clickedComponent}
                 setComponentClicked={setClickedComponent}
               >
-                <a href="/servico/cadastrar">Realizar</a>
+                <a href="/servico/cadastro">Realizar</a>
                 <a href="/servico/listar">Listar</a>
               </Dropdown>
             </li>
@@ -140,7 +140,7 @@ export default function NavBar() {
                 componentClicked={clickedComponent}
                 setComponentClicked={setClickedComponent}
               >
-                <a href="/moto/cadastrar">Cadastrar</a>
+                <a href="/moto/cadastro">Cadastrar</a>
                 <a href="/moto/listar">Listar</a>
               </Dropdown>
             </li>
