@@ -5,7 +5,7 @@ import { Check, Edit, UserCheck, UserX, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Address, addressInitialState } from "../models/address";
-import "../styles/cardListagem.css";
+import "@/styles/listCard.css";
 import { ConfirmDecision } from "./ConfirmDecision";
 
 interface CustomerCardProps {

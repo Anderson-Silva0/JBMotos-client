@@ -1,6 +1,6 @@
 import { ProductOfSale } from "@/models/productOfSale";
 import { formatToBRL } from "@/models/currencyFormatters";
-import "@/styles/tabelaVenda.css";
+import "@/styles/saleTable.css";
 
 interface ProductRowProps {
   productOfSale: ProductOfSale;

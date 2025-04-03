@@ -5,7 +5,7 @@ import { Employee, employeeInitialState } from "@/models/employee";
 import { CardPayment, cardPaymentInitialState } from "@/models/cardPayment";
 import { errorMessage } from "@/models/toast";
 import { Sale } from "@/models/sale";
-import "@/styles/cardListagem.css";
+import "@/styles/listCard.css";
 import { Info } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";

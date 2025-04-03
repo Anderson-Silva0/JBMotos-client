@@ -1,7 +1,7 @@
 import { formatToPercentage } from "@/models/currencyFormatters";
 import { CardPayment } from "@/models/cardPayment";
 import "@/styles/card.css";
-import "@/styles/cardListagem.css";
+import "@/styles/listCard.css";
 
 interface InfoCardProps {
   cardPayment: CardPayment;

@@ -5,7 +5,7 @@ import { errorMessage } from "@/models/toast";
 import { SaleService } from "@/services/saleService";
 import { CustomerService } from "@/services/customerService";
 import { EmployeeService } from "@/services/employeeService";
-import "@/styles/cardListagem.css";
+import "@/styles/listCard.css";
 import { Edit, PackageSearch } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";

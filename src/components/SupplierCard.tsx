@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Address, addressInitialState } from "../models/address";
 import { AddressService } from "../services/addressService";
-import "../styles/cardListagem.css";
+import "@/styles/listCard.css";
 import { ConfirmDecision } from "./ConfirmDecision";
 
 interface SupplierCardProps {

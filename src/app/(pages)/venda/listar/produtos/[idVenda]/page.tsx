@@ -9,7 +9,7 @@ import { ProductOfSale } from "@/models/productOfSale";
 import { formatToBRL } from "@/models/currencyFormatters";
 import { errorMessage } from "@/models/toast";
 import { SaleService } from "@/services/saleService";
-import "@/styles/cardListagem.css";
+import "@/styles/listCard.css";
 import Image from "next/image";
 import Cookies from "js-cookie";
 import { decode } from "jsonwebtoken";

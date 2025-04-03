@@ -6,7 +6,7 @@ import { MotorcycleService } from "@/services/motorcycleService";
 import { Check, CheckSquare, Edit, X, XSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import "../styles/cardListagem.css";
+import "@/styles/listCard.css";
 import { ConfirmDecision } from "./ConfirmDecision";
 
 interface MotorcycleCardProps {

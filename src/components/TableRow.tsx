@@ -11,7 +11,7 @@ import { Product, productInitialState } from "@/models/product";
 import { selectStylesSale } from "@/models/selectStyles";
 import { alertMessage } from "@/models/toast";
 import { StockService } from "@/services/stockService";
-import "@/styles/tabelaVenda.css";
+import "@/styles/saleTable.css";
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import Select from "react-select";
 import { removeProductFromBudget } from "./PDFGenerator";
