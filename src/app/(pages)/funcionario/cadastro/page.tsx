@@ -1,22 +1,22 @@
 "use client";
 
 import { Card } from "@/components/Card";
-import { DisplayError } from "@/components/ExibeErro";
-import { FormGroup } from "@/components/Form-group";
+import { DisplayError } from "@/components/DisplayError";
+import { FormGroup } from "@/components/FormGroup";
 import { CepInput, CpfInput, PhoneInput } from "@/components/Input";
 import {
   AuthRegisterModelEmployee,
   authRegisterModelEmployeeInitialState,
   roleSelectOptions,
 } from "@/models/authRegisterModel";
-import { Address, addressInitialState } from "@/models/endereco";
-import { Errors, saveErrors } from "@/models/erros";
-import { employeeInitialState, Employee } from "@/models/funcionario";
-import { selectionOptionsInitialState, selectionOptions } from "@/models/Selecoes";
+import { Address, addressInitialState } from "@/models/address";
+import { Errors, saveErrors } from "@/models/errors";
+import { employeeInitialState, Employee } from "@/models/employee";
+import { selectionOptionsInitialState, selectionOptions } from "@/models/selectionOptions";
 import { selectStyles } from "@/models/selectStyles";
 import { errorMessage, successMessage } from "@/models/toast";
 import { AuthenticationService } from "@/services/authenticationService";
-import { AddressService } from "@/services/enderecoService";
+import { AddressService } from "@/services/addressService";
 import { Save } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import Select from "react-select";

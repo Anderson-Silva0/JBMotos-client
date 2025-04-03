@@ -2,12 +2,12 @@
 
 import { CpfInput } from "@/components/Input";
 import LoadingLogo from "@/components/LoadingLogo";
-import SaleCard from "@/components/VendaCard";
+import SaleCard from "@/components/SaleCard";
 import imgSale from "@/images/vendas.png";
-import { parseDate } from "@/models/StringParaDate";
+import { parseDate } from "@/models/stringToDate";
 import { errorMessage } from "@/models/toast";
-import { Sale } from "@/models/venda";
-import { SaleService } from "@/services/VendaService";
+import { Sale } from "@/models/sale";
+import { SaleService } from "@/services/saleService";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import "@/styles/card.css";

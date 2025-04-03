@@ -1,13 +1,13 @@
 "use client";
 
-import SupplierCard from "@/components/FornecedorCard";
+import SupplierCard from "@/components/SupplierCard";
 import { CnpjInput, PhoneInput } from "@/components/Input";
 import LoadingLogo from "@/components/LoadingLogo";
 import imgFornecedor from "@/images/supplier.png";
-import { parseDate } from "@/models/StringParaDate";
-import { Supplier } from "@/models/fornecedor";
+import { parseDate } from "@/models/stringToDate";
+import { Supplier } from "@/models/supplier";
 import { errorMessage } from "@/models/toast";
-import { SupplierService } from "@/services/fornecedorService";
+import { SupplierService } from "@/services/supplierService";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import "@/styles/card.css";

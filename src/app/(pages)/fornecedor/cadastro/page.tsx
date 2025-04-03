@@ -1,15 +1,15 @@
 "use client";
 
 import { Card } from "@/components/Card";
-import { DisplayError } from "@/components/ExibeErro";
-import { FormGroup } from "@/components/Form-group";
+import { DisplayError } from "@/components/DisplayError";
+import { FormGroup } from "@/components/FormGroup";
 import { CepInput, CnpjInput, PhoneInput } from "@/components/Input";
-import { Address, addressInitialState } from "@/models/endereco";
-import { Errors, saveErrors } from "@/models/erros";
-import { Supplier, supplierInitialState } from "@/models/fornecedor";
+import { Address, addressInitialState } from "@/models/address";
+import { Errors, saveErrors } from "@/models/errors";
+import { Supplier, supplierInitialState } from "@/models/supplier";
 import { errorMessage, successMessage } from "@/models/toast";
-import { AddressService } from "@/services/enderecoService";
-import { SupplierService } from "@/services/fornecedorService";
+import { AddressService } from "@/services/addressService";
+import { SupplierService } from "@/services/supplierService";
 import { Save } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 

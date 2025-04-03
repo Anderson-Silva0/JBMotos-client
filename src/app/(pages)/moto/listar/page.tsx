@@ -2,18 +2,18 @@
 
 import { CpfInput, PlateInput } from "@/components/Input";
 import LoadingLogo from "@/components/LoadingLogo";
-import MotorcycleCard from "@/components/MotoCard";
+import MotorcycleCard from "@/components/MotorcycleCard";
 import imgMotorcycle from "@/images/moto.png";
-import { parseDate } from "@/models/StringParaDate";
-import { Motorcycle } from "@/models/moto";
+import { parseDate } from "@/models/stringToDate";
+import { Motorcycle } from "@/models/motorcycle";
 import { errorMessage } from "@/models/toast";
-import { MotorcycleService } from "@/services/motoService";
+import { MotorcycleService } from "@/services/motorcycleService";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import "@/styles/card.css";
 import { useEffect, useState } from "react";
 
-export default function ListarMotos() {
+export default function ListMotorcycle() {
   const [motorcycle, setMotorcycle] = useState<Motorcycle[]>([]);
 
   const [isLoaded, setIsLoaded] = useState<boolean>(false);

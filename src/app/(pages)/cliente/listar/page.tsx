@@ -1,13 +1,13 @@
 "use client";
 
-import CustomerCard from "@/components/ClienteCard";
+import CustomerCard from "@/components/CustomerCard";
 import { CpfInput, PhoneInput } from "@/components/Input";
 import LoadingLogo from "@/components/LoadingLogo";
 import imgCliente from "@/images/client.png";
-import { parseDate } from "@/models/StringParaDate";
-import { Customer } from "@/models/cliente";
+import { parseDate } from "@/models/stringToDate";
+import { Customer } from "@/models/customer";
 import { errorMessage } from "@/models/toast";
-import { CustomerService } from "@/services/clienteService";
+import { CustomerService } from "@/services/customerService";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import "@/styles/card.css";

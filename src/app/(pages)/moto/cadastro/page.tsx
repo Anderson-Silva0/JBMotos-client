@@ -1,20 +1,20 @@
 "use client";
 
 import { Card } from "@/components/Card";
-import { DisplayError } from "@/components/ExibeErro";
-import { FormGroup } from "@/components/Form-group";
+import { DisplayError } from "@/components/DisplayError";
+import { FormGroup } from "@/components/FormGroup";
 import { PlateInput } from "@/components/Input";
 import {
   selectionOptions,
   selectionOptionsInitialState,
-} from "@/models/Selecoes";
-import { Customer } from "@/models/cliente";
-import { Errors, saveErrors } from "@/models/erros";
-import { Motorcycle, motorcycleInitialState } from "@/models/moto";
+} from "@/models/selectionOptions";
+import { Customer } from "@/models/customer";
+import { Errors, saveErrors } from "@/models/errors";
+import { Motorcycle, motorcycleInitialState } from "@/models/motorcycle";
 import { selectStyles } from "@/models/selectStyles";
 import { errorMessage, successMessage } from "@/models/toast";
-import { CustomerService } from "@/services/clienteService";
-import { MotorcycleService } from "@/services/motoService";
+import { CustomerService } from "@/services/customerService";
+import { MotorcycleService } from "@/services/motorcycleService";
 import { Save } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import Select from "react-select";

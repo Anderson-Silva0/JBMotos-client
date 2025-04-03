@@ -1,4 +1,4 @@
-import { employeeInitialState, Employee } from "./funcionario";
+import { employeeInitialState, Employee } from "./employee";
 
 export enum ROLE {
   SUPPORT = "SUPPORT",

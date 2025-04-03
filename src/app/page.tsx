@@ -2,12 +2,12 @@
 
 import { Card } from "@/components/Card";
 import { LockIcon, User } from "lucide-react";
-import { FormGroup } from "@/components/Form-group";
+import { FormGroup } from "@/components/FormGroup";
 import "@/app/globals.css";
-import { DisplayError } from "@/components/ExibeErro";
-import { Eye } from "@/components/Olho";
+import { DisplayError } from "@/components/DisplayError";
+import { Eye } from "@/components/Eye";
 import { ChangeEvent, useState } from "react";
-import { Errors, saveErrors } from "@/models/erros";
+import { Errors, saveErrors } from "@/models/errors";
 import {
   Authentication,
   authenticationInitialState,

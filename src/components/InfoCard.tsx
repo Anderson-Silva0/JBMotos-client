@@ -1,5 +1,5 @@
-import { formatToPercentage } from "@/models/formatadorReal";
-import { CardPayment } from "@/models/pagamentoCartao";
+import { formatToPercentage } from "@/models/currencyFormatters";
+import { CardPayment } from "@/models/cardPayment";
 import "@/styles/card.css";
 import "@/styles/cardListagem.css";
 

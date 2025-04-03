@@ -2,12 +2,12 @@
 
 import { CpfInput, PlateInput } from "@/components/Input";
 import LoadingLogo from "@/components/LoadingLogo";
-import RepairCard from "@/components/ServicoCard";
+import RepairCard from "@/components/RepairCard";
 import imgSale from "@/images/vendas.png";
-import { Repair } from "@/models/servico";
-import { parseDate } from "@/models/StringParaDate";
+import { Repair } from "@/models/repair";
+import { parseDate } from "@/models/stringToDate";
 import { errorMessage } from "@/models/toast";
-import { RepairService } from "@/services/servicoService";
+import { RepairService } from "@/services/repairService";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import "@/styles/card.css";

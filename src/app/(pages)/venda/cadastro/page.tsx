@@ -1,41 +1,41 @@
 "use client";
 
 import { Card } from "@/components/Card";
-import { confirmDecision } from "@/components/ConfirmarDecisao";
-import { DisplayError } from "@/components/ExibeErro";
-import { FormGroup } from "@/components/Form-group";
+import { ConfirmDecision } from "@/components/ConfirmDecision";
+import { DisplayError } from "@/components/DisplayError";
+import { FormGroup } from "@/components/FormGroup";
 import {
   PDFGenerator,
   ReceiptType,
   removeProductFromBudget,
-} from "@/components/GeradorPDF";
-import { TableRow } from "@/components/LinhaTabela";
+} from "@/components/PDFGenerator";
+import { TableRow } from "@/components/TableRow";
 import LoadingLogo from "@/components/LoadingLogo";
-import { CreditPayment } from "@/components/PagamentoCredito";
-import SaleTable from "@/components/TabelaVenda";
+import { CreditPayment } from "@/components/CreditPayment";
+import SaleTable from "@/components/SaleTable";
 import imgRemoverLinha from "@/images/icons8-delete-row-100.png";
 import imgAdicionarLinha from "@/images/icons8-insert-row-48.png";
 import { DecodedToken } from "@/middleware";
-import { ProductOfSale } from "@/models/ProdutoVenda";
+import { ProductOfSale } from "@/models/productOfSale";
 import {
   selectionOptions,
   selectionOptionsInitialState,
-} from "@/models/Selecoes";
-import { Customer } from "@/models/cliente";
-import { Errors, saveErrors } from "@/models/erros";
-import { paymentMethods } from "@/models/formasPagamento";
-import { formatToBRL } from "@/models/formatadorReal";
+} from "@/models/selectionOptions";
+import { Customer } from "@/models/customer";
+import { Errors, saveErrors } from "@/models/errors";
+import { paymentMethods } from "@/models/paymentMethods";
+import { formatToBRL } from "@/models/currencyFormatters";
 import {
   CardPayment,
   cardPaymentInitialState,
-} from "@/models/pagamentoCartao";
-import { Product } from "@/models/produto";
+} from "@/models/cardPayment";
+import { Product } from "@/models/product";
 import { selectStyles } from "@/models/selectStyles";
 import { alertMessage, errorMessage, successMessage } from "@/models/toast";
-import { Sale, SaleInitialState } from "@/models/venda";
-import { SaleService } from "@/services/VendaService";
-import { CustomerService } from "@/services/clienteService";
-import { ProductService } from "@/services/produtoService";
+import { Sale, SaleInitialState } from "@/models/sale";
+import { SaleService } from "@/services/saleService";
+import { CustomerService } from "@/services/customerService";
+import { ProductService } from "@/services/productService";
 import Cookies from "js-cookie";
 import { decode } from "jsonwebtoken";
 import { Save } from "lucide-react";
@@ -239,7 +239,7 @@ export default function RegisterSale() {
   ]);
 
   const handlePerformSale = () => {
-    confirmDecision(
+    ConfirmDecision(
       "Confirmação de Venda",
       "Tem certeza de que deseja realizar esta venda?",
       submit

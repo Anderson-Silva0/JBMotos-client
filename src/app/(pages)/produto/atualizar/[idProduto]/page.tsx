@@ -1,22 +1,22 @@
 "use client";
 
 import { Card } from "@/components/Card";
-import { DisplayError } from "@/components/ExibeErro";
-import { FormGroup } from "@/components/Form-group";
+import { DisplayError } from "@/components/DisplayError";
+import { FormGroup } from "@/components/FormGroup";
 import {
   selectionOptions,
   selectionOptionsInitialState,
-} from "@/models/Selecoes";
-import { Errors, saveErrors } from "@/models/erros";
-import { Stock, stockInitialState } from "@/models/estoque";
-import { formatToBRL } from "@/models/formatadorReal";
-import { Supplier } from "@/models/fornecedor";
-import { Product, productInitialState } from "@/models/produto";
+} from "@/models/selectionOptions";
+import { Errors, saveErrors } from "@/models/errors";
+import { Stock, stockInitialState } from "@/models/stock";
+import { formatToBRL } from "@/models/currencyFormatters";
+import { Supplier } from "@/models/supplier";
+import { Product, productInitialState } from "@/models/product";
 import { selectStyles } from "@/models/selectStyles";
 import { errorMessage, successMessage } from "@/models/toast";
-import { StockService } from "@/services/estoqueService";
-import { SupplierService } from "@/services/fornecedorService";
-import { ProductService } from "@/services/produtoService";
+import { StockService } from "@/services/stockService";
+import { SupplierService } from "@/services/supplierService";
+import { ProductService } from "@/services/productService";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import Select from "react-select";

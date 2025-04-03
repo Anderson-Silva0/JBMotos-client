@@ -1,13 +1,13 @@
 "use client";
 
-import EmployeeCard from "@/components/FuncionarioCard";
+import EmployeeCard from "@/components/EmployeeCard";
 import { CpfInput, PhoneInput } from "@/components/Input";
 import LoadingLogo from "@/components/LoadingLogo";
 import imgFuncionario from "@/images/employee.png";
-import { parseDate } from "@/models/StringParaDate";
-import { Employee } from "@/models/funcionario";
+import { parseDate } from "@/models/stringToDate";
+import { Employee } from "@/models/employee";
 import { errorMessage } from "@/models/toast";
-import { EmployeeService } from "@/services/funcionarioService";
+import { EmployeeService } from "@/services/employeeService";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import "@/styles/card.css";

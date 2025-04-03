@@ -1,12 +1,12 @@
 "use client";
 
 import LoadingLogo from "@/components/LoadingLogo";
-import ProdutoCard from "@/components/ProdutoCard";
+import ProductCard from "@/components/ProductCard";
 import imgProduto from "@/images/checklist.png";
-import { parseDate } from "@/models/StringParaDate";
-import { Product } from "@/models/produto";
+import { parseDate } from "@/models/stringToDate";
+import { Product } from "@/models/product";
 import { errorMessage } from "@/models/toast";
-import { ProductService } from "@/services/produtoService";
+import { ProductService } from "@/services/productService";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -249,7 +249,7 @@ export default function ListProducts() {
 
       {products.map((produto) => {
         return (
-          <ProdutoCard
+          <ProductCard
             key={produto.id}
             product={produto}
             setProduct={setProducts}

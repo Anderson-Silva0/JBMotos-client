@@ -1,14 +1,14 @@
 "use client";
 
-import { ProductRow } from "@/components/LinhaProduto";
-import { Eye } from "@/components/Olho";
-import SaleTable from "@/components/TabelaVenda";
+import { ProductRow } from "@/components/ProductRow";
+import { Eye } from "@/components/Eye";
+import SaleTable from "@/components/SaleTable";
 import imgProduto from "@/images/checklist.png";
 import imgVenda from "@/images/vendas.png";
-import { ProductOfSale } from "@/models/ProdutoVenda";
-import { formatToBRL } from "@/models/formatadorReal";
+import { ProductOfSale } from "@/models/productOfSale";
+import { formatToBRL } from "@/models/currencyFormatters";
 import { errorMessage } from "@/models/toast";
-import { SaleService } from "@/services/VendaService";
+import { SaleService } from "@/services/saleService";
 import "@/styles/cardListagem.css";
 import Image from "next/image";
 import Cookies from "js-cookie";
@@ -16,7 +16,7 @@ import { decode } from "jsonwebtoken";
 import { DecodedToken } from "@/middleware";
 import { ROLE } from "@/models/authRegisterModel";
 import { useEffect, useState } from "react";
-import { Sale } from "@/models/venda";
+import { Sale } from "@/models/sale";
 
 interface ProductsOfSaleProps {
   params: {

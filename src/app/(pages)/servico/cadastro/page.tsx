@@ -7,32 +7,32 @@ import {
   TotalValuesProps,
 } from "@/app/(pages)/venda/cadastro/page";
 import { Card } from "@/components/Card";
-import { DisplayError } from "@/components/ExibeErro";
-import { FormGroup } from "@/components/Form-group";
-import { CreditPayment } from "@/components/PagamentoCredito";
-import ProductRepair from "@/components/ProdutoServico";
+import { DisplayError } from "@/components/DisplayError";
+import { FormGroup } from "@/components/FormGroup";
+import { CreditPayment } from "@/components/CreditPayment";
+import ProductRepair from "@/components/ProductRepair";
 import {
   selectionOptions,
   selectionOptionsInitialState,
-} from "@/models/Selecoes";
-import { Customer } from "@/models/cliente";
-import { Errors, saveErrors } from "@/models/erros";
-import { paymentMethods } from "@/models/formasPagamento";
-import { formatToBRL } from "@/models/formatadorReal";
-import { motorcycleInitialState, Motorcycle } from "@/models/moto";
+} from "@/models/selectionOptions";
+import { Customer } from "@/models/customer";
+import { Errors, saveErrors } from "@/models/errors";
+import { paymentMethods } from "@/models/paymentMethods";
+import { formatToBRL } from "@/models/currencyFormatters";
+import { motorcycleInitialState, Motorcycle } from "@/models/motorcycle";
 import {
   CardPayment,
   cardPaymentInitialState,
-} from "@/models/pagamentoCartao";
-import { Product } from "@/models/produto";
+} from "@/models/cardPayment";
+import { Product } from "@/models/product";
 import { selectStyles } from "@/models/selectStyles";
-import { Repair, repairInitialState } from "@/models/servico";
+import { Repair, repairInitialState } from "@/models/repair";
 import { alertMessage, errorMessage, successMessage } from "@/models/toast";
-import { Sale, SaleInitialState } from "@/models/venda";
-import { CustomerService } from "@/services/clienteService";
-import { MotorcycleService } from "@/services/motoService";
-import { ProductService } from "@/services/produtoService";
-import { RepairService } from "@/services/servicoService";
+import { Sale, SaleInitialState } from "@/models/sale";
+import { CustomerService } from "@/services/customerService";
+import { MotorcycleService } from "@/services/motorcycleService";
+import { ProductService } from "@/services/productService";
+import { RepairService } from "@/services/repairService";
 import { Save } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
 import Image from "next/image";
@@ -42,11 +42,11 @@ import Cookies from "js-cookie";
 import { decode } from "jsonwebtoken";
 import Select from "react-select";
 import { DecodedToken } from "@/middleware";
-import { confirmDecision } from "@/components/ConfirmarDecisao";
+import { ConfirmDecision } from "@/components/ConfirmDecision";
 import LoadingLogo from "@/components/LoadingLogo";
-import { Employee } from "@/models/funcionario";
+import { Employee } from "@/models/employee";
 
-export default function CadastroServico() {
+export default function RegisterRepair() {
   const { findAllCustomer } = CustomerService();
   const { findMotorcycleByCustomerCpf } = MotorcycleService();
   const { saveRepair } = RepairService();
@@ -284,7 +284,7 @@ export default function CadastroServico() {
   };
 
   const handlePerformRepair = () => {
-    confirmDecision(
+    ConfirmDecision(
       "Confirmação de Serviço",
       "Tem certeza de que deseja realizar este serviço?",
       submit
