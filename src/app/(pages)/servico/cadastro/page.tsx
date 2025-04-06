@@ -359,10 +359,10 @@ export default function RegisterRepair() {
 
         <FormGroup label="Serviços Realizados: *" htmlFor="servicosRealizados">
           <textarea
-            value={repair.repairPerformed}
+            value={repair.repairsPerformed}
             onChange={(e) => {
               setErrors([]);
-              setRepair({ ...repair, repairPerformed: e.target.value });
+              setRepair({ ...repair, repairsPerformed: e.target.value });
             }}
             id="servicosRealizados"
           />

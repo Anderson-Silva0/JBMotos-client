@@ -116,7 +116,7 @@ export default function ListarClientes() {
             <div className="div-msg-busca">
               <p>Selecione o filtro desejado:</p>
             </div>
-          ) : selectedField === "nome" ? (
+          ) : selectedField === "name" ? (
             <input
               className="input-buscar"
               placeholder="Digite o Nome"
@@ -138,7 +138,7 @@ export default function ListarClientes() {
               value={searchInputValue}
               onChange={(e) => setSearchInputValue(e.target.value)}
             />
-          ) : selectedField === "telefone" ? (
+          ) : selectedField === "phone" ? (
             <PhoneInput
               className="input-buscar"
               placeholder="Digite o Telefone"
@@ -147,7 +147,7 @@ export default function ListarClientes() {
               onChange={(e) => setSearchInputValue(e.target.value)}
             />
           ) : (
-            selectedField === "statusCliente" && (
+            selectedField === "customerStatus" && (
               <>
                 <div style={{ marginRight: "2vw" }}>
                   <label className="label-radio" htmlFor="opcaoStatusCliente1">
@@ -159,7 +159,7 @@ export default function ListarClientes() {
                     type="radio"
                     name="status"
                     value={selectedField}
-                    onChange={() => setSearchInputValue("ATIVO")}
+                    onChange={() => setSearchInputValue("ACTIVE")}
                   />
                 </div>
                 <div>
@@ -172,7 +172,7 @@ export default function ListarClientes() {
                     type="radio"
                     name="status"
                     value={selectedField}
-                    onChange={() => setSearchInputValue("INATIVO")}
+                    onChange={() => setSearchInputValue("INACTIVE")}
                   />
                 </div>
               </>
@@ -190,9 +190,9 @@ export default function ListarClientes() {
               name="opcao"
               id="opcaoNome"
               value={selectedField}
-              onChange={() => setSelectedField("nome")}
-              onClick={() => handleRadioClick("nome")}
-              checked={selectedField === "nome"}
+              onChange={() => setSelectedField("name")}
+              onClick={() => handleRadioClick("name")}
+              checked={selectedField === "name"}
             />
           </div>
           <div className="div-dupla-radio">
@@ -235,9 +235,9 @@ export default function ListarClientes() {
               name="opcao"
               id="opcaoTelefone"
               value={selectedField}
-              onChange={() => setSelectedField("telefone")}
-              onClick={() => handleRadioClick("telefone")}
-              checked={selectedField === "telefone"}
+              onChange={() => setSelectedField("phone")}
+              onClick={() => handleRadioClick("phone")}
+              checked={selectedField === "phone"}
             />
           </div>
           <div className="div-dupla-radio">
@@ -250,9 +250,9 @@ export default function ListarClientes() {
               name="opcao"
               id="opcaoStatusCliente"
               value={selectedField}
-              onChange={() => setSelectedField("statusCliente")}
-              onClick={() => handleRadioClick("statusCliente")}
-              checked={selectedField === "statusCliente"}
+              onChange={() => setSelectedField("customerStatus")}
+              onClick={() => handleRadioClick("customerStatus")}
+              checked={selectedField === "customerStatus"}
             />
           </div>
         </div>

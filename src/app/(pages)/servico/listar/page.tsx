@@ -257,7 +257,7 @@ export default function ListRepair() {
             createdAt={servico.createdAt}
             observation={servico.observation}
             laborCost={servico.laborCost}
-            repairPerformed={servico.repairPerformed}
+            repairsPerformed={servico.repairsPerformed}
             sale={servico.sale}
             motorcycle={servico.motorcycle}
           />

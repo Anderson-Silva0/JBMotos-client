@@ -7,7 +7,7 @@ export interface Repair {
   motorcycle: Motorcycle;
   sale: Sale | null;
   createdAt: string;
-  repairPerformed: string;
+  repairsPerformed: string;
   observation: string;
   laborCost: number;
 }
@@ -18,7 +18,7 @@ export const repairInitialState: Repair = {
   motorcycle: motorcycleInitialState,
   sale: null,
   createdAt: "",
-  repairPerformed: "",
+  repairsPerformed: "",
   observation: "",
   laborCost: 0,
 };

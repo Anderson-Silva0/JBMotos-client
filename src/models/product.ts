@@ -5,7 +5,7 @@ export interface Product {
   salePrice: number | string;
   brand: string;
   stockId: number;
-  supplierCNPJ: string;
+  supplierCnpj: string;
   productStatus: string;
   createdAt: string;
 }
@@ -17,7 +17,7 @@ export const productInitialState: Product = {
   salePrice: 0,
   brand: "",
   stockId: 0,
-  supplierCNPJ: "",
+  supplierCnpj: "",
   productStatus: "",
   createdAt: "",
 };

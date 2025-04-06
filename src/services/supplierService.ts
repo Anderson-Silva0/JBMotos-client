@@ -17,7 +17,7 @@ export const SupplierService = () => {
   };
 
   const filterSupplier = (fieldName: string, value: string) => {
-    return ApiService.get(`${url}/filtrar?${fieldName}=${value}`);
+    return ApiService.get(`${url}/filter?${fieldName}=${value}`);
   };
 
   const toggleStatusSupplier = (cnpj: string) => {

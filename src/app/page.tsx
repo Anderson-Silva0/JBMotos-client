@@ -23,9 +23,7 @@ export default function Login() {
   const router = useRouter();
   const { authLogin } = AuthenticationService();
 
-  const [authentication, setAuthentication] = useState<Authentication>(
-    authenticationInitialState
-  );
+  const [authentication, setAuthentication] = useState<Authentication>(authenticationInitialState);
   const [errors, setErrors] = useState<Errors[]>([]);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
@@ -34,10 +32,7 @@ export default function Login() {
     inputType = "password";
   }
 
-  const setPropsAuthentication = (
-    key: string,
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
+  const setPropsAuthentication = (key: string, e: ChangeEvent<HTMLInputElement>) => {
     setAuthentication({ ...authentication, [key]: e.target.value });
     setErrors([]);
   };
@@ -97,18 +92,18 @@ export default function Login() {
               </div>
             </div>
           </FormGroup>
-          <FormGroup label="" htmlFor="email">
+          <FormGroup label="" htmlFor="password">
             <div className="div-login-pair">
               <LockIcon size="8vh" strokeWidth={3} />
               <input
                 value={authentication.password}
-                onChange={(e) => setPropsAuthentication("senha", e)}
-                id="email"
+                onChange={(e) => setPropsAuthentication("password", e)}
+                id="password"
                 placeholder="Senha"
                 type={inputType}
               />
               <div className="div-msg">
-                {<DisplayError errors={errors} inputName="senha" />}
+                {<DisplayError errors={errors} inputName="password" />}
               </div>
             </div>
           </FormGroup>

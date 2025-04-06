@@ -46,7 +46,7 @@ export default function ProductCard({ product, setProduct }: ProductCardProps) {
         const stockResponse = await findStockById(product.stockId);
         setStockState(stockResponse.data);
 
-        const supplierResponse = await findSupplierByCnpj(product.supplierCNPJ);
+        const supplierResponse = await findSupplierByCnpj(product.supplierCnpj);
         setSupplierState(supplierResponse.data);
       } catch (error: any) {
         errorMessage(error.response.data);
@@ -145,20 +145,20 @@ export default function ProductCard({ product, setProduct }: ProductCardProps) {
           <div className="div-resultado">{stockState.quantity}</div>
           <div className="div-dados">Status do Estoque</div>
           <div className="div-resultado">
-            {stockState.status === "DISPONIVEL" ? (
+            {stockState.status === "AVAILABLE" ? (
               <strong className="item">
                 <span style={{ color: "green" }}>Disponível</span>
               </strong>
-            ) : stockState.status === "INDISPONIVEL" ? (
+            ) : stockState.status === "UNAVAILABLE" ? (
               <strong className="item">
                 <span style={{ color: "red" }}>Indisponível</span>
               </strong>
-            ) : stockState.status === "ESTOQUE_ALTO" ? (
+            ) : stockState.status === "HIGH_STOCK" ? (
               <strong className="item">
                 <span style={{ color: "orange" }}>Estoque Alto</span>
               </strong>
             ) : (
-              stockState.status === "ESTOQUE_BAIXO" && (
+              stockState.status === "LOW_STOCK" && (
                 <strong className="item">
                   <span style={{ color: "darkred" }}>Estoque Baixo</span>
                 </strong>

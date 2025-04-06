@@ -2,7 +2,7 @@ import { Customer } from "@/models/customer";
 import { ApiService } from "./apiService";
 
 export const CustomerService = () => {
-  const url = "/cliente";
+  const url = "/customer";
 
   const saveCustomer = (cliente: Customer) => {
     return ApiService.post(`${url}`, cliente);
@@ -17,7 +17,7 @@ export const CustomerService = () => {
   };
 
   const filterCustomer = (fieldName: string, value: string) => {
-    return ApiService.get(`${url}/filtrar?${fieldName}=${value}`);
+    return ApiService.get(`${url}/filter?${fieldName}=${value}`);
   };
 
   const toggleCustomerStatus = (cpf: string) => {

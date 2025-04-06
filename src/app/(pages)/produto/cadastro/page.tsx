@@ -79,7 +79,7 @@ export default function RegisterProduct() {
   useEffect(() => {
     setProduct({
       ...product,
-      supplierCNPJ: String(selectedSupplierOption?.value),
+      supplierCnpj: String(selectedSupplierOption?.value),
     });
     setErrors([]);
   }, [selectedSupplierOption]);

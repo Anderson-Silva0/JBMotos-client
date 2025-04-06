@@ -32,10 +32,6 @@ export const SaleService = () => {
     return ApiService.get(`${url}/sale-profit/${id}`);
   };
 
-  const totalSaleValue = (id: number) => {
-    return ApiService.get(`${url}/total-sale-value/${id}`);
-  };
-
   const findSaleProducts = (id: number) => {
     return ApiService.get(`${url}/find-sale-products/${id}`);
   };
@@ -48,7 +44,6 @@ export const SaleService = () => {
     updateSale,
     deleteSaleById,
     saleProfit,
-    totalSaleValue,
     findSaleProducts,
   };
 };

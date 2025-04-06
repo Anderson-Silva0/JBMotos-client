@@ -102,7 +102,7 @@ export default function RepairCard(repair: Repair) {
             {formatToBRL(repair.laborCost)}
           </div>
           <div className="div-dados">Serviços Realizados</div>
-          <div className="div-resultado">{repair.repairPerformed}</div>
+          <div className="div-resultado">{repair.repairsPerformed}</div>
           {repair.sale && (
             <>
               <div

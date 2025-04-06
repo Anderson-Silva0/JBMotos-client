@@ -71,7 +71,7 @@ export default function UpdateProduct({ params }: UpdateProductProps) {
       setProduct(productResponse);
 
       const supplierResponse = (
-        await findSupplierByCnpj(productResponse.supplierCNPJ)
+        await findSupplierByCnpj(productResponse.supplierCnpj)
       ).data as Supplier;
       const selectionOption = {
         label: supplierResponse.name,
@@ -106,7 +106,7 @@ export default function UpdateProduct({ params }: UpdateProductProps) {
   useEffect(() => {
     setProduct({
       ...product,
-      supplierCNPJ: String(selectedSupplierOption.value),
+      supplierCnpj: String(selectedSupplierOption.value),
     });
   }, [selectedSupplierOption]);
 

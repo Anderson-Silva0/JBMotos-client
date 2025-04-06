@@ -30,8 +30,12 @@ export const StockService = () => {
     );
   };
 
-  const totalValueStock = () => {
-    return ApiService.get(`${url}/total-value`);
+  const totalValueStockCost = () => {
+    return ApiService.get(`${url}/total-stock-cost-value`);
+  };
+
+  const potentialStockSale = () => {
+    return ApiService.get(`${url}/sales-potential-stock`);
   };
 
   return {
@@ -41,6 +45,7 @@ export const StockService = () => {
     updateStock,
     deleteStock,
     addQuantity,
-    totalValueStock,
+    totalValueStockCost,
+    potentialStockSale
   };
 };
