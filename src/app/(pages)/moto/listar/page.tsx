@@ -14,7 +14,7 @@ import "@/styles/card.css";
 import { useEffect, useState } from "react";
 
 export default function ListMotorcycle() {
-  const [motorcycle, setMotorcycle] = useState<Motorcycle[]>([]);
+  const [motorcycles, setMotorcycles] = useState<Motorcycle[]>([]);
 
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
@@ -32,17 +32,17 @@ export default function ListMotorcycle() {
 
   useEffect(() => {
     if (selectedValue === "antiga") {
-      const sortedRecentProducts = [...motorcycle].sort(
+      const sortedRecentProducts = [...motorcycles].sort(
         (a: Motorcycle, b: Motorcycle) =>
           parseDate(a.createdAt).getTime() - parseDate(b.createdAt).getTime()
       );
-      setMotorcycle(sortedRecentProducts);
+      setMotorcycles(sortedRecentProducts);
     } else if (selectedValue === "recente") {
-      const sortedRecentProducts = [...motorcycle].sort(
+      const sortedRecentProducts = [...motorcycles].sort(
         (a: Motorcycle, b: Motorcycle) =>
           parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime()
       );
-      setMotorcycle(sortedRecentProducts);
+      setMotorcycles(sortedRecentProducts);
     }
   }, [selectedValue]);
 
@@ -53,7 +53,7 @@ export default function ListMotorcycle() {
           selectedField,
           searchInputValue
         );
-        setMotorcycle(motorcycleResponse.data);
+        setMotorcycles(motorcycleResponse.data);
       } catch (error: any) {
         errorMessage("Erro ao tentar buscar Moto.");
       } finally {
@@ -81,15 +81,15 @@ export default function ListMotorcycle() {
     <div className="div-form-container">
       <h1 className="centered-text">
         {selectedField === "" ? (
-          motorcycle.length > 1 ? (
+          motorcycles.length > 1 ? (
             <>
               <Image src={imgMotorcycle} width={60} height={60} alt="" />{" "}
-              {motorcycle.length} Motos cadastradas
+              {motorcycles.length} Motos cadastradas
             </>
-          ) : motorcycle.length === 1 ? (
+          ) : motorcycles.length === 1 ? (
             <>
               <Image src={imgMotorcycle} width={60} height={60} alt="" />{" "}
-              {motorcycle.length} Moto cadastrada
+              {motorcycles.length} Moto cadastrada
             </>
           ) : (
             "Nenhuma Moto cadastrada no sistema"
@@ -98,10 +98,10 @@ export default function ListMotorcycle() {
           selectedField !== "" &&
           searchInputValue !== "" && (
             <>
-              {motorcycle.length === 1 ? (
-                <strong>{motorcycle.length} Moto encontrada</strong>
-              ) : motorcycle.length > 1 ? (
-                <strong>{motorcycle.length} Motos encontradas</strong>
+              {motorcycles.length === 1 ? (
+                <strong>{motorcycles.length} Moto encontrada</strong>
+              ) : motorcycles.length > 1 ? (
+                <strong>{motorcycles.length} Motos encontradas</strong>
               ) : (
                 "Nenhuma Moto encontrada"
               )}
@@ -109,200 +109,204 @@ export default function ListMotorcycle() {
           )
         )}
       </h1>
-      <div className="div-container-buscar">
-        <div className="div-buscar">
-          <Search size={60} strokeWidth={3} />
-          {selectedField === "" ? (
-            <div className="div-msg-busca">
-              <p>Selecione o filtro desejado:</p>
+      {motorcycles.length > 0 && (
+        <>
+          <div className="div-container-buscar">
+            <div className="div-buscar">
+              <Search size={60} strokeWidth={3} />
+              {selectedField === "" ? (
+                <div className="div-msg-busca">
+                  <p>Selecione o filtro desejado:</p>
+                </div>
+              ) : selectedField === "placa" ? (
+                <PlateInput
+                  className="input-buscar"
+                  placeholder="Digite a Placa"
+                  type="search"
+                  onChange={(e) => setSearchInputValue(e.target.value)}
+                />
+              ) : selectedField === "marca" ? (
+                <input
+                  className="input-buscar"
+                  placeholder="Digite a Marca"
+                  type="search"
+                  onChange={(e) => setSearchInputValue(e.target.value)}
+                />
+              ) : selectedField === "modelo" ? (
+                <input
+                  className="input-buscar"
+                  placeholder="Digite o Modelo"
+                  type="search"
+                  value={searchInputValue}
+                  onChange={(e) => setSearchInputValue(e.target.value)}
+                />
+              ) : selectedField === "cpfCliente" ? (
+                <CpfInput
+                  className="input-buscar"
+                  placeholder="Digite o CPF do Cliente"
+                  type="search"
+                  value={searchInputValue}
+                  onChange={(e) => setSearchInputValue(e.target.value)}
+                />
+              ) : (
+                selectedField === "statusMoto" && (
+                  <>
+                    <div style={{ marginRight: "2vw" }}>
+                      <label className="label-radio" htmlFor="opcaoStatusMoto1">
+                        ATIVO
+                      </label>
+                      <input
+                        id="opcaoStatusMoto1"
+                        className="input-radio"
+                        type="radio"
+                        name="status"
+                        value={selectedField}
+                        onChange={() => setSearchInputValue("ATIVO")}
+                      />
+                    </div>
+                    <div>
+                      <label className="label-radio" htmlFor="opcaoStatusMoto2">
+                        INATIVO
+                      </label>
+                      <input
+                        id="opcaoStatusMoto2"
+                        className="input-radio"
+                        type="radio"
+                        name="status"
+                        value={selectedField}
+                        onChange={() => setSearchInputValue("INATIVO")}
+                      />
+                    </div>
+                  </>
+                )
+              )}
             </div>
-          ) : selectedField === "placa" ? (
-            <PlateInput
-              className="input-buscar"
-              placeholder="Digite a Placa"
-              type="search"
-              onChange={(e) => setSearchInputValue(e.target.value)}
-            />
-          ) : selectedField === "marca" ? (
-            <input
-              className="input-buscar"
-              placeholder="Digite a Marca"
-              type="search"
-              onChange={(e) => setSearchInputValue(e.target.value)}
-            />
-          ) : selectedField === "modelo" ? (
-            <input
-              className="input-buscar"
-              placeholder="Digite o Modelo"
-              type="search"
-              value={searchInputValue}
-              onChange={(e) => setSearchInputValue(e.target.value)}
-            />
-          ) : selectedField === "cpfCliente" ? (
-            <CpfInput
-              className="input-buscar"
-              placeholder="Digite o CPF do Cliente"
-              type="search"
-              value={searchInputValue}
-              onChange={(e) => setSearchInputValue(e.target.value)}
-            />
-          ) : (
-            selectedField === "statusMoto" && (
-              <>
-                <div style={{ marginRight: "2vw" }}>
-                  <label className="label-radio" htmlFor="opcaoStatusMoto1">
-                    ATIVO
-                  </label>
-                  <input
-                    id="opcaoStatusMoto1"
-                    className="input-radio"
-                    type="radio"
-                    name="status"
-                    value={selectedField}
-                    onChange={() => setSearchInputValue("ATIVO")}
-                  />
-                </div>
-                <div>
-                  <label className="label-radio" htmlFor="opcaoStatusMoto2">
-                    INATIVO
-                  </label>
-                  <input
-                    id="opcaoStatusMoto2"
-                    className="input-radio"
-                    type="radio"
-                    name="status"
-                    value={selectedField}
-                    onChange={() => setSearchInputValue("INATIVO")}
-                  />
-                </div>
-              </>
-            )
-          )}
-        </div>
-        <div className="div-radios">
-          <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoPlaca">
-              Placa
-            </label>
-            <input
-              className="input-radio"
-              type="radio"
-              name="opcao"
-              id="opcaoPlaca"
-              value={selectedField}
-              onChange={() => setSelectedField("placa")}
-              onClick={() => handleRadioClick("placa")}
-              checked={selectedField === "placa"}
-            />
+            <div className="div-radios">
+              <div className="div-dupla-radio">
+                <label className="label-radio" htmlFor="opcaoPlaca">
+                  Placa
+                </label>
+                <input
+                  className="input-radio"
+                  type="radio"
+                  name="opcao"
+                  id="opcaoPlaca"
+                  value={selectedField}
+                  onChange={() => setSelectedField("placa")}
+                  onClick={() => handleRadioClick("placa")}
+                  checked={selectedField === "placa"}
+                />
+              </div>
+              <div className="div-dupla-radio">
+                <label className="label-radio" htmlFor="opcaoMarca">
+                  Marca
+                </label>
+                <input
+                  className="input-radio"
+                  type="radio"
+                  name="opcao"
+                  id="opcaoMarca"
+                  value={selectedField}
+                  onChange={() => setSelectedField("marca")}
+                  onClick={() => handleRadioClick("marca")}
+                  checked={selectedField === "marca"}
+                />
+              </div>
+              <div className="div-dupla-radio">
+                <label className="label-radio" htmlFor="opcaoModelo">
+                  Modelo
+                </label>
+                <input
+                  className="input-radio"
+                  type="radio"
+                  name="opcao"
+                  id="opcaoModelo"
+                  value={selectedField}
+                  onChange={() => setSelectedField("modelo")}
+                  onClick={() => handleRadioClick("modelo")}
+                  checked={selectedField === "modelo"}
+                />
+              </div>
+              <div className="div-dupla-radio">
+                <label className="label-radio" htmlFor="opcaoCpfCliente">
+                  CPF do Cliente
+                </label>
+                <input
+                  className="input-radio"
+                  type="radio"
+                  name="opcao"
+                  id="opcaoCpfCliente"
+                  value={selectedField}
+                  onChange={() => setSelectedField("cpfCliente")}
+                  onClick={() => handleRadioClick("cpfCliente")}
+                  checked={selectedField === "cpfCliente"}
+                />
+              </div>
+              <div className="div-dupla-radio">
+                <label className="label-radio" htmlFor="opcaoStatusMoto">
+                  Status da Moto
+                </label>
+                <input
+                  className="input-radio"
+                  type="radio"
+                  name="opcao"
+                  id="opcaoStatusMoto"
+                  value={selectedField}
+                  onChange={() => setSelectedField("statusMoto")}
+                  onClick={() => handleRadioClick("statusMoto")}
+                  checked={selectedField === "statusMoto"}
+                />
+              </div>
+            </div>
           </div>
-          <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoMarca">
-              Marca
-            </label>
-            <input
-              className="input-radio"
-              type="radio"
-              name="opcao"
-              id="opcaoMarca"
-              value={selectedField}
-              onChange={() => setSelectedField("marca")}
-              onClick={() => handleRadioClick("marca")}
-              checked={selectedField === "marca"}
-            />
+          <div className="div-dupla-check">
+            <div
+              style={{
+                display: "flex",
+                whiteSpace: "nowrap",
+                fontWeight: "bolder",
+              }}
+            >
+              <label className="label-radio" htmlFor="recente">
+                Mais recente
+              </label>
+              <input
+                className="input-check"
+                type="checkbox"
+                name="filtroData"
+                id="recente"
+                value="recente"
+                checked={selectedValue === "recente"}
+                onChange={() => checkboxSelectionToggle("recente")}
+              />
+            </div>
+            <div style={{ display: "flex", whiteSpace: "nowrap" }}>
+              <label className="label-radio" htmlFor="antiga">
+                Mais antiga
+              </label>
+              <input
+                className="input-check"
+                type="checkbox"
+                name="filtroData"
+                id="antiga"
+                value="antiga"
+                checked={selectedValue === "antiga"}
+                onChange={() => checkboxSelectionToggle("antiga")}
+              />
+            </div>
           </div>
-          <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoModelo">
-              Modelo
-            </label>
-            <input
-              className="input-radio"
-              type="radio"
-              name="opcao"
-              id="opcaoModelo"
-              value={selectedField}
-              onChange={() => setSelectedField("modelo")}
-              onClick={() => handleRadioClick("modelo")}
-              checked={selectedField === "modelo"}
-            />
-          </div>
-          <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoCpfCliente">
-              CPF do Cliente
-            </label>
-            <input
-              className="input-radio"
-              type="radio"
-              name="opcao"
-              id="opcaoCpfCliente"
-              value={selectedField}
-              onChange={() => setSelectedField("cpfCliente")}
-              onClick={() => handleRadioClick("cpfCliente")}
-              checked={selectedField === "cpfCliente"}
-            />
-          </div>
-          <div className="div-dupla-radio">
-            <label className="label-radio" htmlFor="opcaoStatusMoto">
-              Status da Moto
-            </label>
-            <input
-              className="input-radio"
-              type="radio"
-              name="opcao"
-              id="opcaoStatusMoto"
-              value={selectedField}
-              onChange={() => setSelectedField("statusMoto")}
-              onClick={() => handleRadioClick("statusMoto")}
-              checked={selectedField === "statusMoto"}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="div-dupla-check">
-        <div
-          style={{
-            display: "flex",
-            whiteSpace: "nowrap",
-            fontWeight: "bolder",
-          }}
-        >
-          <label className="label-radio" htmlFor="recente">
-            Mais recente
-          </label>
-          <input
-            className="input-check"
-            type="checkbox"
-            name="filtroData"
-            id="recente"
-            value="recente"
-            checked={selectedValue === "recente"}
-            onChange={() => checkboxSelectionToggle("recente")}
-          />
-        </div>
-        <div style={{ display: "flex", whiteSpace: "nowrap" }}>
-          <label className="label-radio" htmlFor="antiga">
-            Mais antiga
-          </label>
-          <input
-            className="input-check"
-            type="checkbox"
-            name="filtroData"
-            id="antiga"
-            value="antiga"
-            checked={selectedValue === "antiga"}
-            onChange={() => checkboxSelectionToggle("antiga")}
-          />
-        </div>
-      </div>
 
-      {motorcycle.map((moto) => {
-        return (
-          <MotorcycleCard
-            key={moto.id}
-            motorcycle={moto}
-            setMotorcycle={setMotorcycle}
-          />
-        );
-      })}
+          {motorcycles.map((moto) => {
+            return (
+              <MotorcycleCard
+                key={moto.id}
+                motorcycle={moto}
+                setMotorcycle={setMotorcycles}
+              />
+            );
+          })}
+        </>
+      )}
     </div>
   );
 }
