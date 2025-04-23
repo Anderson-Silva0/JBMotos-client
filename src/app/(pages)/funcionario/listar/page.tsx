@@ -16,6 +16,8 @@ import { useEffect, useState } from "react";
 export default function ListEmployees() {
   const [employees, setEmployees] = useState<Employee[]>([]);
 
+  const [hasInitialData, setHasInitialData] = useState<boolean>(false);
+
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const [searchInputValue, setSearchInputValue] = useState<string>("");
@@ -53,11 +55,18 @@ export default function ListEmployees() {
           selectedField,
           searchInputValue
         );
-        const employeesList = employeeResponse.data as Employee[];
-        const employeesFilter = employeesList.filter(
-          (f) => f.cpf !== "710.606.394-08"
-        );
-        setEmployees(employeesFilter);
+        if (employeeResponse) {
+          const employeesList = employeeResponse.data as Employee[];
+          if (employeesList) {
+            const employeesFilter = employeesList.filter(
+              (f) => f.cpf !== "710.606.394-08"
+            );
+            setEmployees(employeesFilter);
+            if (employeesFilter && employeesFilter.length > 0) {
+              setHasInitialData(true);
+            }
+          }
+        }
       } catch (error: any) {
         errorMessage("Erro ao tentar buscar Funcionário.");
       } finally {
@@ -113,7 +122,7 @@ export default function ListEmployees() {
           )
         )}
       </h1>
-      {employees.length > 0 && (
+      {(employees.length > 0 || hasInitialData) && (
         <>
           <div className="div-container-buscar">
             <div className="div-buscar">

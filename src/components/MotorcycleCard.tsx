@@ -98,13 +98,13 @@ export default function MotorcycleCard({ motorcycle, setMotorcycle }: Motorcycle
           <div className="div-dados">Status da Moto</div>
           {motorcycle.motorcycleStatus === "ACTIVE" ? (
             <div style={{ color: "green" }} className="div-resultado">
-              {motorcycle.motorcycleStatus}
+              ATIVO
               <Check strokeWidth={3} />
             </div>
           ) : (
             motorcycle.motorcycleStatus === "INACTIVE" && (
               <div style={{ color: "red" }} className="div-resultado">
-                {motorcycle.motorcycleStatus}
+                INATIVO
                 <X strokeWidth={3} />
               </div>
             )

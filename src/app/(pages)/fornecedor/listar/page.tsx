@@ -16,6 +16,8 @@ import { useEffect, useState } from "react";
 export default function ListSuppliers() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
 
+  const [hasInitialData, setHasInitialData] = useState<boolean>(false);
+
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const [searchInputValue, setSearchInputValue] = useState<string>("");
@@ -53,7 +55,13 @@ export default function ListSuppliers() {
           selectedField,
           searchInputValue
         );
-        setSuppliers(supplierResponse.data);
+        if (supplierResponse) {
+          const supplierData = supplierResponse.data as Supplier[];
+          setSuppliers(supplierData);
+          if (supplierData && supplierData.length > 0) {
+            setHasInitialData(true);
+          }
+        }
       } catch (error: any) {
         errorMessage("Erro ao tentar buscar Fornecedor.");
       } finally {
@@ -109,7 +117,7 @@ export default function ListSuppliers() {
           )
         )}
       </h1>
-      {suppliers.length > 0 && (
+      {(suppliers.length > 0 || hasInitialData) && (
         <>
           <div className="div-container-buscar">
             <div className="div-buscar">

@@ -17,6 +17,7 @@ export default function ListSales() {
   const { filterSale } = SaleService();
 
   const [sales, setSales] = useState<Sale[]>([]);
+  const [hasInitialData, setHasInitialData] = useState<boolean>(false);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [searchInputValue, setSearchInputValue] = useState<string>("");
   const [selectedField, setSelectedField] = useState<string>("");
@@ -49,7 +50,13 @@ export default function ListSales() {
           selectedField,
           searchInputValue
         );
-        setSales(saleResponse.data);
+        if (saleResponse) {
+          const saleData = saleResponse.data as Sale[];
+          setSales(saleData);
+          if (saleData && saleData.length > 0) {
+            setHasInitialData(true);
+          }
+        }
       } catch (error: any) {
         errorMessage("Erro ao tentar buscar Venda.");
       } finally {
@@ -105,7 +112,7 @@ export default function ListSales() {
           )
         )}
       </h1>
-      {sales.length > 0 && (
+      {(sales.length > 0 || hasInitialData) && (
         <>
           <div className="div-container-buscar">
             <div className="div-buscar">

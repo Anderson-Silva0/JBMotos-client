@@ -13,8 +13,10 @@ import Image from "next/image";
 import "@/styles/card.css";
 import { useEffect, useState } from "react";
 
-export default function ListarClientes() {
+export default function ListCustomers() {
   const [customers, setCustomers] = useState<Customer[]>([]);
+
+  const [hasInitialData, setHasInitialData] = useState<boolean>(false);
 
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
@@ -53,7 +55,13 @@ export default function ListarClientes() {
           selectedField,
           searchInputValue
         );
-        setCustomers(customerResponse.data);
+        if (customerResponse) {
+          const customerData = customerResponse.data as Customer[];
+          setCustomers(customerData);
+          if (customerData && customerData.length > 0) {
+            setHasInitialData(true);
+          }
+        }
       } catch (error: any) {
         errorMessage("Erro ao tentar buscar cliente.");
       } finally {
@@ -109,7 +117,7 @@ export default function ListarClientes() {
           )
         )}
       </h1>
-      {customers.length > 0 && (
+      {(customers.length > 0 || hasInitialData) && (
         <>
           <div className="div-container-buscar">
             <div className="div-buscar">

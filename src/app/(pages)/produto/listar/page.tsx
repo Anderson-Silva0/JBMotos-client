@@ -15,6 +15,8 @@ import "@/styles/card.css";
 export default function ListProducts() {
   const [products, setProducts] = useState<Product[]>([]);
 
+  const [hasInitialData, setHasInitialData] = useState<boolean>(false);
+
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const [searchInputValue, setSearchInputValue] = useState<string>("");
@@ -52,7 +54,13 @@ export default function ListProducts() {
           selectedField,
           searchInputValue
         );
-        setProducts(productResponse.data);
+        if (productResponse) {
+          const productData = productResponse.data as Product[];
+          setProducts(productData);
+          if (productData && productData.length > 0) {
+            setHasInitialData(true);
+          }
+        }
       } catch (error: any) {
         errorMessage("Erro ao tentar buscar Produto.");
       } finally {
@@ -108,7 +116,7 @@ export default function ListProducts() {
           )
         )}
       </h1>
-      {products.length > 0 && (
+      {(products.length > 0 || hasInitialData) && (
         <>
           <div className="div-container-buscar">
             <div className="div-buscar">

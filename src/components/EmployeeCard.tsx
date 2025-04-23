@@ -91,13 +91,13 @@ export default function EmployeeCard({
           <div className="div-dados">Status do Funcionário</div>
           {employee.employeeStatus === "ACTIVE" ? (
             <div style={{ color: "green" }} className="div-resultado">
-              {employee.employeeStatus}
+              ATIVO
               <Check strokeWidth={3} />
             </div>
           ) : (
             employee.employeeStatus === "INACTIVE" && (
               <div style={{ color: "red" }} className="div-resultado">
-                {employee.employeeStatus}
+                INATIVO
                 <X strokeWidth={3} />
               </div>
             )

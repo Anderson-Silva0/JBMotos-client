@@ -96,13 +96,13 @@ export default function CustomerCard({
           <div className="div-dados">Status do Cliente</div>
           {customer.customerStatus === "ACTIVE" ? (
             <div style={{ color: "green" }} className="div-resultado">
-              {customer.customerStatus}
+              ATIVO
               <Check strokeWidth={3} />
             </div>
           ) : (
             customer.customerStatus === "INACTIVE" && (
               <div style={{ color: "red" }} className="div-resultado">
-                {customer.customerStatus}
+                INATIVO
                 <X strokeWidth={3} />
               </div>
             )

@@ -17,6 +17,7 @@ export default function ListRepair() {
   const { filterRepair } = RepairService();
 
   const [repairs, setRepairs] = useState<Repair[]>([]);
+  const [hasInitialData, setHasInitialData] = useState<boolean>(false);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [searchInputValue, setSearchInputValue] = useState<string>("");
   const [selectedField, setSelectedField] = useState<string>("");
@@ -49,7 +50,13 @@ export default function ListRepair() {
           selectedField,
           searchInputValue
         );
-        setRepairs(repairResponse.data);
+        if (repairResponse) {
+          const repairData = repairResponse.data as Repair[];
+          setRepairs(repairData);
+          if (repairData && repairData.length > 0) {
+            setHasInitialData(true);
+          }
+        }
       } catch (error: any) {
         errorMessage("Erro ao tentar buscar Serviço.");
       } finally {
@@ -105,7 +112,7 @@ export default function ListRepair() {
           )
         )}
       </h1>
-      {repairs.length > 0 && (
+      {(repairs.length > 0 || hasInitialData) && (
         <>
           <div className="div-container-buscar">
             <div className="div-buscar">

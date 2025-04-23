@@ -169,13 +169,13 @@ export default function ProductCard({ product, setProduct }: ProductCardProps) {
           <div className="div-dados">Status do Produto</div>
           {product.productStatus === "ACTIVE" ? (
             <div style={{ color: "green" }} className="div-resultado">
-              {product.productStatus}
+              ATIVO
               <Check strokeWidth={3} />
             </div>
           ) : (
             product.productStatus === "INACTIVE" && (
               <div style={{ color: "red" }} className="div-resultado">
-                {product.productStatus}
+                INATIVO
                 <X strokeWidth={3} />
               </div>
             )

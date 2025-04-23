@@ -16,6 +16,8 @@ import { useEffect, useState } from "react";
 export default function ListMotorcycle() {
   const [motorcycles, setMotorcycles] = useState<Motorcycle[]>([]);
 
+  const [hasInitialData, setHasInitialData] = useState<boolean>(false);
+
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const [searchInputValue, setSearchInputValue] = useState<string>("");
@@ -53,7 +55,13 @@ export default function ListMotorcycle() {
           selectedField,
           searchInputValue
         );
-        setMotorcycles(motorcycleResponse.data);
+        if (motorcycleResponse) {
+          const motorcycleData = motorcycleResponse.data as Motorcycle[];
+          setMotorcycles(motorcycleData);
+          if (motorcycleData && motorcycleData.length > 0) {
+            setHasInitialData(true);
+          }
+        }
       } catch (error: any) {
         errorMessage("Erro ao tentar buscar Moto.");
       } finally {
@@ -109,7 +117,7 @@ export default function ListMotorcycle() {
           )
         )}
       </h1>
-      {motorcycles.length > 0 && (
+      {(motorcycles.length > 0 || hasInitialData) && (
         <>
           <div className="div-container-buscar">
             <div className="div-buscar">

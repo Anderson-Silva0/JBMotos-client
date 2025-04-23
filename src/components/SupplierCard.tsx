@@ -100,13 +100,13 @@ export default function SupplierCard({
           <div className="div-dados">Status do Fornecedor</div>
           {supplier.supplierStatus === "ACTIVE" ? (
             <div style={{ color: "green" }} className="div-resultado">
-              {supplier.supplierStatus}
+              ATIVO
               <Check strokeWidth={3} />
             </div>
           ) : (
             supplier.supplierStatus === "INACTIVE" && (
               <div style={{ color: "red" }} className="div-resultado">
-                {supplier.supplierStatus}
+                INATIVO
                 <X strokeWidth={3} />
               </div>
             )
