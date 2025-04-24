@@ -131,7 +131,7 @@ export default function ListEmployees() {
                 <div className="div-msg-busca">
                   <p>Selecione o filtro desejado:</p>
                 </div>
-              ) : selectedField === "nome" ? (
+              ) : selectedField === "name" ? (
                 <input
                   className="input-buscar"
                   placeholder="Digite o Nome"
@@ -146,7 +146,7 @@ export default function ListEmployees() {
                   value={searchInputValue}
                   onChange={(e) => setSearchInputValue(e.target.value)}
                 />
-              ) : selectedField === "telefone" ? (
+              ) : selectedField === "phone" ? (
                 <PhoneInput
                   className="input-buscar"
                   placeholder="Digite o Telefone"
@@ -155,7 +155,7 @@ export default function ListEmployees() {
                   onChange={(e) => setSearchInputValue(e.target.value)}
                 />
               ) : (
-                selectedField === "statusFuncionario" && (
+                selectedField === "employeeStatus" && (
                   <>
                     <div style={{ marginRight: "2vw" }}>
                       <label
@@ -170,7 +170,7 @@ export default function ListEmployees() {
                         type="radio"
                         name="status"
                         value={selectedField}
-                        onChange={() => setSearchInputValue("ATIVO")}
+                        onChange={() => setSearchInputValue("ACTIVE")}
                       />
                     </div>
                     <div>
@@ -186,7 +186,7 @@ export default function ListEmployees() {
                         type="radio"
                         name="status"
                         value={selectedField}
-                        onChange={() => setSearchInputValue("INATIVO")}
+                        onChange={() => setSearchInputValue("INACTIVE")}
                       />
                     </div>
                   </>
@@ -204,9 +204,9 @@ export default function ListEmployees() {
                   name="opcao"
                   id="opcaoNome"
                   value={selectedField}
-                  onChange={() => setSelectedField("nome")}
-                  onClick={() => handleRadioClick("nome")}
-                  checked={selectedField === "nome"}
+                  onChange={() => setSelectedField("name")}
+                  onClick={() => handleRadioClick("name")}
+                  checked={selectedField === "name"}
                 />
               </div>
               <div className="div-dupla-radio">
@@ -234,9 +234,9 @@ export default function ListEmployees() {
                   name="opcao"
                   id="opcaoTelefone"
                   value={selectedField}
-                  onChange={() => setSelectedField("telefone")}
-                  onClick={() => handleRadioClick("telefone")}
-                  checked={selectedField === "telefone"}
+                  onChange={() => setSelectedField("phone")}
+                  onClick={() => handleRadioClick("phone")}
+                  checked={selectedField === "phone"}
                 />
               </div>
               <div className="div-dupla-radio">
@@ -249,9 +249,9 @@ export default function ListEmployees() {
                   name="opcao"
                   id="opcaoStatusFuncionario"
                   value={selectedField}
-                  onChange={() => setSelectedField("statusFuncionario")}
-                  onClick={() => handleRadioClick("statusFuncionario")}
-                  checked={selectedField === "statusFuncionario"}
+                  onChange={() => setSelectedField("employeeStatus")}
+                  onClick={() => handleRadioClick("employeeStatus")}
+                  checked={selectedField === "employeeStatus"}
                 />
               </div>
             </div>
