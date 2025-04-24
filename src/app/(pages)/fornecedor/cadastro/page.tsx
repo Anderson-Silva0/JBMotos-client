@@ -59,14 +59,14 @@ export default function RegisterSupplier() {
         <Save size="6vh" strokeWidth={3} /> Cadastro de Fornecedor
       </h1>
       <Card title="Dados do Fornecedor">
-        <FormGroup label="Nome: *" htmlFor="nome">
+        <FormGroup label="Nome: *" htmlFor="name">
           <input
             value={supplier.name}
-            onChange={(e) => setSupplierProps("nome", e)}
-            id="nome"
+            onChange={(e) => setSupplierProps("name", e)}
+            id="name"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="nome" />}
+          {<DisplayError errors={errors} inputName="name" />}
         </FormGroup>
         <FormGroup label="CNPJ: *" htmlFor="cnpj">
           <CnpjInput
@@ -75,12 +75,12 @@ export default function RegisterSupplier() {
           />
           {<DisplayError errors={errors} inputName="cnpj" />}
         </FormGroup>
-        <FormGroup label="Celular: *" htmlFor="telefone">
+        <FormGroup label="Celular: *" htmlFor="phone">
           <PhoneInput
             value={supplier.phone}
-            onChange={(e) => setSupplierProps("telefone", e)}
+            onChange={(e) => setSupplierProps("phone", e)}
           />
-          {<DisplayError errors={errors} inputName="telefone" />}
+          {<DisplayError errors={errors} inputName="phone" />}
         </FormGroup>
       </Card>
       <Card title="Endereço do Fornecedor">
@@ -95,43 +95,43 @@ export default function RegisterSupplier() {
           />
           {<DisplayError errors={errors} inputName="cep" />}
         </FormGroup>
-        <FormGroup label="Logradouro: *" htmlFor="rua">
+        <FormGroup label="Logradouro: *" htmlFor="road">
           <input
             value={address.road}
-            onChange={(e) => setAddressProps("rua", e)}
-            id="rua"
+            onChange={(e) => setAddressProps("road", e)}
+            id="road"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="rua" />}
+          {<DisplayError errors={errors} inputName="road" />}
         </FormGroup>
-        <FormGroup label="Número: *" htmlFor="numero">
+        <FormGroup label="Número: *" htmlFor="number">
           <input
             className="input-number-form"
             value={address.number}
-            onChange={(e) => setAddressProps("numero", e)}
-            id="numero"
+            onChange={(e) => setAddressProps("number", e)}
+            id="number"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={errors} inputName="numero" />}
+          {<DisplayError errors={errors} inputName="number" />}
         </FormGroup>
-        <FormGroup label="Bairro: *" htmlFor="bairro">
+        <FormGroup label="Bairro: *" htmlFor="neighborhood">
           <input
             value={address.neighborhood}
-            onChange={(e) => setAddressProps("bairro", e)}
-            id="bairro"
+            onChange={(e) => setAddressProps("neighborhood", e)}
+            id="neighborhood"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="bairro" />}
+          {<DisplayError errors={errors} inputName="neighborhood" />}
         </FormGroup>
-        <FormGroup label="Cidade: *" htmlFor="cidade">
+        <FormGroup label="Cidade: *" htmlFor="city">
           <input
             value={address.city}
-            onChange={(e) => setAddressProps("cidade", e)}
-            id="cidade"
+            onChange={(e) => setAddressProps("city", e)}
+            id="city"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="cidade" />}
+          {<DisplayError errors={errors} inputName="city" />}
         </FormGroup>
       </Card>
       <div className="divBotaoCadastrar">

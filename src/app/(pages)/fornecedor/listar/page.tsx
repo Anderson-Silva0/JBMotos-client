@@ -126,7 +126,7 @@ export default function ListSuppliers() {
                 <div className="div-msg-busca">
                   <p>Selecione o filtro desejado:</p>
                 </div>
-              ) : selectedField === "nome" ? (
+              ) : selectedField === "name" ? (
                 <input
                   className="input-buscar"
                   placeholder="Digite o Nome"
@@ -141,7 +141,7 @@ export default function ListSuppliers() {
                   value={searchInputValue}
                   onChange={(e) => setSearchInputValue(e.target.value)}
                 />
-              ) : selectedField === "telefone" ? (
+              ) : selectedField === "phone" ? (
                 <PhoneInput
                   className="input-buscar"
                   placeholder="Digite o Telefone"
@@ -150,7 +150,7 @@ export default function ListSuppliers() {
                   onChange={(e) => setSearchInputValue(e.target.value)}
                 />
               ) : (
-                selectedField === "statusFornecedor" && (
+                selectedField === "supplierStatus" && (
                   <>
                     <div style={{ marginRight: "2vw" }}>
                       <label
@@ -165,7 +165,7 @@ export default function ListSuppliers() {
                         type="radio"
                         name="status"
                         value={selectedField}
-                        onChange={() => setSearchInputValue("ATIVO")}
+                        onChange={() => setSearchInputValue("ACTIVE")}
                       />
                     </div>
                     <div>
@@ -181,7 +181,7 @@ export default function ListSuppliers() {
                         type="radio"
                         name="status"
                         value={selectedField}
-                        onChange={() => setSearchInputValue("INATIVO")}
+                        onChange={() => setSearchInputValue("INACTIVE")}
                       />
                     </div>
                   </>
@@ -199,9 +199,9 @@ export default function ListSuppliers() {
                   name="opcao"
                   id="opcaoNome"
                   value={selectedField}
-                  onChange={() => setSelectedField("nome")}
-                  onClick={() => handleRadioClick("nome")}
-                  checked={selectedField === "nome"}
+                  onChange={() => setSelectedField("name")}
+                  onClick={() => handleRadioClick("name")}
+                  checked={selectedField === "name"}
                 />
               </div>
               <div className="div-dupla-radio">
@@ -229,9 +229,9 @@ export default function ListSuppliers() {
                   name="opcao"
                   id="opcaoTelefone"
                   value={selectedField}
-                  onChange={() => setSelectedField("telefone")}
-                  onClick={() => handleRadioClick("telefone")}
-                  checked={selectedField === "telefone"}
+                  onChange={() => setSelectedField("phone")}
+                  onClick={() => handleRadioClick("phone")}
+                  checked={selectedField === "phone"}
                 />
               </div>
               <div className="div-dupla-radio">
@@ -244,9 +244,9 @@ export default function ListSuppliers() {
                   name="opcao"
                   id="opcaoStatusFornecedor"
                   value={selectedField}
-                  onChange={() => setSelectedField("statusFornecedor")}
-                  onClick={() => handleRadioClick("statusFornecedor")}
-                  checked={selectedField === "statusFornecedor"}
+                  onChange={() => setSelectedField("supplierStatus")}
+                  onClick={() => handleRadioClick("supplierStatus")}
+                  checked={selectedField === "supplierStatus"}
                 />
               </div>
             </div>
