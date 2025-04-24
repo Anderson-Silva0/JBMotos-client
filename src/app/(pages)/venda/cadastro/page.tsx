@@ -389,9 +389,15 @@ export default function RegisterSale() {
             placeholder="Selecione..."
             value={selectedCustomerOption}
             onChange={(option: any) => setSelectedCustomerOption(option)}
-            options={customers.map(
-              (c) => ({ label: c.cpf, value: c.cpf } as selectionOptions)
-            )}
+            options={
+              customers.map((customer) => {
+                const namesList = customer.name.split(" ");
+                if (namesList && namesList.length > 0) {
+                  const firstName = namesList[0];
+                  return { label: `${firstName} • ${customer.cpf}`, value: customer.cpf } as selectionOptions;
+                }
+              })
+            }
             instanceId="select-cpfCliente"
           />
           {<DisplayError errors={errors} inputName="cpfCliente" />}
