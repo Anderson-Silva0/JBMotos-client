@@ -66,7 +66,7 @@ export default function RegisterProduct() {
         const allSuppliersResponse = await findAllSupplier();
         const allSuppliers = allSuppliersResponse.data;
         const activeSuppliers = allSuppliers.filter(
-          (f: Supplier) => f.supplierStatus === "ATIVO"
+          (f: Supplier) => f.supplierStatus === "ACTIVE"
         );
         setSuppliers(activeSuppliers);
       } catch (erro: any) {
@@ -123,43 +123,43 @@ export default function RegisterProduct() {
   return (
     <div className="div-form-container">
       <Card title="Informações do Produto">
-        <FormGroup label="Nome: *" htmlFor="nome">
+        <FormGroup label="Nome: *" htmlFor="name">
           <input
             value={product.name}
-            onChange={(e) => setProductProps("nome", e)}
-            id="nome"
+            onChange={(e) => setProductProps("name", e)}
+            id="name"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="nome" />}
+          {<DisplayError errors={errors} inputName="name" />}
         </FormGroup>
-        <FormGroup label="Preço de Custo: *" htmlFor="precoCusto">
+        <FormGroup label="Preço de Custo: *" htmlFor="costPrice">
           <input
             value={formatToBRL(product.costPrice)}
-            onChange={(e) => setProductMoneyProps("precoCusto", e)}
-            id="precoCusto"
+            onChange={(e) => setProductMoneyProps("costPrice", e)}
+            id="costPrice"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="precoCusto" />}
+          {<DisplayError errors={errors} inputName="costPrice" />}
         </FormGroup>
-        <FormGroup label="Preço de Venda: *" htmlFor="precoVenda">
+        <FormGroup label="Preço de Venda: *" htmlFor="salePrice">
           <input
             value={formatToBRL(product.salePrice)}
-            onChange={(e) => setProductMoneyProps("precoVenda", e)}
-            id="precoVenda"
+            onChange={(e) => setProductMoneyProps("salePrice", e)}
+            id="salePrice"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="precoVenda" />}
+          {<DisplayError errors={errors} inputName="salePrice" />}
         </FormGroup>
-        <FormGroup label="Marca: *" htmlFor="marca">
+        <FormGroup label="Marca: *" htmlFor="brand">
           <input
             value={product.brand}
-            onChange={(e) => setProductProps("marca", e)}
-            id="marca"
+            onChange={(e) => setProductProps("brand", e)}
+            id="brand"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="marca" />}
+          {<DisplayError errors={errors} inputName="brand" />}
         </FormGroup>
-        <FormGroup label="Selecione o Fornecedor: *" htmlFor="cnpjFornecedor">
+        <FormGroup label="Selecione o Fornecedor: *" htmlFor="supplierCnpj">
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
@@ -172,42 +172,42 @@ export default function RegisterProduct() {
                   value: fornecedor.cnpj,
                 } as selectionOptions)
             )}
-            instanceId="select-cnpjFornecedor"
+            instanceId="select-supplierCnpj"
           />
-          {<DisplayError errors={errors} inputName="cnpjFornecedor" />}
+          {<DisplayError errors={errors} inputName="supplierCnpj" />}
         </FormGroup>
-        <FormGroup label="Estoque Mínimo: *" htmlFor="estoqueMinimo">
+        <FormGroup label="Estoque Mínimo: *" htmlFor="minStock">
           <input
             className="input-number-form"
             value={stock.minStock}
-            onChange={(e) => setStockProps("estoqueMinimo", e)}
-            id="estoqueMinimo"
+            onChange={(e) => setStockProps("minStock", e)}
+            id="minStock"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={errors} inputName="estoqueMinimo" />}
+          {<DisplayError errors={errors} inputName="minStock" />}
         </FormGroup>
-        <FormGroup label="Estoque Máximo: *" htmlFor="estoqueMaximo">
+        <FormGroup label="Estoque Máximo: *" htmlFor="maxStock">
           <input
             className="input-number-form"
             value={stock.maxStock}
-            onChange={(e) => setStockProps("estoqueMaximo", e)}
-            id="estoqueMaximo"
+            onChange={(e) => setStockProps("maxStock", e)}
+            id="maxStock"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={errors} inputName="estoqueMaximo" />}
+          {<DisplayError errors={errors} inputName="maxStock" />}
         </FormGroup>
-        <FormGroup label="Quantidade: *" htmlFor="quantidade">
+        <FormGroup label="Quantidade: *" htmlFor="quantity">
           <input
             className="input-number-form"
             value={stock.quantity}
-            onChange={(e) => setStockProps("quantidade", e)}
-            id="quantidade"
+            onChange={(e) => setStockProps("quantity", e)}
+            id="quantity"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={errors} inputName="quantidade" />}
+          {<DisplayError errors={errors} inputName="quantity" />}
         </FormGroup>
       </Card>
       <div className="divBotaoCadastrar">

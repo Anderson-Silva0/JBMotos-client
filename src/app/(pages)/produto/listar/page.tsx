@@ -125,22 +125,22 @@ export default function ListProducts() {
                 <div className="div-msg-busca">
                   <p>Selecione o filtro desejado:</p>
                 </div>
-              ) : selectedField === "nome" ? (
+              ) : selectedField === "name" ? (
                 <input
                   className="input-buscar"
                   placeholder="Digite o Nome"
                   type="search"
                   onChange={(e) => setSearchInputValue(e.target.value)}
                 />
-              ) : selectedField === "marca" ? (
+              ) : selectedField === "brand" ? (
                 <input
                   className="input-buscar"
-                  placeholder="Digite a marca"
+                  placeholder="Digite a brand"
                   type="search"
                   onChange={(e) => setSearchInputValue(e.target.value)}
                 />
               ) : (
-                selectedField === "statusProduto" && (
+                selectedField === "productStatus" && (
                   <>
                     <div style={{ marginRight: "2vw" }}>
                       <label className="label-radio" htmlFor="opcaoStatusProduto1">
@@ -152,7 +152,7 @@ export default function ListProducts() {
                         type="radio"
                         name="status"
                         value={selectedField}
-                        onChange={() => setSearchInputValue("ATIVO")}
+                        onChange={() => setSearchInputValue("ACTIVE")}
                       />
                     </div>
                     <div>
@@ -165,7 +165,7 @@ export default function ListProducts() {
                         type="radio"
                         name="status"
                         value={selectedField}
-                        onChange={() => setSearchInputValue("INATIVO")}
+                        onChange={() => setSearchInputValue("INACTIVE")}
                       />
                     </div>
                   </>
@@ -183,9 +183,9 @@ export default function ListProducts() {
                   name="opcao"
                   id="opcaoNome"
                   value={selectedField}
-                  onChange={() => setSelectedField("nome")}
-                  onClick={() => handleRadioClick("nome")}
-                  checked={selectedField === "nome"}
+                  onChange={() => setSelectedField("name")}
+                  onClick={() => handleRadioClick("name")}
+                  checked={selectedField === "name"}
                 />
               </div>
               <div className="div-dupla-radio">
@@ -198,9 +198,9 @@ export default function ListProducts() {
                   name="opcao"
                   id="opcaoMarca"
                   value={selectedField}
-                  onChange={() => setSelectedField("marca")}
-                  onClick={() => handleRadioClick("marca")}
-                  checked={selectedField === "marca"}
+                  onChange={() => setSelectedField("brand")}
+                  onClick={() => handleRadioClick("brand")}
+                  checked={selectedField === "brand"}
                 />
               </div>
               <div className="div-dupla-radio">
@@ -213,9 +213,9 @@ export default function ListProducts() {
                   name="opcao"
                   id="opcaoStatusProduto"
                   value={selectedField}
-                  onChange={() => setSelectedField("statusProduto")}
-                  onClick={() => handleRadioClick("statusProduto")}
-                  checked={selectedField === "statusProduto"}
+                  onChange={() => setSelectedField("productStatus")}
+                  onClick={() => handleRadioClick("productStatus")}
+                  checked={selectedField === "productStatus"}
                 />
               </div>
             </div>
