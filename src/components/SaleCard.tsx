@@ -70,7 +70,7 @@ export default function SaleCard(sale: Sale) {
     }
 
     const currentUrl = window.location.pathname;
-    router.push(`${currentUrl}/products/${sale.id}`);
+    router.push(`${currentUrl}/produtos/${sale.id}`);
   };
 
   const [showInfo, setShowInfo] = useState(false);

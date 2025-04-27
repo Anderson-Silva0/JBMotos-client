@@ -259,7 +259,6 @@ export function TableRow(props: TableRowProps) {
 
         newProductOfSale.product.id = selectedOption.product.id;
         newProductOfSale.unitValue = selectedOption.product.salePrice;
-        console.log("selectedOption.product.id: ", selectedOption.product.id);
       }
   
       const productIndex = saleProductRowId.findIndex(
@@ -282,7 +281,6 @@ export function TableRow(props: TableRowProps) {
         }
       }
   
-      console.log("Lista atualizada: ", newProductOfSaleRowId);
       props.setSaleProductRowId(newProductOfSaleRowId);
     };
   

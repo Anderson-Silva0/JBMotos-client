@@ -180,7 +180,7 @@ export default function RegisterRepair() {
           setCardPayment({
             installment: selectedInstallmentOption.value,
             flag: selectedCardFlagOption.value,
-            totalFees: interestRate,
+            interestRate: interestRate,
             saleId: 0,
           });
         }

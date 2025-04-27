@@ -209,13 +209,10 @@ export default function RegisterSale() {
     const setCardPaymentMethod = () => {
       if (selectedPaymentMethodOption.label === "Cartão de Crédito") {
         if (selectedInstallmentOption.value || selectedCardFlagOption.value || interestRate) {
-          console.log("sale.totalSaleValue", sale.totalSaleValue);
-          console.log("interestRate", interestRate);
-          console.log("total taxa juros valor: ", interestRate * sale.totalSaleValue);
           setCardPayment({
             installment: selectedInstallmentOption.value,
             flag: selectedCardFlagOption.value,
-            totalFees: interestRate,
+            interestRate: interestRate,
             saleId: 0,
           });
         }

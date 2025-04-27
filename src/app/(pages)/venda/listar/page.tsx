@@ -121,7 +121,7 @@ export default function ListSales() {
                 <div className="div-msg-busca">
                   <p>Selecione o filtro desejado:</p>
                 </div>
-              ) : selectedField === "cpfCliente" ? (
+              ) : selectedField === "customerCpf" ? (
                 <CpfInput
                   className="input-buscar"
                   placeholder="Digite o CPF"
@@ -130,7 +130,7 @@ export default function ListSales() {
                   onChange={(e) => setSearchInputValue(e.target.value)}
                 />
               ) : (
-                selectedField === "cpfFuncionario" && (
+                selectedField === "employeeCpf" && (
                   <CpfInput
                     className="input-buscar"
                     placeholder="Digite o CPF"
@@ -152,9 +152,9 @@ export default function ListSales() {
                   name="opcao"
                   id="opcaoNome"
                   value={selectedField}
-                  onChange={() => setSelectedField("cpfCliente")}
-                  onClick={() => handleRadioClick("cpfCliente")}
-                  checked={selectedField === "cpfCliente"}
+                  onChange={() => setSelectedField("customerCpf")}
+                  onClick={() => handleRadioClick("customerCpf")}
+                  checked={selectedField === "customerCpf"}
                 />
               </div>
               <div className="div-dupla-radio">
@@ -167,9 +167,9 @@ export default function ListSales() {
                   name="opcao"
                   id="opcaoMarca"
                   value={selectedField}
-                  onChange={() => setSelectedField("cpfFuncionario")}
-                  onClick={() => handleRadioClick("cpfFuncionario")}
-                  checked={selectedField === "cpfFuncionario"}
+                  onChange={() => setSelectedField("employeeCpf")}
+                  onClick={() => handleRadioClick("employeeCpf")}
+                  checked={selectedField === "employeeCpf"}
                 />
               </div>
             </div>
@@ -211,19 +211,19 @@ export default function ListSales() {
             </div>
           </div>
 
-          {sales.map((venda) => {
+          {sales.map((sale) => {
             return (
               <SaleCard
-                key={venda.id}
-                id={venda.id}
-                cardPayment={null}
-                productsOfSale={[]}
-                customer={venda.customer}
-                employee={venda.employee}
-                createdAt={venda.createdAt}
-                observation={venda.observation}
-                paymentMethod={venda.paymentMethod}
-                totalSaleValue={venda.totalSaleValue}
+                key={sale.id}
+                id={sale.id}
+                cardPayment={sale.cardPayment}
+                productsOfSale={sale.productsOfSale}
+                customer={sale.customer}
+                employee={sale.employee}
+                createdAt={sale.createdAt}
+                observation={sale.observation}
+                paymentMethod={sale.paymentMethod}
+                totalSaleValue={sale.totalSaleValue}
               />
             );
           })}

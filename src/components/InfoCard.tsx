@@ -18,7 +18,7 @@ export default function InfoCard({ cardPayment: cardPayment }: InfoCardProps) {
 
       <div className="div-dados">Taxa de Juros (Ton)</div>
       <div className="div-resultado">
-        {formatToPercentage(Number(cardPayment.totalFees))}
+        {formatToPercentage(Number(cardPayment.interestRate))}
       </div>
     </div>
   );
