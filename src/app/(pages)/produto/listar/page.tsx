@@ -135,7 +135,7 @@ export default function ListProducts() {
               ) : selectedField === "brand" ? (
                 <input
                   className="input-buscar"
-                  placeholder="Digite a brand"
+                  placeholder="Digite a Marca"
                   type="search"
                   onChange={(e) => setSearchInputValue(e.target.value)}
                 />

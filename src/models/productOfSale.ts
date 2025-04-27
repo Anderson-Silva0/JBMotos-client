@@ -7,7 +7,6 @@ export interface ProductOfSale {
   quantity: number;
   unitValue: number | string;
   totalValue: number | string;
-  productId: number;
 }
 
 export const productOfSaleInitialState: ProductOfSale = {
@@ -17,5 +16,4 @@ export const productOfSaleInitialState: ProductOfSale = {
   quantity: 0,
   unitValue: 0,
   totalValue: 0,
-  productId: 0,
 };

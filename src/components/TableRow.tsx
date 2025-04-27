@@ -164,10 +164,9 @@ export function TableRow(props: TableRowProps) {
 
   useEffect(() => {
     const setInitialQuantity = () => {
-      if (
-        selectedOption.product.id !== 0 &&
-        selectedProductStock.status !== "UNAVAILABLE"
-      ) {
+      if (selectedOption.product.id !== 0 &&
+        selectedProductStock.status !== "UNAVAILABLE") {
+
         setProductOfSale((prevState) => ({
           ...prevState,
           quantity: 1,
@@ -249,40 +248,44 @@ export function TableRow(props: TableRowProps) {
   useEffect(() => {
     const addProductsToSaleList = () => {
       const { rowId, saleProductRowId } = props;
+  
+      const newProductOfSale = {
+        ...productOfSale,
+        product: { ...productOfSale.product }
+      };
+  
+      if (!newProductOfSale.product.id ||
+        (newProductOfSale.product.id !== selectedOption.product.id)) {
 
-      const newProductOfSale = { ...productOfSale };
-
-      if (
-        !newProductOfSale.product.id ||
-        newProductOfSale.product.id !== selectedOption.product.id
-      ) {
         newProductOfSale.product.id = selectedOption.product.id;
         newProductOfSale.unitValue = selectedOption.product.salePrice;
+        console.log("selectedOption.product.id: ", selectedOption.product.id);
       }
-
+  
       const productIndex = saleProductRowId.findIndex(
-        (product) => product.rowId === rowId
+        (item) => item.rowId === rowId
       );
-
+  
       const newProductOfSaleRowId = [...saleProductRowId];
-
+  
       if (productIndex !== -1) {
         newProductOfSaleRowId.splice(productIndex, 1, {
           productOfSale: newProductOfSale,
-          rowId: rowId,
+          rowId,
         });
       } else {
         if (newProductOfSale.quantity > 0) {
           newProductOfSaleRowId.push({
             productOfSale: newProductOfSale,
-            rowId: rowId,
+            rowId,
           });
         }
       }
-
+  
+      console.log("Lista atualizada: ", newProductOfSaleRowId);
       props.setSaleProductRowId(newProductOfSaleRowId);
     };
-
+  
     addProductsToSaleList();
   }, [productOfSale, selectedOption]);
 
@@ -319,11 +322,9 @@ export function TableRow(props: TableRowProps) {
             placeholder="Selecione..."
             value={selectedOption}
             onChange={(option: any) => setSelectedOption(option)}
-            options={activeProducts.map(
-              (produto) =>
-                ({
-                  label: produto.name,
-                  product: produto,
+            options={activeProducts.map((product) => ({
+                  label: product.name,
+                  product: product,
                 } as SelectedOptionProps)
             )}
             instanceId="select-idProduto"

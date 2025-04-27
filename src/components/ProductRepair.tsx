@@ -109,7 +109,7 @@ export default function ProductRepair(props: ProductRepairProps) {
           props.setTotalValues(newTotalValues);
 
           const indexToRemove = props.productOfSaleRowId.findIndex(
-            (item) => item.productOfSale.productId === deletedProduct.productId
+            (item) => item.productOfSale.product.id === deletedProduct.productId
           );
           if (indexToRemove >= 0) {
             props.productOfSaleRowId.splice(indexToRemove, 1);

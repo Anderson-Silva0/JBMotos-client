@@ -16,7 +16,7 @@ export default function RepairCard(repair: Repair) {
 
   const { findCustomerByCpf } = CustomerService();
   const { findEmployeeByCpf: findEmployeeByCpf } = EmployeeService();
-  const { totalSaleValue: totalSaleValue } = SaleService();
+  // const { totalSaleValue: totalSaleValue } = SaleService();
 
   const [customerState, setCustomerState] = useState<Customer>(customerInitialState);
   const [employeeState, setEmployeeState] = useState<Employee>(employeeInitialState);
@@ -39,10 +39,10 @@ export default function RepairCard(repair: Repair) {
         setEmployeeState(employeeResponse.data);
 
         if (repair.sale) {
-          const totalSaleValueResponse = await totalSaleValue(
-            repair.sale.id
-          );
-          setTotalSaleValueState(totalSaleValueResponse.data);
+          // const totalSaleValueResponse = await totalSaleValue(
+          //   repair.sale.id
+          // );
+          // setTotalSaleValueState(totalSaleValueResponse.data);
         }
       } catch (error: any) {
         errorMessage(error.response.data);

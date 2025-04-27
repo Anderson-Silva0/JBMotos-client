@@ -183,7 +183,7 @@ export default function RegisterSale() {
         const productsOfSale = productsOfSaleRowId.map((item) => {
           const saleProducts = { ...item.productOfSale };
           saleProducts.product = { ...saleProducts.product };
-          saleProducts.product.id = saleProducts.productId;
+          saleProducts.product.id = saleProducts.product.id;
 
           return saleProducts;
         });
@@ -208,11 +208,10 @@ export default function RegisterSale() {
   useEffect(() => {
     const setCardPaymentMethod = () => {
       if (selectedPaymentMethodOption.label === "Cartão de Crédito") {
-        if (
-          selectedInstallmentOption.value ||
-          selectedCardFlagOption.value ||
-          interestRate
-        ) {
+        if (selectedInstallmentOption.value || selectedCardFlagOption.value || interestRate) {
+          console.log("sale.totalSaleValue", sale.totalSaleValue);
+          console.log("interestRate", interestRate);
+          console.log("total taxa juros valor: ", interestRate * sale.totalSaleValue);
           setCardPayment({
             installment: selectedInstallmentOption.value,
             flag: selectedCardFlagOption.value,
@@ -383,7 +382,7 @@ export default function RegisterSale() {
         <Save size="6vh" strokeWidth={3} /> Registro de Venda
       </h1>
       <Card title="Detalhes da Venda">
-        <FormGroup label="Selecione o Cliente: *" htmlFor="cpfCliente">
+        <FormGroup label="Selecione o Cliente: *" htmlFor="customerCpf">
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
@@ -400,11 +399,11 @@ export default function RegisterSale() {
             }
             instanceId="select-cpfCliente"
           />
-          {<DisplayError errors={errors} inputName="cpfCliente" />}
+          {<DisplayError errors={errors} inputName="cpf" />}
         </FormGroup>
         <FormGroup
           label="Selecione a forma de pagamento*"
-          htmlFor="formaDePagamento"
+          htmlFor="paymentMethod"
         >
           <Select
             styles={selectStyles}
@@ -416,7 +415,7 @@ export default function RegisterSale() {
             options={paymentMethods}
             instanceId="select-formaDePagamento"
           />
-          {<DisplayError errors={errors} inputName="formaDePagamento" />}
+          {<DisplayError errors={errors} inputName="paymentMethod" />}
           {selectedPaymentMethodOption.value === "Cartão de Crédito" && (
             <CreditPayment
               errors={errors}
@@ -429,7 +428,7 @@ export default function RegisterSale() {
             />
           )}
         </FormGroup>
-        <FormGroup label="Observação:" htmlFor="observacao">
+        <FormGroup label="Observação:" htmlFor="observation">
           <input
             maxLength={100}
             value={sale.observation}
@@ -440,7 +439,7 @@ export default function RegisterSale() {
             id="observacao"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="observacao" />}
+          {<DisplayError errors={errors} inputName="observation" />}
         </FormGroup>
       </Card>
       <SaleTable>
@@ -451,9 +450,7 @@ export default function RegisterSale() {
               rowId={idLinha}
               products={products}
               rowQuantity={rowQuantity}
-              updateSelectedProductIdAndRowId={
-                updateSelectedProductIdRowId
-              }
+              updateSelectedProductIdAndRowId={updateSelectedProductIdRowId}
               totalValues={totalValues}
               setTotalValues={setTotalValues}
               setProducts={setProducts}
