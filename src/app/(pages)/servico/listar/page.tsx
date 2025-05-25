@@ -146,7 +146,7 @@ export default function ListRepair() {
                   onChange={(e) => setSearchInputValue(e.target.value)}
                 />
               ) : (
-                selectedField === "servicosRealizados" && (
+                selectedField === "repairsPerformed" && (
                   <input
                     className="input-buscar"
                     placeholder="Digite algum Serviço"
@@ -213,9 +213,9 @@ export default function ListRepair() {
                   name="opcao"
                   id="opcaoRealizados"
                   value={selectedField}
-                  onChange={() => setSelectedField("servicosRealizados")}
-                  onClick={() => handleRadioClick("servicosRealizados")}
-                  checked={selectedField === "servicosRealizados"}
+                  onChange={() => setSelectedField("repairsPerformed")}
+                  onClick={() => handleRadioClick("repairsPerformed")}
+                  checked={selectedField === "repairsPerformed"}
                 />
               </div>
             </div>
@@ -257,18 +257,18 @@ export default function ListRepair() {
             </div>
           </div>
 
-          {repairs.map((servico) => {
+          {repairs.map((repair) => {
             return (
               <RepairCard
-                key={servico.id}
-                id={servico.id}
-                employeeCpf={servico.employeeCpf}
-                createdAt={servico.createdAt}
-                observation={servico.observation}
-                laborCost={servico.laborCost}
-                repairsPerformed={servico.repairsPerformed}
-                sale={servico.sale}
-                motorcycle={servico.motorcycle}
+                key={repair.id}
+                id={repair.id}
+                employee={repair.employee}
+                createdAt={repair.createdAt}
+                observation={repair.observation}
+                laborCost={repair.laborCost}
+                repairsPerformed={repair.repairsPerformed}
+                sale={repair.sale}
+                motorcycle={repair.motorcycle}
               />
             );
           })}

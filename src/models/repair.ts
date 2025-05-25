@@ -1,9 +1,10 @@
+import { Employee, employeeInitialState } from "./employee";
 import { motorcycleInitialState, Motorcycle } from "./motorcycle";
 import { Sale } from "./sale";
 
 export interface Repair {
   id: number;
-  employeeCpf: string;
+  employee: Employee;
   motorcycle: Motorcycle;
   sale: Sale | null;
   createdAt: string;
@@ -14,7 +15,7 @@ export interface Repair {
 
 export const repairInitialState: Repair = {
   id: 0,
-  employeeCpf: "",
+  employee: employeeInitialState,
   motorcycle: motorcycleInitialState,
   sale: null,
   createdAt: "",

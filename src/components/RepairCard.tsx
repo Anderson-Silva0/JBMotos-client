@@ -20,7 +20,7 @@ export default function RepairCard(repair: Repair) {
 
   const [customerState, setCustomerState] = useState<Customer>(customerInitialState);
   const [employeeState, setEmployeeState] = useState<Employee>(employeeInitialState);
-  const [totalSaleValueState, setTotalSaleValueState] = useState<string>("");
+  const [totalSaleValueState, setTotalSaleValueState] = useState<number>(0);
 
   const viewProductButton = useRef<HTMLButtonElement>(null);
   const listingCardContainer = useRef<HTMLDivElement>(null);
@@ -28,21 +28,21 @@ export default function RepairCard(repair: Repair) {
   useEffect(() => {
     const search = async () => {
       try {
-        const customerResponse = await findCustomerByCpf(
-          repair.motorcycle.customerCpf
-        );
-        setCustomerState(customerResponse.data);
+        if (repair) {
+          if (repair.motorcycle && repair.motorcycle.customer) {
+            const customer = repair.motorcycle.customer;;
+            setCustomerState(customer);
+          }
 
-        const employeeResponse = await findEmployeeByCpf(
-          repair.employeeCpf
-        );
-        setEmployeeState(employeeResponse.data);
+          if (repair.employee) {
+            const employee = repair.employee;
+            setEmployeeState(employee);
+          }
 
-        if (repair.sale) {
-          // const totalSaleValueResponse = await totalSaleValue(
-          //   repair.sale.id
-          // );
-          // setTotalSaleValueState(totalSaleValueResponse.data);
+          if (repair.sale && repair.sale.totalSaleValue >= 0) {
+            const totalSaleValue = repair.sale.totalSaleValue;
+            setTotalSaleValueState(totalSaleValue);
+          }
         }
       } catch (error: any) {
         errorMessage(error.response.data);

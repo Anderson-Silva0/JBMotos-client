@@ -224,8 +224,15 @@ export function TableRow(props: TableRowProps) {
     ) {
       newValue = Number(selectedProductStock.quantity);
       if (selectedOption.label !== "Selecione...") {
-        alertMessage(`Limite de estoque atingido. Máximo de ${selectedProductStock.quantity}
-       unidades disponíveis para ${selectedOption.label}.`);
+        const productName = selectedOption.label;
+        const productQuantity = selectedProductStock.quantity;
+
+        let commonMessage = "unidades disponíveis";
+        if (productQuantity == 1) {
+          commonMessage = "unidade disponível";
+        }
+
+        alertMessage(`Limite de estoque atingido. Apenas ${productQuantity} ${commonMessage} para ${productName}.`);
       }
     }
     if (selectedOption.product.id) {

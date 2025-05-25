@@ -1,3 +1,5 @@
+import { Customer, customerInitialState } from "./customer";
+
 export interface Motorcycle {
   id: number | string;
   plate: string;
@@ -5,7 +7,7 @@ export interface Motorcycle {
   model: string;
   year: string;
   createdAt: string;
-  customerCpf: string;
+  customer: Customer;
   motorcycleStatus: string;
 }
 
@@ -16,6 +18,6 @@ export const motorcycleInitialState: Motorcycle = {
   model: "",
   year: "",
   createdAt: "",
-  customerCpf: "",
+  customer: customerInitialState,
   motorcycleStatus: "",
 };

@@ -51,10 +51,17 @@ export default function UpdateMotorcycle({ params }: UpdateMotorcycleProps) {
       const motorcycleResponse = (await findMotorcycleById(params.motorcycleId)).data as Motorcycle;
       setMotorcycle(motorcycleResponse);
 
-      setSelectedCustomerOption({
-        label: motorcycleResponse.customerCpf,
-        value: motorcycleResponse.customerCpf,
-      });
+      if (motorcycleResponse && motorcycleResponse.customer) {
+        const customer = motorcycleResponse.customer;
+        const namesList = customer.name.split(" ");
+        if (namesList && namesList.length > 0) {
+          const firstName = namesList[0];
+          setSelectedCustomerOption({
+            label:  `${firstName} • ${customer.cpf}`,
+            value: customer.cpf,
+          });
+        }
+      }
     };
     search();
   }, []);
@@ -65,7 +72,7 @@ export default function UpdateMotorcycle({ params }: UpdateMotorcycleProps) {
         const allCustomersResponse = await findAllCustomer();
         const allCustomers = allCustomersResponse.data;
         const activeCustomers = allCustomers.filter(
-          (c: Customer) => c.customerStatus === "ATIVO"
+          (c: Customer) => c.customerStatus === "ACTIVE"
         );
         setCustomers(activeCustomers);
       } catch (erro: any) {
@@ -78,7 +85,7 @@ export default function UpdateMotorcycle({ params }: UpdateMotorcycleProps) {
   useEffect(() => {
     setMotorcycle({
       ...motorcycle,
-      customerCpf: String(selectedCustomerOption?.value),
+      customer: {cpf: String(selectedCustomerOption?.value)} as Customer,
     });
     setErrors([]);
   }, [selectedCustomerOption]);
@@ -100,56 +107,62 @@ export default function UpdateMotorcycle({ params }: UpdateMotorcycleProps) {
         <Edit3 size="6vh" strokeWidth={3} /> Atualização de Moto
       </h1>
       <Card title="Dados da Moto">
-        <FormGroup label="Placa: *" htmlFor="placa">
+        <FormGroup label="Placa: *" htmlFor="plate">
           <PlateInput
             value={motorcycle.plate}
-            onChange={(e) => setMotorcycleProps("placa", e)}
-            id="placa"
+            onChange={(e) => setMotorcycleProps("plate", e)}
+            id="plate"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="placa" />}
+          {<DisplayError errors={errors} inputName="plate" />}
         </FormGroup>
-        <FormGroup label="Marca: *" htmlFor="marca">
+        <FormGroup label="Marca: *" htmlFor="brand">
           <input
             value={motorcycle.brand}
-            onChange={(e) => setMotorcycleProps("marca", e)}
-            id="marca"
+            onChange={(e) => setMotorcycleProps("brand", e)}
+            id="brand"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="marca" />}
+          {<DisplayError errors={errors} inputName="brand" />}
         </FormGroup>
-        <FormGroup label="Modelo: *" htmlFor="modelo">
+        <FormGroup label="Modelo: *" htmlFor="model">
           <input
             value={motorcycle.model}
-            onChange={(e) => setMotorcycleProps("modelo", e)}
-            id="modelo"
+            onChange={(e) => setMotorcycleProps("model", e)}
+            id="model"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="modelo" />}
+          {<DisplayError errors={errors} inputName="model" />}
         </FormGroup>
-        <FormGroup label="Ano: *" htmlFor="ano">
+        <FormGroup label="Ano: *" htmlFor="year">
           <input
             className="input-number-form"
             value={motorcycle.year}
-            onChange={(e) => setMotorcycleProps("ano", e)}
-            id="ano"
+            onChange={(e) => setMotorcycleProps("year", e)}
+            id="year"
             type="number"
             onWheel={(e) => e.currentTarget.blur()}
           />
-          {<DisplayError errors={errors} inputName="ano" />}
+          {<DisplayError errors={errors} inputName="year" />}
         </FormGroup>
-        <FormGroup label="Selecione o Cliente: *" htmlFor="cpfCliente">
+        <FormGroup label="Selecione o Cliente: *" htmlFor="customerCpf">
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
             value={selectedCustomerOption}
             onChange={(option: any) => setSelectedCustomerOption(option)}
-            options={customers.map(
-              (c) => ({ label: c.cpf, value: c.cpf } as selectionOptions)
-            )}
-            instanceId="select-cpfCliente"
+            options={
+              customers.map((customer) => {
+                const namesList = customer.name.split(" ");
+                if (namesList && namesList.length > 0) {
+                  const firstName = namesList[0];
+                  return { label: `${firstName} • ${customer.cpf}`, value: customer.cpf } as selectionOptions;
+                }
+              })
+            }
+            instanceId="select-customerCpf"
           />
-          {<DisplayError errors={errors} inputName="cpfCliente" />}
+          {<DisplayError errors={errors} inputName="customerCpf" />}
         </FormGroup>
       </Card>
       <div className="divBotaoCadastrar">

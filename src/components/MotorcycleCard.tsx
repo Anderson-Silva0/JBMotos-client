@@ -1,7 +1,6 @@
 import { Customer, customerInitialState } from "@/models/customer";
 import { Motorcycle } from "@/models/motorcycle";
 import { errorMessage, successMessage } from "@/models/toast";
-import { CustomerService } from "@/services/customerService";
 import { MotorcycleService } from "@/services/motorcycleService";
 import { Check, CheckSquare, Edit, X, XSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -20,13 +19,13 @@ export default function MotorcycleCard({ motorcycle, setMotorcycle }: Motorcycle
   const [customerState, setCustomerState] = useState<Customer>(customerInitialState);
 
   const { findAllMotorcycle, toggleStatusMotorcycle } = MotorcycleService();
-  const { findCustomerByCpf } = CustomerService();
 
   useEffect(() => {
     async function search() {
       try {
-        const customerResponse = await findCustomerByCpf(motorcycle.customerCpf);
-        setCustomerState(customerResponse.data);
+        if (motorcycle && motorcycle.customer) {
+          setCustomerState(motorcycle.customer);
+        }
       } catch (error: any) {
         errorMessage(error.response.data);
       }

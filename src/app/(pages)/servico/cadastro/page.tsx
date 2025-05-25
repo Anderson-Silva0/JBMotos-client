@@ -104,7 +104,7 @@ export default function RegisterRepair() {
       const allCustomersResponse = await findAllCustomer();
       const allCustomers = allCustomersResponse.data;
       const activeCustomers = allCustomers.filter((c: Customer) => 
-        c.customerStatus === "ATIVO"
+        c.customerStatus === "ACTIVE"
       );
       setCustomers(activeCustomers);
 
@@ -130,7 +130,7 @@ export default function RegisterRepair() {
         );
         const customerMotorcycles = customerMotorcyclesResponse.data;
         const activeCustomerMotorcycles = customerMotorcycles.filter((m: Motorcycle) =>
-          m.motorcycleStatus === "ATIVO"
+          m.motorcycleStatus === "ACTIVE"
         );
         setCustomerMotorcycles(activeCustomerMotorcycles);
 
@@ -153,7 +153,7 @@ export default function RegisterRepair() {
     motorcycleResult.id = Number(selectedMotorcycleOption.value);
     setRepair({
       ...repair,
-      employeeCpf: userCpf,
+      employee: {cpf: userCpf} as Employee,
       motorcycle: motorcycleResult,
     });
     setSale({
@@ -167,6 +167,7 @@ export default function RegisterRepair() {
     selectedClientOption,
     selectedPaymentMethodOption,
     selectedMotorcycleOption,
+    userCpf
   ]);
 
   useEffect(() => {
@@ -278,7 +279,6 @@ export default function RegisterRepair() {
       }
     } catch (error) {
       errorMessage("Erro no preenchimento dos campos");
-      showCustomerFieldError();
       saveErrors(error, errors, setErrors);
     }
   };
@@ -289,18 +289,6 @@ export default function RegisterRepair() {
       "Tem certeza de que deseja realizar este serviço?",
       submit
     );
-  };
-
-  const showCustomerFieldError = () => {
-    if (!selectedClientOption.value) {
-      setErrors([
-        ...errors,
-        {
-          inputName: "cpfCliente",
-          errorMessage: "O campo CPF do Cliente é obrigatório.",
-        },
-      ]);
-    }
   };
 
   const productAdditionStateToggle = () => {
@@ -324,21 +312,27 @@ export default function RegisterRepair() {
         <Save size="6vh" strokeWidth={3} /> Cadastro de Serviço
       </h1>
       <Card title="Dados do Serviço">
-        <FormGroup label="Selecione o Cliente*" htmlFor="cpfCliente">
+        <FormGroup label="Selecione o Cliente*" htmlFor="customerCpf">
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
             value={selectedClientOption}
             onChange={(option: any) => setSelectedCustomerOption(option)}
-            options={customers.map(
-              (c) => ({ label: c.cpf, value: c.cpf } as selectionOptions)
-            )}
-            instanceId="select-cpfCliente"
+            options={
+              customers.map((customer) => {
+                const namesList = customer.name.split(" ");
+                if (namesList && namesList.length > 0) {
+                  const firstName = namesList[0];
+                  return { label: `${firstName} • ${customer.cpf}`, value: customer.cpf } as selectionOptions;
+                }
+              })
+            }
+            instanceId="select-customerCpf"
           />
-          {<DisplayError errors={errors} inputName="cpfCliente" />}
+          {<DisplayError errors={errors} inputName="cpf" />}
         </FormGroup>
 
-        <FormGroup label="Selecione a Moto*" htmlFor="moto">
+        <FormGroup label="Selecione a Moto*" htmlFor="motorcycle">
           <Select
             isDisabled={!customerMotorcycles.length}
             styles={selectStyles}
@@ -352,49 +346,49 @@ export default function RegisterRepair() {
                   value: m.id,
                 } as selectionOptions)
             )}
-            instanceId="select-idMoto"
+            instanceId="select-motorcycleId"
           />
-          {<DisplayError errors={errors} inputName="idMoto" />}
+          {<DisplayError errors={errors} inputName="id" />}
         </FormGroup>
 
-        <FormGroup label="Serviços Realizados: *" htmlFor="servicosRealizados">
+        <FormGroup label="Serviços Realizados: *" htmlFor="repairsPerformed">
           <textarea
             value={repair.repairsPerformed}
             onChange={(e) => {
               setErrors([]);
               setRepair({ ...repair, repairsPerformed: e.target.value });
             }}
-            id="servicosRealizados"
+            id="repairsPerformed"
           />
-          {<DisplayError errors={errors} inputName="servicosRealizados" />}
+          {<DisplayError errors={errors} inputName="repairsPerformed" />}
         </FormGroup>
 
-        <FormGroup label="Observação: *" htmlFor="observacao">
+        <FormGroup label="Observação: *" htmlFor="observation">
           <input
             value={repair.observation}
             onChange={(e) => {
               setErrors([]);
               setRepair({ ...repair, observation: e.target.value });
             }}
-            id="observacao"
+            id="observation"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="observacao" />}
+          {<DisplayError errors={errors} inputName="observation" />}
         </FormGroup>
 
-        <FormGroup label="Preço de Mão de Obra: *" htmlFor="precoMaoDeObra">
+        <FormGroup label="Preço de Mão de Obra: *" htmlFor="laborCost">
           <input
             value={formatToBRL(repair.laborCost)}
-            onChange={(e) => setProductMoneyProps("precoMaoDeObra", e)}
-            id="precoMaoDeObra"
+            onChange={(e) => setProductMoneyProps("laborCost", e)}
+            id="laborCost"
             type="text"
           />
-          {<DisplayError errors={errors} inputName="precoMaoDeObra" />}
+          {<DisplayError errors={errors} inputName="laborCost" />}
         </FormGroup>
         {productAddition && (
           <FormGroup
             label="Selecione a forma de pagamento*"
-            htmlFor="formaDePagamento"
+            htmlFor="paymentMethods"
           >
             <Select
               styles={selectStyles}
@@ -404,9 +398,9 @@ export default function RegisterRepair() {
                 setSelectedPaymentMethodOption(option)
               }
               options={paymentMethods}
-              instanceId="select-formaDePagamento"
+              instanceId="select-paymentMethods"
             />
-            {<DisplayError errors={errors} inputName="formaDePagamento" />}
+            {<DisplayError errors={errors} inputName="paymentMethods" />}
             {selectedPaymentMethodOption.value === "Cartão de Crédito" && (
               <CreditPayment
                 errors={errors}
