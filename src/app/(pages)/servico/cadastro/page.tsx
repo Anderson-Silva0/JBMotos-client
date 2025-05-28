@@ -82,7 +82,7 @@ export default function RegisterRepair() {
   const [interestRate, setInterestRate] = useState<number>(0);
   const [productsOfSaleRowId, setProductsOfSaleRowId] = useState<ProductOfSaleRowIdProps[]>([]);
 
-  const [selectedClientOption, setSelectedCustomerOption] = useState<selectionOptions>(selectionOptionsInitialState);
+  const [selectedCustomerOption, setSelectedCustomerOption] = useState<selectionOptions>(selectionOptionsInitialState);
 
   const [selectedMotorcycleOption, setSelectedMotorcycleOption] = useState<selectionOptions>(selectionOptionsInitialState);
 
@@ -126,12 +126,10 @@ export default function RegisterRepair() {
     const fetchCustomerMotorcycles = async () => {
       try {
         const customerMotorcyclesResponse = await findMotorcycleByCustomerCpf(
-          String(selectedClientOption.value)
+          String(selectedCustomerOption.value)
         );
-        const customerMotorcycles = customerMotorcyclesResponse.data;
-        const activeCustomerMotorcycles = customerMotorcycles.filter((m: Motorcycle) =>
-          m.motorcycleStatus === "ACTIVE"
-        );
+        const customerMotorcyclesData = customerMotorcyclesResponse.data;
+        const activeCustomerMotorcycles = customerMotorcyclesData.filter((m: Motorcycle) => m.motorcycleStatus === "ACTIVE");
         setCustomerMotorcycles(activeCustomerMotorcycles);
 
         if (selectedMotorcycleOption.value) {
@@ -143,14 +141,18 @@ export default function RegisterRepair() {
         setSelectedMotorcycleOption(selectionOptionsInitialState);
       }
     };
-    if (selectedClientOption.value) {
+    if (selectedCustomerOption.value) {
       fetchCustomerMotorcycles();
     }
-  }, [selectedClientOption]);
+  }, [selectedCustomerOption]);
 
   useEffect(() => {
     let motorcycleResult = motorcycleInitialState;
     motorcycleResult.id = Number(selectedMotorcycleOption.value);
+    motorcycleResult.customer = {
+      ...motorcycleResult.customer,
+      cpf: String(selectedCustomerOption.value),
+    };
     setRepair({
       ...repair,
       employee: {cpf: userCpf} as Employee,
@@ -159,12 +161,12 @@ export default function RegisterRepair() {
     setSale({
       ...sale,
       employee: {cpf: userCpf} as Employee,
-      customer: {cpf: String(selectedClientOption.value)} as Customer,
+      customer: {cpf: String(selectedCustomerOption.value)} as Customer,
       paymentMethod: String(selectedPaymentMethodOption.value),
     });
     setErrors([]);
   }, [
-    selectedClientOption,
+    selectedCustomerOption,
     selectedPaymentMethodOption,
     selectedMotorcycleOption,
     userCpf
@@ -316,7 +318,7 @@ export default function RegisterRepair() {
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
-            value={selectedClientOption}
+            value={selectedCustomerOption}
             onChange={(option: any) => setSelectedCustomerOption(option)}
             options={
               customers.map((customer) => {
@@ -388,7 +390,7 @@ export default function RegisterRepair() {
         {productAddition && (
           <FormGroup
             label="Selecione a forma de pagamento*"
-            htmlFor="paymentMethods"
+            htmlFor="paymentMethod"
           >
             <Select
               styles={selectStyles}
@@ -398,9 +400,9 @@ export default function RegisterRepair() {
                 setSelectedPaymentMethodOption(option)
               }
               options={paymentMethods}
-              instanceId="select-paymentMethods"
+              instanceId="select-paymentMethod"
             />
-            {<DisplayError errors={errors} inputName="paymentMethods" />}
+            {<DisplayError errors={errors} inputName="paymentMethod" />}
             {selectedPaymentMethodOption.value === "Cartão de Crédito" && (
               <CreditPayment
                 errors={errors}

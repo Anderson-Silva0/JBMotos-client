@@ -28,38 +28,38 @@ export function CreditPayment(props: CreditPaymentProps) {
 
   return (
     <div className="config-pagamentos">
-      <label htmlFor="select-divisoes">Parcelas</label>
+      <label htmlFor="select-installment">Parcelas</label>
       <Select
         styles={selectStyles}
         placeholder="Selecione..."
         value={props.selectedInstallmentOption}
         onChange={(option: any) => props.setSelectedInstallmentOption(option)}
         options={getInstallments()}
-        instanceId="select-divisoes"
-        id="select-divisoes"
+        instanceId="select-installment"
+        id="select-installment"
       />
-      {<DisplayError errors={props.errors} inputName="parcela" />}
+      {<DisplayError errors={props.errors} inputName="installment" />}
 
-      <label htmlFor="select-bandeiras">Bandeira</label>
+      <label htmlFor="select-flag">Bandeira</label>
       <Select
         styles={selectStyles}
         placeholder="Selecione..."
         value={props.selectedCardFlagOption}
         onChange={(option: any) => props.setSelectedCardFlagOption(option)}
         options={cardFlags}
-        instanceId="select-divisoes"
-        id="select-bandeiras"
+        instanceId="select-flag"
+        id="select-flag"
       />
-      {<DisplayError errors={props.errors} inputName="bandeira" />}
+      {<DisplayError errors={props.errors} inputName="flag" />}
 
-      <label htmlFor="taxaJuros">Taxa de Juros (Ton)</label>
+      <label htmlFor="interestRate">Taxa de Juros (Ton)</label>
       <input
         value={formatToPercentage(props.interestRate)}
         onChange={(e) => updateInterestRate(e)}
         type="text"
-        id="taxaJuros"
+        id="interestRate"
       />
-      {<DisplayError errors={props.errors} inputName="totalTaxas" />}
+      {<DisplayError errors={props.errors} inputName="interestRate" />}
     </div>
   );
 }
