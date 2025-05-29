@@ -116,7 +116,7 @@ export default function RegisterMotorcycle() {
           />
           {<DisplayError errors={errors} inputName="year" />}
         </FormGroup>
-        <FormGroup label="Selecione o Cliente: *" htmlFor="customerCpf">
+        <FormGroup label="Selecione o Cliente: *" htmlFor="cpf">
           <Select
             styles={selectStyles}
             placeholder="Selecione..."
@@ -132,8 +132,9 @@ export default function RegisterMotorcycle() {
               })
             }
             instanceId="select-customerCpf"
+            id="cpf"
           />
-          {<DisplayError errors={errors} inputName="customerCpf" />}
+          {<DisplayError errors={errors} inputName="cpf" />}
         </FormGroup>
       </Card>
       <div className="divBotaoCadastrar">
