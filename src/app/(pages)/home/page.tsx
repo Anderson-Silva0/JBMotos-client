@@ -8,6 +8,8 @@ import { Chart, LineController, LineElement, PointElement, LinearScale, Title, C
 import { DailyDataChartService } from '@/services/dailyDataChartService';
 import { errorMessage } from '@/models/toast';
 import { DailyDataChart } from '@/models/dailyDataChart';
+import WelcomeHeader from '@/components/WelcomeHeader';
+import '@/styles/home.css';
 
 Chart.register(LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip);
 
@@ -38,6 +40,21 @@ export default function HomePage() {
     fetchDailyDataChart();
 
   }, []);
+
+
+
+function isMobileViewport(): boolean {
+  let viewportIsMobile = false;
+  const MOBILE_MAX_WIDTH_PX = 999;
+
+  if (typeof window != 'undefined') {
+    const mobileBreakpointQuery = `(max-width: ${MOBILE_MAX_WIDTH_PX}px)`;
+    const mediaQueryList = window.matchMedia(mobileBreakpointQuery);
+    viewportIsMobile = mediaQueryList.matches;
+  }
+
+  return viewportIsMobile;
+}
 
   useEffect(() => {
     const ctx = document.getElementById('myChart') as HTMLCanvasElement;
@@ -81,9 +98,9 @@ export default function HomePage() {
           plugins: {
             title: {
               display: true,
-              text: 'Vendas e Serviços por Dia',
+              text: 'Desempenho Mensal',
               font: {
-                size: 24,
+                size: isMobileViewport() ? 16 : 22,
               },
             },
             legend: {
@@ -92,7 +109,7 @@ export default function HomePage() {
               labels: {
                 color: 'black',
                 font: {
-                  size: 14,
+                  size: isMobileViewport() ? 8 : 13,
                 },
               },
             },
@@ -119,6 +136,9 @@ export default function HomePage() {
               ticks: {
                 autoSkip: false,
                 display: true,
+                font: {
+                  size: isMobileViewport() ? 9 : 13,
+                }
               },
             },
             y: {
@@ -142,11 +162,11 @@ export default function HomePage() {
   }, [chartData]);
 
   return (
-    <div style={{ textAlign: 'center', width: '100%' }}>
-      <h1>Olá {userName}!</h1>
-      <h2>Bem-vindo ao sistema <span style={{ fontSize: '1.2em', fontWeight: 'bolder' }}>JB Motos</span></h2>
+    <div style={{ width: '100%' }}>
 
-      <div style={{ width: '100%', height: '14.6em', display: 'flex', justifyContent: 'center' }}>
+      <WelcomeHeader userName={userName} />
+
+      <div className="chart-container">
         <canvas id="myChart"></canvas>
       </div>
     </div>
