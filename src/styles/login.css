@@ -1,0 +1,318 @@
+.login-screen {
+  min-height: 100vh;
+  width: 100%;
+  padding: clamp(14px, 3vw, 32px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(3, 83, 164, 0.2) 0, rgba(3, 83, 164, 0) 35%),
+    radial-gradient(circle at 92% 84%, rgba(0, 40, 85, 0.25) 0, rgba(0, 40, 85, 0) 42%),
+    linear-gradient(180deg, #dee2e6 0%, #ced4da 100%);
+}
+
+.login-shell {
+  width: min(100%, 1060px);
+  min-height: clamp(500px, 78vh, 720px);
+  border: 1px solid rgba(151, 157, 172, 0.55);
+  border-radius: 26px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  box-shadow: 0 22px 45px rgba(73, 80, 87, 0.28);
+  background-color: #f8f9fa;
+}
+
+.login-brand-panel {
+  padding: clamp(22px, 4vw, 48px);
+  color: #f8f9fa;
+  background:
+    linear-gradient(155deg, #002855 0%, #0353a4 64%, #034078 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+}
+
+.login-brand-kicker {
+  align-self: flex-start;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  border: 1px solid rgba(248, 249, 250, 0.45);
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+.login-brand-panel h1 {
+  font-size: clamp(1.75rem, 3.1vw, 2.6rem);
+  line-height: 1.15;
+  max-width: 18ch;
+}
+
+.login-brand-description {
+  font-size: clamp(0.96rem, 1.2vw, 1.08rem);
+  color: #dee2e6;
+  max-width: 38ch;
+  line-height: 1.5;
+}
+
+.login-brand-highlights {
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.login-brand-highlights article {
+  border: 1px solid rgba(248, 249, 250, 0.26);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background-color: rgba(248, 249, 250, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.login-brand-highlights strong {
+  font-size: 0.96rem;
+}
+
+.login-brand-highlights span {
+  font-size: 0.86rem;
+  color: #dee2e6;
+}
+
+.login-form-panel {
+  padding: clamp(18px, 3vw, 36px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(180deg, rgba(248, 249, 250, 0.95) 0%, rgba(222, 226, 230, 0.9) 100%);
+}
+
+.login-form-card {
+  width: min(100%, 430px);
+  border-radius: 20px;
+  border: 1px solid rgba(181, 185, 190, 0.7);
+  padding: clamp(18px, 2.3vw, 28px);
+  background-color: rgba(248, 249, 250, 0.88);
+  box-shadow: 0 14px 34px rgba(73, 80, 87, 0.18);
+}
+
+.login-form-header {
+  margin-bottom: 20px;
+}
+
+.login-form-header h2 {
+  color: #002855;
+  font-size: clamp(1.45rem, 2vw, 1.9rem);
+  letter-spacing: 0.02em;
+}
+
+.login-form-header p {
+  color: #495057;
+  margin-top: 4px;
+  font-size: 0.95rem;
+}
+
+.login-form {
+  display: grid;
+  gap: 16px;
+}
+
+.login-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.login-field label {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #495057;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.login-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid #ced4da;
+  border-radius: 14px;
+  background-color: #dee2e6;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.login-input-wrap:focus-within {
+  border-color: #0353a4;
+  background-color: #f8f9fa;
+  box-shadow: 0 0 0 3px rgba(3, 83, 164, 0.18);
+}
+
+.login-input-wrap > svg {
+  color: #0353a4;
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+.login-input-wrap input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 13px 14px 13px 10px;
+  color: #495057;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.login-input-wrap input::placeholder {
+  color: #6f7884;
+  font-weight: 600;
+}
+
+.login-input-wrap input:focus {
+  outline: none;
+}
+
+.login-password-field .login-input-wrap input {
+  padding-right: 50px;
+}
+
+.login-eye-toggle {
+  position: absolute;
+  top: 50%;
+  right: 11px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.login-screen .div-olho {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ced4da;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.login-screen .div-olho:hover {
+  background-color: #b5b9be;
+  transform: scale(1.08);
+}
+
+.login-screen .login-msg {
+  position: static;
+  min-height: 18px;
+}
+
+.login-screen .erro {
+  justify-content: flex-start;
+  font-size: 0.79rem;
+}
+
+.login-submit-wrapper {
+  margin-top: 2px;
+}
+
+.login-submit-wrapper button {
+  width: 100%;
+  min-height: 50px;
+  max-width: none;
+  min-width: 0;
+  border-radius: 12px;
+  padding: 0 16px;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+}
+
+.login-submit-wrapper button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  filter: saturate(0.7);
+}
+
+.login-submit-wrapper button:focus-visible {
+  outline: 2px solid #0353a4;
+  outline-offset: 2px;
+}
+
+@media (max-width: 980px) {
+  .login-shell {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .login-brand-panel {
+    gap: 14px;
+    padding: 20px;
+  }
+
+  .login-brand-panel h1 {
+    max-width: none;
+    font-size: clamp(1.45rem, 6vw, 2rem);
+  }
+
+  .login-brand-description {
+    max-width: none;
+  }
+
+  .login-brand-highlights {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .login-screen {
+    align-items: flex-start;
+  }
+
+  .login-brand-highlights {
+    grid-template-columns: 1fr;
+  }
+
+  .login-form-panel {
+    padding-top: 14px;
+  }
+
+  .login-form-card {
+    width: 100%;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-screen {
+    padding: 10px;
+  }
+
+  .login-shell {
+    border-radius: 18px;
+  }
+
+  .login-brand-panel {
+    padding: 16px;
+  }
+
+  .login-form-panel {
+    padding: 12px;
+  }
+
+  .login-form-card {
+    padding: 14px;
+  }
+
+  .login-input-wrap > svg {
+    margin-left: 10px;
+  }
+
+  .login-input-wrap input {
+    padding: 12px 11px 12px 9px;
+  }
+}

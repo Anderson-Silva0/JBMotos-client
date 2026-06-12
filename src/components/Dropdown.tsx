@@ -1,11 +1,13 @@
-import { Plus } from "lucide-react";
-import { useRef, ReactNode, useState, useEffect, Dispatch } from "react";
+import { ChevronDown } from "lucide-react";
+import { useRef, ReactNode, useEffect, Dispatch } from "react";
 
 interface DropdownProps {
   title: string;
   children: ReactNode;
   componentClicked: string;
   setComponentClicked: Dispatch<React.SetStateAction<string>>;
+  onNavigate?: () => void;
+  isActive?: boolean;
 }
 
 export default function Dropdown({
@@ -13,58 +15,67 @@ export default function Dropdown({
   children,
   componentClicked,
   setComponentClicked,
+  onNavigate,
+  isActive = false,
 }: DropdownProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const isOpen = componentClicked === titulo;
 
-  const handleClickContent = () => {
-    if (contentRef.current) {
-      const dropdownContent = contentRef.current.style;
-      const computedDisplay = window.getComputedStyle(
-        contentRef.current
-      ).display;
+  const handleToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
 
-      if (computedDisplay === "none" && !isOpen && componentClicked === "") {
-        dropdownContent.display = "flex";
-        dropdownContent.flexDirection = "column";
-        setIsOpen(true);
-        setComponentClicked(titulo);
-      } else if (isOpen && titulo === componentClicked) {
-        dropdownContent.display = "none";
-        setIsOpen(false);
-        setComponentClicked("");
-      }
+    if (isOpen) {
+      setComponentClicked("");
+    } else {
+      setComponentClicked(titulo);
     }
   };
 
-  const handleClickAnywhere = (event: any) => {
+  const handleClickAnywhere = (event: MouseEvent | TouchEvent) => {
     if (
-      contentRef.current &&
-      !contentRef.current.contains(event.target as Node) &&
-      isOpen &&
-      titulo === componentClicked
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node) &&
+      isOpen
     ) {
-      contentRef.current.style.display = "none";
-      setIsOpen(false);
       setComponentClicked("");
     }
   };
 
   useEffect(() => {
-    document.addEventListener("click", handleClickAnywhere);
+    document.addEventListener("mousedown", handleClickAnywhere);
+    document.addEventListener("touchstart", handleClickAnywhere);
 
     return () => {
-      document.removeEventListener("click", handleClickAnywhere);
+      document.removeEventListener("mousedown", handleClickAnywhere);
+      document.removeEventListener("touchstart", handleClickAnywhere);
     };
-  }, [isOpen]);
+  }, [isOpen, setComponentClicked]);
+
+  const handleContentClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLElement;
+
+    if (target.closest("a")) {
+      setComponentClicked("");
+      if (onNavigate) {
+        onNavigate();
+      }
+    }
+  };
 
   return (
-    <div onClick={handleClickContent} className="dropdown">
-      <span className="dropdown-titulo">
+    <div className={`dropdown ${isOpen ? "is-open" : ""}`} ref={dropdownRef}>
+      <button
+        type="button"
+        className={`dropdown-titulo ${isActive ? "is-active" : ""}`}
+        onClick={handleToggle}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        aria-label={`${isOpen ? "Fechar" : "Abrir"} menu ${titulo}`}
+      >
         {titulo}
-        <Plus strokeWidth={3} style={{ verticalAlign: "middle" }} />
-      </span>
-      <div className="dropdown-content" ref={contentRef}>
+        <ChevronDown strokeWidth={3} className="dropdown-icon" />
+      </button>
+      <div className={`dropdown-content ${isOpen ? "open" : ""}`} onClick={handleContentClick}>
         {children}
       </div>
     </div>

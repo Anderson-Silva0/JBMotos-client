@@ -9,7 +9,7 @@ export default function WelcomeHeader({ userName }: WelcomeHeaderProps) {
     <header className="welcome">
       <h1 className="welcome__title">Olá, {userName}!</h1>
       <p className="welcome__subtitle">
-        Bem-vindo ao sistema <span className="welcome__highlight">JB Motos</span>
+        Bem-vindo ao sistema <span className="welcome__highlight">SERVIPEX</span>
       </p>
     </header>
   );

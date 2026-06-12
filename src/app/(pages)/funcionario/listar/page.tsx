@@ -156,8 +156,8 @@ export default function ListEmployees() {
                 />
               ) : (
                 selectedField === "employeeStatus" && (
-                  <>
-                    <div style={{ marginRight: "2vw" }}>
+                  <div className="status-inline-group">
+                    <div className="status-option">
                       <label
                         className="label-radio"
                         htmlFor="opcaoStatusFuncionario1"
@@ -173,7 +173,7 @@ export default function ListEmployees() {
                         onChange={() => setSearchInputValue("ACTIVE")}
                       />
                     </div>
-                    <div>
+                    <div className="status-option">
                       <label
                         className="label-radio"
                         htmlFor="opcaoStatusFuncionario2"
@@ -189,7 +189,7 @@ export default function ListEmployees() {
                         onChange={() => setSearchInputValue("INACTIVE")}
                       />
                     </div>
-                  </>
+                  </div>
                 )
               )}
             </div>
