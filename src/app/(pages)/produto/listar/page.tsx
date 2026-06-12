@@ -141,8 +141,8 @@ export default function ListProducts() {
                 />
               ) : (
                 selectedField === "productStatus" && (
-                  <>
-                    <div style={{ marginRight: "2vw" }}>
+                  <div className="status-inline-group">
+                    <div className="status-option">
                       <label className="label-radio" htmlFor="opcaoStatusProduto1">
                         ATIVO
                       </label>
@@ -155,7 +155,7 @@ export default function ListProducts() {
                         onChange={() => setSearchInputValue("ACTIVE")}
                       />
                     </div>
-                    <div>
+                    <div className="status-option">
                       <label className="label-radio" htmlFor="opcaoStatusProduto2">
                         INATIVO
                       </label>
@@ -168,7 +168,7 @@ export default function ListProducts() {
                         onChange={() => setSearchInputValue("INACTIVE")}
                       />
                     </div>
-                  </>
+                  </div>
                 )
               )}
             </div>

@@ -151,8 +151,8 @@ export default function ListSuppliers() {
                 />
               ) : (
                 selectedField === "supplierStatus" && (
-                  <>
-                    <div style={{ marginRight: "2vw" }}>
+                  <div className="status-inline-group">
+                    <div className="status-option">
                       <label
                         className="label-radio"
                         htmlFor="opcaoStatusFornecedor1"
@@ -168,7 +168,7 @@ export default function ListSuppliers() {
                         onChange={() => setSearchInputValue("ACTIVE")}
                       />
                     </div>
-                    <div>
+                    <div className="status-option">
                       <label
                         className="label-radio"
                         htmlFor="opcaoStatusFornecedor2"
@@ -184,7 +184,7 @@ export default function ListSuppliers() {
                         onChange={() => setSearchInputValue("INACTIVE")}
                       />
                     </div>
-                  </>
+                  </div>
                 )
               )}
             </div>

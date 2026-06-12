@@ -158,8 +158,8 @@ export default function ListCustomers() {
                 />
               ) : (
                 selectedField === "customerStatus" && (
-                  <>
-                    <div style={{ marginRight: "2vw" }}>
+                  <div className="status-inline-group">
+                    <div className="status-option">
                       <label className="label-radio" htmlFor="opcaoStatusCliente1">
                         ATIVO
                       </label>
@@ -172,7 +172,7 @@ export default function ListCustomers() {
                         onChange={() => setSearchInputValue("ACTIVE")}
                       />
                     </div>
-                    <div>
+                    <div className="status-option">
                       <label className="label-radio" htmlFor="opcaoStatusCliente2">
                         INATIVO
                       </label>
@@ -185,7 +185,7 @@ export default function ListCustomers() {
                         onChange={() => setSearchInputValue("INACTIVE")}
                       />
                     </div>
-                  </>
+                  </div>
                 )
               )}
             </div>

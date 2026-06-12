@@ -191,32 +191,87 @@
 .div-container-buscar {
   display: flex;
   flex-direction: column;
-  padding: 2vh;
+  padding: clamp(12px, 2vw, 22px);
   justify-content: space-between;
-  gap: 3vh;
+  gap: 18px;
   align-items: center;
-  width: 90%;
+  width: min(96%, 980px);
+  margin: 0 auto;
+  border: 1px solid rgba(151, 157, 172, 0.55);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f8f9fa 0%, #dee2e6 100%);
+  box-shadow: 0 10px 20px rgba(73, 80, 87, 0.16);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .div-buscar {
   display: flex;
-  width: 70vw;
+  width: 100%;
   text-align: center;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: clamp(10px, 1.5vw, 14px);
+  border-radius: 14px;
+  background-color: #f8f9fa;
+  border: 1px solid rgba(173, 181, 189, 0.7);
+  box-sizing: border-box;
+  min-height: clamp(56px, 5vw, 68px);
 }
 
 .div-buscar input {
   background-color: white;
-  width: 80%;
+  width: auto;
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #ced4da;
+}
+
+.div-buscar svg {
+  color: #0353a4;
+  width: clamp(28px, 3vw, 40px);
+  height: clamp(28px, 3vw, 40px);
+  flex-shrink: 0;
+}
+
+.status-inline-group {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.status-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(173, 181, 189, 0.7);
+  background-color: #f8f9fa;
+}
+
+.status-option .label-radio {
+  border: 0;
+  min-height: auto;
+  padding: 0;
+  background: transparent;
+}
+
+.status-option .input-radio {
+  margin: 0;
 }
 
 .div-msg-busca p {
-  font-weight: 700;
-  text-align: center;
-  font-size: 2vw;
-  width: 32vw;
+  font-weight: 800;
+  text-align: left;
+  font-size: clamp(0.9rem, 1.3vw, 1.15rem);
+  width: auto;
   margin: 1px;
+  color: #495057;
 }
 
 .div-dupla-radio {
@@ -225,46 +280,121 @@
 }
 
 .div-dupla-check {
-  width: 74%;
-  align-items: end;
+  width: min(96%, 980px);
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px auto 2px;
+}
+
+.div-dupla-check > div {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  min-height: 42px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background-color: rgba(248, 249, 250, 0.86);
+  border: 1px solid rgba(173, 181, 189, 0.65);
+  box-sizing: border-box;
+}
+
+.div-dupla-check .label-radio {
+  margin: 0;
+  padding: 0;
+  min-height: auto;
+  border: none;
+  background: transparent;
+}
+
+.div-dupla-check .input-check {
+  margin: 0;
 }
 
 .input-check {
-  height: 2.5vw;
-  width: 2.5vw;
+  height: clamp(18px, 2.2vw, 24px);
+  width: clamp(18px, 2.2vw, 24px);
+  accent-color: #0353a4;
+  cursor: pointer;
 }
 
 .label-radio {
-  font-size: 100%;
+  font-size: clamp(0.76rem, 1vw, 0.95rem);
   font-weight: 700;
-  margin: auto 1vw 0.5vw auto;
-  border-radius: 10px;
-  background-color: white;
-  height: 32%;
-  padding: 2%;
+  margin: 0;
+  border-radius: 999px;
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  min-height: 34px;
+  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   white-space: nowrap;
+  color: #495057;
 }
 
 .input-radio {
-  height: 2.5vw;
-  width: 2.5vw;
-  margin: 8px auto 0 auto;
+  height: clamp(18px, 2vw, 22px);
+  width: clamp(18px, 2vw, 22px);
+  margin: 8px auto 0;
+  accent-color: #0353a4;
+  cursor: pointer;
 }
 
 .input-buscar {
-  border-radius: 2vw;
-  padding: 1.5vh;
-  font-size: 4vh;
+  border-radius: 12px;
+  padding: clamp(10px, 1.4vw, 14px);
+  font-size: clamp(0.95rem, 1.8vw, 1.2rem);
   color: #495057;
   font-weight: 700;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.input-buscar:focus {
+  border-color: #0353a4;
+  box-shadow: 0 0 0 3px rgba(3, 83, 164, 0.2);
 }
 
 .div-radios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+  gap: 10px;
+  width: 100%;
+  align-items: stretch;
+}
+
+.div-dupla-radio {
   display: flex;
-  justify-content: space-around;
-  width: 80%;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+  align-items: center;
+  min-height: 92px;
+  border: 1px solid rgba(173, 181, 189, 0.65);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background-color: rgba(248, 249, 250, 0.86);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.div-dupla-radio .label-radio {
+  width: 100%;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.2;
+  min-height: 44px;
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
+
+.div-dupla-radio .input-radio {
+  margin: auto auto 2px;
 }
 
 @media (max-width: 999px) {
@@ -296,35 +426,36 @@
   }
 
   .div-radios {
-    display: flex;
-    justify-content: space-between;
-    gap: 4px;
-    align-items: center;
-    justify-content: center;
-    width: auto;
-    height: auto;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .div-dupla-radio {
+    min-height: 86px;
+    padding: 8px 10px;
   }
 
   .label-radio {
-    font-size: 2.6vw;
+    font-size: clamp(0.72rem, 2.2vw, 0.9rem);
     font-weight: 700;
-    margin: auto 1vw 0.5vw auto;
-    border-radius: 10px;
-    background-color: white;
-    height: 32%;
-    padding: 2%;
+    margin: 0;
+    border-radius: 999px;
+    background-color: #f8f9fa;
+    min-height: 32px;
+    padding: 6px 10px;
     white-space: nowrap;
   }
 
   .input-radio {
-    height: 6vw;
-    width: 5vw;
-    margin: 8px auto 0 auto;
+    height: 18px;
+    width: 18px;
+    margin: auto auto 2px;
   }
 
   .input-check {
-    height: 6vw;
-    width: 6vw;
+    height: 20px;
+    width: 20px;
   }
 
   .div-dados {
@@ -418,19 +549,34 @@
   }
 
   .input-buscar {
-    border-radius: 2vw;
-    padding: 1vh;
-    font-size: 2vh;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.98rem;
     color: #495057;
     font-weight: 700;
   }
 
+  .status-inline-group {
+    gap: 8px;
+  }
+
+  .status-option {
+    padding: 5px 8px;
+  }
+
   .div-msg-busca p {
-    font-weight: 700;
-    text-align: center;
-    font-size: 4vw;
-    width: 32vw;
+    font-weight: 800;
+    text-align: left;
+    font-size: clamp(0.86rem, 3.2vw, 1rem);
+    width: auto;
     margin: 1px;
+  }
+
+  .div-dupla-check {
+    width: min(96%, 980px);
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 
   .cardListagem-container-venda {

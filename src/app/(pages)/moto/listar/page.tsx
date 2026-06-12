@@ -158,8 +158,8 @@ export default function ListMotorcycle() {
                 />
               ) : (
                 selectedField === "statusMoto" && (
-                  <>
-                    <div style={{ marginRight: "2vw" }}>
+                  <div className="status-inline-group">
+                    <div className="status-option">
                       <label className="label-radio" htmlFor="opcaoStatusMoto1">
                         ATIVO
                       </label>
@@ -172,7 +172,7 @@ export default function ListMotorcycle() {
                         onChange={() => setSearchInputValue("ATIVO")}
                       />
                     </div>
-                    <div>
+                    <div className="status-option">
                       <label className="label-radio" htmlFor="opcaoStatusMoto2">
                         INATIVO
                       </label>
@@ -185,7 +185,7 @@ export default function ListMotorcycle() {
                         onChange={() => setSearchInputValue("INATIVO")}
                       />
                     </div>
-                  </>
+                  </div>
                 )
               )}
             </div>
