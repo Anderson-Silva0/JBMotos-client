@@ -1,7 +1,7 @@
 'use client';
 
 import Cookies from 'js-cookie';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { decode } from 'jsonwebtoken';
 import { DecodedToken } from '@/middleware';
 import { Chart, LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip } from 'chart.js';
@@ -20,6 +20,46 @@ export default function HomePage() {
   const chartRef = useRef<Chart | null>(null);
 
   const { fetchChartData } = DailyDataChartService();
+
+  const dashboardSummary = useMemo(() => {
+    const safeQuantity = (value: number | null | undefined): number => value ?? 0;
+
+    if (!chartData.length) {
+      return {
+        totalSales: 0,
+        totalRepairs: 0,
+        peakDayLabel: '--/--',
+        peakDayValue: 0,
+        lastUpdateLabel: '--/--',
+      };
+    }
+
+    const totalSales = chartData.reduce((acc, item) => acc + safeQuantity(item.saleQuantity), 0);
+    const totalRepairs = chartData.reduce((acc, item) => acc + safeQuantity(item.repairQuantity), 0);
+
+    const peakDay = [...chartData].sort((a, b) => {
+      const totalA = safeQuantity(a.saleQuantity) + safeQuantity(a.repairQuantity);
+      const totalB = safeQuantity(b.saleQuantity) + safeQuantity(b.repairQuantity);
+      return totalB - totalA;
+    })[0];
+
+    const formatLabel = (dataMillis: number) => {
+      const date = new Date(dataMillis);
+      return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
+    };
+
+    const peakDayLabel = formatLabel(peakDay.dataMillis);
+    const peakDayValue = safeQuantity(peakDay.saleQuantity) + safeQuantity(peakDay.repairQuantity);
+    const lastUpdateLabel = formatLabel(chartData[chartData.length - 1].dataMillis);
+
+    return {
+      totalSales,
+      totalRepairs,
+      peakDayLabel,
+      peakDayValue,
+      lastUpdateLabel,
+    };
+  }, [chartData]);
 
   useEffect(() => {
     const token = Cookies.get('login-token');
@@ -95,6 +135,7 @@ function isMobileViewport(): boolean {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           plugins: {
             title: {
               display: true,
@@ -162,13 +203,43 @@ function isMobileViewport(): boolean {
   }, [chartData]);
 
   return (
-    <div style={{ width: '100%' }}>
-
+    <div className="home-dashboard">
       <WelcomeHeader userName={userName} />
 
-      <div className="chart-container">
-        <canvas id="myChart"></canvas>
-      </div>
+      <section className="dashboard-summary-grid" aria-label="Resumo do desempenho">
+        <article className="summary-card">
+          <p className="summary-label">Vendas no periodo</p>
+          <p className="summary-value">{dashboardSummary.totalSales}</p>
+        </article>
+
+        <article className="summary-card">
+          <p className="summary-label">Servicos no periodo</p>
+          <p className="summary-value">{dashboardSummary.totalRepairs}</p>
+        </article>
+
+        <article className="summary-card">
+          <p className="summary-label">Pico operacional</p>
+          <p className="summary-value">
+            {dashboardSummary.peakDayLabel} <span>{dashboardSummary.peakDayValue} itens</span>
+          </p>
+        </article>
+
+        <article className="summary-card summary-card-highlight">
+          <p className="summary-label">Ultima atualizacao</p>
+          <p className="summary-value">{dashboardSummary.lastUpdateLabel}</p>
+        </article>
+      </section>
+
+      <section className="dashboard-chart-panel" aria-label="Grafico de desempenho mensal">
+        <div className="chart-panel-header">
+          <h2>Visao mensal de vendas e servicos</h2>
+          <p>Comparativo diario para apoio rapido nas decisoes operacionais.</p>
+        </div>
+
+        <div className="chart-container">
+          <canvas id="myChart"></canvas>
+        </div>
+      </section>
     </div>
   );
 }
