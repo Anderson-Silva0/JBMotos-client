@@ -65,7 +65,7 @@ export function PDFGenerator(props: PDFGeneratorProps) {
           startY: 10,
           tableWidth: 110,
 
-          head: [["Orçamento da JB Motos"]],
+          head: [["Orçamento da SERVIPEX"]],
           theme: "striped",
           styles: { halign: "center" },
           margin: { horizontal: 50 },
@@ -79,7 +79,7 @@ export function PDFGenerator(props: PDFGeneratorProps) {
           startY: 10,
           tableWidth: 110,
 
-          head: [["Comprovante de Venda da JB Motos"]],
+          head: [["Comprovante de Venda da SERVIPEX"]],
           theme: "striped",
           styles: { halign: "center" },
           margin: { horizontal: 50 },
@@ -168,10 +168,10 @@ export function PDFGenerator(props: PDFGeneratorProps) {
         });
 
     props.receiptType === ReceiptType.Budget
-      ? doc.save(`orcamento_JBMotos_${getCurrentDateTime(UsageType.Title)}.pdf`)
+      ? doc.save(`orcamento_SERVIPEX_${getCurrentDateTime(UsageType.Title)}.pdf`)
       : props.receiptType === ReceiptType.Receipt &&
         doc.save(
-          `comprovante_venda_JBMotos_${getCurrentDateTime(UsageType.Title)}.pdf`
+          `comprovante_venda_SERVIPEX_${getCurrentDateTime(UsageType.Title)}.pdf`
         );
   };
 

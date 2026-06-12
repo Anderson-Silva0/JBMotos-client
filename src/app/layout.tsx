@@ -5,7 +5,7 @@ import "toastr/build/toastr.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "JB Motos",
+  title: "SERVIPEX",
   description: "Gerenciamento de Oficina Mecânica de Motos",
 };
 

@@ -62,7 +62,7 @@ export default function NavBar() {
     <>
       <header>
         <nav>
-          <Image src={Logo} alt="Logo-JBMotos" priority className="logo" />
+          <Image src={Logo} alt="Logo-SERVIPEX" priority className="logo" />
           <div className="mobile-menu">
             <div className="line1"></div>
             <div className="line2"></div>
