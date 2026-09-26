@@ -30,9 +30,6 @@ yarn-error.log*
 # vercel
 .vercel
 
-# copilot custom agents
-/.github/agents/
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts
