@@ -81,20 +81,18 @@ export default function HomePage() {
 
   }, []);
 
+  function isMobileViewport(): boolean {
+    let viewportIsMobile = false;
+    const MOBILE_MAX_WIDTH_PX = 999;
 
+    if (typeof window != 'undefined') {
+      const mobileBreakpointQuery = `(max-width: ${MOBILE_MAX_WIDTH_PX}px)`;
+      const mediaQueryList = window.matchMedia(mobileBreakpointQuery);
+      viewportIsMobile = mediaQueryList.matches;
+    }
 
-function isMobileViewport(): boolean {
-  let viewportIsMobile = false;
-  const MOBILE_MAX_WIDTH_PX = 999;
-
-  if (typeof window != 'undefined') {
-    const mobileBreakpointQuery = `(max-width: ${MOBILE_MAX_WIDTH_PX}px)`;
-    const mediaQueryList = window.matchMedia(mobileBreakpointQuery);
-    viewportIsMobile = mediaQueryList.matches;
+    return viewportIsMobile;
   }
-
-  return viewportIsMobile;
-}
 
   useEffect(() => {
     const ctx = document.getElementById('myChart') as HTMLCanvasElement;
@@ -208,12 +206,12 @@ function isMobileViewport(): boolean {
 
       <section className="dashboard-summary-grid" aria-label="Resumo do desempenho">
         <article className="summary-card">
-          <p className="summary-label">Vendas no periodo</p>
+          <p className="summary-label">Vendas no período</p>
           <p className="summary-value">{dashboardSummary.totalSales}</p>
         </article>
 
         <article className="summary-card">
-          <p className="summary-label">Servicos no periodo</p>
+          <p className="summary-label">Servicos no período</p>
           <p className="summary-value">{dashboardSummary.totalRepairs}</p>
         </article>
 
@@ -225,15 +223,15 @@ function isMobileViewport(): boolean {
         </article>
 
         <article className="summary-card summary-card-highlight">
-          <p className="summary-label">Ultima atualizacao</p>
+          <p className="summary-label">Última atualização</p>
           <p className="summary-value">{dashboardSummary.lastUpdateLabel}</p>
         </article>
       </section>
 
       <section className="dashboard-chart-panel" aria-label="Grafico de desempenho mensal">
         <div className="chart-panel-header">
-          <h2>Visao mensal de vendas e servicos</h2>
-          <p>Comparativo diario para apoio rapido nas decisoes operacionais.</p>
+          <h2>Visão mensal de vendas e serviços</h2>
+          <p>Comparativo diário para apoio rápido nas decisões operacionais.</p>
         </div>
 
         <div className="chart-container">
